@@ -1,0 +1,61 @@
+.full-width {
+  float: left;
+  width: 100%;
+}
+
+#components-layout-demo-top-side-2 .logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.ant-row-rtl #components-layout-demo-top-side-2 .logo {
+  float: right;
+  margin: 16px 0 16px 24px;
+}
+
+.site-layout-background {
+  background: #fff;
+}
+
+.leftSidebarMenu {
+  a {
+    color: #888;
+  }
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.videoTitle {
+  font-size: 18px;
+  font-weight: bold;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.publishedDate {
+  color: #777;
+  font-size: 14px;
+}
+
+.videoDuration {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  background-color: rgba(0,0,0,0.6);
+  line-height: 1;
+  padding: 3px 5px;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+
+}

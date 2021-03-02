@@ -9,11 +9,12 @@
     "antd": "^4.12.3",
     "axios": "^0.21.1",
     "framer-motion": "^3.7.0",
+    "node-sass": "^5.0.0",
     "qs": "^6.9.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.2",
-    "sass": "^1.32.8",
+    "uppy": "^1.25.2",
     "web-vitals": "^1.0.1"
   },
   "scripts": {

@@ -23,13 +23,16 @@ const App = (props) => {
 
   const onSubmit = (val) => {
     console.log("Values from App.jsx - ", val);
+    sessionStorage.setItem("token", val.token);
+    setToken(val.token);
+    setSignedIn(true);
   };
 
   useEffect((prev) => {});
 
   if (signedIn) {
     return (
-      <Context.Provider value={[token, apiUrl]}>
+      <Context.Provider value={{ token, apiUrl }}>
         <AdminModule />
       </Context.Provider>
     );

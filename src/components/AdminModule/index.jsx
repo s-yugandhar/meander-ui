@@ -63,7 +63,7 @@ const AdminModule = () => {
           </Col>
         </Row>
       </Header>
-      <Layout>
+      <Layout style={{ paddingBottom: "50px" }}>
         <SideNav updateTab={(tab) => setSelectedTab(tab)} />
         {content[selectedTab] ||
           "You do not have permissions to view this module"}

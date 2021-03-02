@@ -13,7 +13,6 @@ import {
 } from "antd";
 import axios from "axios";
 import qs from "qs";
-import { motion } from "framer-motion";
 
 import { url } from "../src/components/API";
 
@@ -38,11 +37,13 @@ const Login = (props) => {
     };
 
     const loginBody = qs.stringify({
-      username: values.email,
+      email: values.email,
       password: values.password,
     });
 
-    axios
+    props.onSubmit({ token: "sadf233ddws" });
+
+    /* axios
       .post(url + "/token", loginBody, loginHeaders)
       .then((loginRes) => {
         console.log(loginRes);
@@ -56,7 +57,7 @@ const Login = (props) => {
         setTimeout(() => {
           setCommonError("");
         }, 5000);
-      });
+      }); */
   };
 
   if (signup) {
@@ -89,7 +90,7 @@ const Login = (props) => {
                   { required: true, message: "Please enter your email!" },
                 ]}
               >
-                <Input />
+                <Input value="abcd@abcd.com" />
               </Form.Item>
               <Form.Item
                 label="Email"
@@ -102,7 +103,7 @@ const Login = (props) => {
                   },
                 ]}
               >
-                <Input />
+                <Input value="" name="signupEmail" id="signupEmail" />
               </Form.Item>
 
               <Form.Item
@@ -116,7 +117,11 @@ const Login = (props) => {
                   },
                 ]}
               >
-                <Input.Password />
+                <Input
+                  type="password"
+                  name="signupPassword"
+                  id="signupPassword"
+                />
               </Form.Item>
 
               <Form.Item>
@@ -156,7 +161,7 @@ const Login = (props) => {
           <Row>
             <Title level={3}>Login</Title>
           </Row>
-          <motion.div style={{ width: "460px" }}>
+          <div style={{ width: "460px" }}>
             <Card>
               {commonError ? (
                 <Row justify="center">
@@ -165,10 +170,18 @@ const Login = (props) => {
                   </Text>
                 </Row>
               ) : null}
-              <Form name="basic" onFinish={setSignedIn} layout="vertical">
+              <Form
+                name="basic"
+                initialValues={{
+                  loginEmail: "abcd@abcd.com",
+                  loginPassword: "asdfASDF@#343",
+                }}
+                onFinish={setSignedIn}
+                layout="vertical"
+              >
                 <Form.Item
                   label="Email"
-                  name="email"
+                  name="loginEmail"
                   rules={[
                     {
                       type: "email",
@@ -177,12 +190,17 @@ const Login = (props) => {
                     },
                   ]}
                 >
-                  <Input />
+                  <Input
+                    type="email"
+                    value=""
+                    name="loginEmail"
+                    id="loginEmail"
+                  />
                 </Form.Item>
 
                 <Form.Item
                   label="Password"
-                  name="password"
+                  name="loginPassword"
                   rules={[
                     {
                       required: true,
@@ -190,7 +208,12 @@ const Login = (props) => {
                     },
                   ]}
                 >
-                  <Input.Password />
+                  <Input
+                    type="password"
+                    value=""
+                    name="loginPassword"
+                    id="loginPassword"
+                  />
                 </Form.Item>
 
                 <Form.Item name="remember" valuePropName="checked">
@@ -208,7 +231,7 @@ const Login = (props) => {
                 </Form.Item>
               </Form>
             </Card>
-          </motion.div>{" "}
+          </div>{" "}
           <Row align="middle" style={{ marginTop: "20px" }}>
             <Col>
               <Title level={5}>

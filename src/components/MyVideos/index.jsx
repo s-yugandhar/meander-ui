@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { PlusCircleFilled, CloudUploadOutlined } from "@ant-design/icons";
 
 import {
   Layout,
@@ -16,6 +18,7 @@ import {
   Image,
   Card,
   Typography,
+  Tooltip,
 } from "antd";
 import {
   EditOutlined,
@@ -23,6 +26,8 @@ import {
   LinkOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import VideoCard from "../Shared/VideoCard";
+import "../MyVideos/MyVideos.scss";
 
 const MyVideos = ({ updateTab }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -32,7 +37,27 @@ const MyVideos = ({ updateTab }) => {
   const { Paragraph, Text } = Typography;
 
   const [ellipsis, setEllipsis] = useState(true);
-  const [addVideo, setAddvideo] = useState(false);
+  const [addVideo, setAddvideo] = useState("");
+
+  const container = {
+    hidden: { opacity: 0, y: 5 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 5 },
+    show: { opacity: 1, y: 0 },
+  };
+
+  useEffect(() => {
+    updateTab = addVideo;
+  });
 
   return (
     <Layout style={{ padding: "24px" }}>
@@ -69,184 +94,77 @@ const MyVideos = ({ updateTab }) => {
           </Col>
         </Row>
         <Divider orientation="left"></Divider>
-        <Row gutter={[16, 16]}>
-          <Col span={6}>
-            <Card
-              bordered={true}
-              hoverable
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-              actions={[
-                <DeleteOutlined key="delete" />,
-                <EditOutlined key="edit" />,
-                <LinkOutlined key="embed" />,
-              ]}
-            >
-              <div className="videoDuration">10:00</div>
-              <div className="videoInfoBlock">
-                <div className="videoTitle">
-                  Video title runs here like this and if extend looks like this
-                </div>
-                <div className="publishedDate">12th Jan, 2021</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card
-              bordered={true}
-              hoverable
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-              actions={[
-                <DeleteOutlined key="delete" />,
-                <EditOutlined key="edit" />,
-                <LinkOutlined key="embed" />,
-              ]}
-            >
-              <div className="videoDuration">10:00</div>
-              <div className="videoInfoBlock">
-                <div className="videoTitle">
-                  Video title runs here like this and if extend looks like this
-                </div>
-                <div className="publishedDate">12th Jan, 2021</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card
-              bordered={true}
-              hoverable
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-              actions={[
-                <DeleteOutlined key="delete" />,
-                <EditOutlined key="edit" />,
-                <LinkOutlined key="embed" />,
-              ]}
-            >
-              <div className="videoDuration">10:00</div>
-              <div className="videoInfoBlock">
-                <div className="videoTitle">
-                  Video title runs here like this and if extend looks like this
-                </div>
-                <div className="publishedDate">12th Jan, 2021</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card
-              bordered={true}
-              hoverable
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-              actions={[
-                <DeleteOutlined key="delete" />,
-                <EditOutlined key="edit" />,
-                <LinkOutlined key="embed" />,
-              ]}
-            >
-              <div className="videoDuration">10:00</div>
-              <div className="videoInfoBlock">
-                <div className="videoTitle">
-                  Video title runs here like this and if extend looks like this
-                </div>
-                <div className="publishedDate">12th Jan, 2021</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card
-              bordered={true}
-              hoverable
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-              actions={[
-                <DeleteOutlined key="delete" />,
-                <EditOutlined key="edit" />,
-                <LinkOutlined key="embed" />,
-              ]}
-            >
-              <div className="videoDuration">10:00</div>
-              <div className="videoInfoBlock">
-                <div className="videoTitle">
-                  Video title runs here like this and if extend looks like this
-                </div>
-                <div className="publishedDate">12th Jan, 2021</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card
-              bordered={true}
-              hoverable
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-              actions={[
-                <DeleteOutlined key="delete" />,
-                <EditOutlined key="edit" />,
-                <LinkOutlined key="embed" />,
-              ]}
-            >
-              <div className="videoDuration">10:00</div>
-              <div className="videoInfoBlock">
-                <div className="videoTitle">
-                  Video title runs here like this and if extend looks like this
-                </div>
-                <div className="publishedDate">12th Jan, 2021</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card
-              bordered={true}
-              hoverable
-              cover={
-                <img
-                  alt="example"
-                  src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-                />
-              }
-              actions={[
-                <DeleteOutlined key="delete" />,
-                <EditOutlined key="edit" />,
-                <LinkOutlined key="embed" />,
-              ]}
-            >
-              <div className="videoDuration">10:00</div>
-              <div className="videoInfoBlock">
-                <div className="videoTitle">
-                  Video title runs here like this and if extend looks like this
-                </div>
-                <div className="publishedDate">12th Jan, 2021</div>
-              </div>
-            </Card>
-          </Col>
-        </Row>
+        <motion.div
+          className="ant-row"
+          variants={container}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+          <motion.div className="ant-col-6 eachVideo" variants={item}>
+            <VideoCard />
+          </motion.div>
+        </motion.div>
       </Content>
+      <Tooltip placement="left" title="Upload New Video">
+        <Button
+          type="button"
+          onClick={() => updateTab("add-video")}
+          className="floating-btn add-new-video-btn"
+        >
+          <CloudUploadOutlined key="add-video" />
+        </Button>
+      </Tooltip>
     </Layout>
   );
 };

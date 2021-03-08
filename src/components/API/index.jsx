@@ -1,1 +1,1 @@
-export const url = "http://bright-yak-28.loca.lt";
+export const url = "http://188.42.97.42:8000";

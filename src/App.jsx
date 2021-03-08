@@ -5,7 +5,7 @@ import "./App.scss";
 
 import AdminModule from "./components/AdminModule";
 
-import { Context } from "./context";
+import { Context, AuthContext } from "./context";
 import Login from "./Login";
 
 const App = (props) => {
@@ -18,23 +18,38 @@ const App = (props) => {
 
   const [signedIn, setSignedIn] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState();
+  const [auth, setAuth] = useState({ token: localStorage.getItem('token'), userId: localStorage.getItem('userId') });
   const { Header, Footer, Content } = Layout;
 
   const onSubmit = (val) => {
     console.log("Values from App.jsx - ", val);
-    sessionStorage.setItem("token", val.token);
-    setToken(val.token);
-    setSignedIn(true);
+    localStorage.setItem("token", val.token);
+    localStorage.setItem('userId', val.userId);
+    setAuth({
+      token: val.token,
+      userId: val.userId
+    });
+
   };
 
-  useEffect((prev) => {});
+
+  useEffect((prev) => {
+
+    if (auth.token) {
+      setSignedIn(true);
+    } else {
+      setSignedIn(false);
+    }
+
+  }, [auth]);
 
   if (signedIn) {
     return (
-      <Context.Provider value={{ token, apiUrl }}>
-        <AdminModule />
-      </Context.Provider>
+      <AuthContext.Provider value={{ token: auth.token, userId: auth.userId }}>
+        <Context.Provider value={{ apiUrl }}>
+          <AdminModule />
+        </Context.Provider>
+      </AuthContext.Provider>
     );
   } else {
     return <Login onSubmit={onSubmit} />;

@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Web site created using create-react-app" />
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <!-- <link href="https://releases.transloadit.com/uppy/v1.25.2/uppy.min.css" rel="stylesheet"> -->
   <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -38,6 +39,86 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+  <div id="drag-drop-area"></div>
+  <div id="drag-drop-area-two"></div>
+
+  <script src="https://releases.transloadit.com/uppy/v1.25.2/uppy.min.js"></script>
+  <script>
+    var cUrl = "http://182.142.97.42:8000/";
+    var nodecUrl = "http://182.142.97.42:3020";
+    var uppy = new Uppy.Core({
+      meta: { userId: "369", foldername: "please", Bucket: "bucket-369" },
+      debug: true, autoProceed: false,
+      restrictions: { maxNumberOfFiles: 3, allowedFileTypes: ['*/*', 'video/*'] }
+    }).use(Uppy.Dashboard, {
+      inline: true, target: '#drag-drop-area', replaceTargetContent: true,
+      showProgressDetails: true, height: 470,
+      metaFields: [{ id: 'name', name: 'Name', placeholder: 'file name' },
+      { id: 'caption', name: 'Caption', placeholder: 'describe what the image is about' }],
+      browserBackButtonClose: false
+    })
+      .use(Uppy.GoogleDrive, { target: Uppy.Dashboard, companionUrl: nodecUrl })
+      .use(Uppy.Dropbox, { target: Uppy.Dashboard, companionUrl: nodecUrl })
+      .use(Uppy.Instagram, { target: Uppy.Dashboard, companionUrl: nodecUrl })
+      .use(Uppy.Facebook, { target: Uppy.Dashboard, companionUrl: nodecUrl })
+      .use(Uppy.OneDrive, { target: Uppy.Dashboard, companionUrl: nodecUrl })
+      .use(Uppy.AwsS3, {
+        getUploadParameters(file) {
+          return fetch('/presignurls3?id=369&methodname=PUT&objectname=please/' + file.name + '&mimetype=' + file.type + '&expirydays=1',
+            {
+              method: 'get', headers: { accept: 'application/json', 'content-type': 'application/json' },
+              /*body: JSON.stringify({    filename: file.name,   contentType: file.type   })*/
+            }).then((response) => { return response.json(); })
+        }
+      })
+
+
+
+    var uppy2 = new Uppy.Core({
+      meta: { userId: "369", foldername: "please", Bucket: "bucket-369" },
+      debug: true, autoProceed: false,
+      restrictions: { maxNumberOfFiles: 3, allowedFileTypes: ['*/*', 'video/*'] }
+    }).use(Uppy.Dashboard, {
+      inline: true, target: '#drag-drop-area-two', replaceTargetContent: true,
+      showProgressDetails: true, height: 470,
+      metaFields: [{ id: 'name', name: 'Name', placeholder: 'file name' },
+      { id: 'caption', name: 'Caption', placeholder: 'describe what the image is about' }],
+      browserBackButtonClose: false
+    }).use(Uppy.Webcam, { target: '#drag-drop-area-two' })
+      .use(Uppy.ScreenCapture, { target: Uppy.Dashboard })
+      .use(Uppy.ImageEditor, { target: Uppy.Dashboard })
+      .use(Uppy.AwsS3Multipart,
+        {
+          limit: 3, companionUrl: cUrl,
+          getChunkSize(file) {
+            var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
+            return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
+          }
+        })
+
+    /*.use(Uppy.Tus, {
+        endpoint: 'https://tusd.tusdemo.net/files', // use your tus endpoint here
+        chunksize : 5*1024*1024-5,
+        resume: true,
+        retryDelays: [0, 1000, 3000, 5000]
+      })*/
+
+
+    uppy.on('complete', result => {
+      console.log('successful files:', result.successful)
+      console.log('failed files:', result.failed)
+    })
+
+    uppy2.on('complete', result => {
+      console.log('successful files:', result.successful)
+      console.log('failed files:', result.failed)
+    })
+
+  </script>
+
+
+
   <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
   <script>
     WebFont.load({
@@ -46,6 +127,7 @@
       }
     });
   </script>
+
 </body>
 
 </html>

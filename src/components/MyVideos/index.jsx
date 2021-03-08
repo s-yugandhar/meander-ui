@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
+import axios from 'axios';
 import { PlusCircleFilled, CloudUploadOutlined } from "@ant-design/icons";
 
 import {
@@ -28,8 +29,11 @@ import {
 } from "@ant-design/icons";
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
+import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
+import { url } from "../API/index";
+import { AuthContext } from '../../context';
 
-const MyVideos = ({ updateTab }) => {
+const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
   const { SubMenu } = Menu;
   const { Search } = Input;
@@ -38,6 +42,8 @@ const MyVideos = ({ updateTab }) => {
 
   const [ellipsis, setEllipsis] = useState(true);
   const [addVideo, setAddvideo] = useState("");
+
+  const auth = useContext(AuthContext);
 
   const container = {
     hidden: { opacity: 0, y: 5 },
@@ -57,6 +63,15 @@ const MyVideos = ({ updateTab }) => {
 
   useEffect(() => {
     updateTab = addVideo;
+    console.log('All Videos updateTab - ', updateTab);
+
+    axios.post(url + '/list_objects?id=5&recursive=true', null, {
+      headers: {
+        accept: 'application/json'
+      }
+    })
+
+
   });
 
   return (
@@ -100,71 +115,11 @@ const MyVideos = ({ updateTab }) => {
           initial="hidden"
           animate="show"
         >
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
-          <motion.div className="ant-col-6 eachVideo" variants={item}>
+          <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
             <VideoCard />
           </motion.div>
         </motion.div>
       </Content>
-      <Tooltip placement="left" title="Upload New Video">
-        <Button
-          type="button"
-          onClick={() => updateTab("add-video")}
-          className="floating-btn add-new-video-btn"
-        >
-          <CloudUploadOutlined key="add-video" />
-        </Button>
-      </Tooltip>
     </Layout>
   );
 };

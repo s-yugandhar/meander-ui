@@ -5,4 +5,13 @@ import { createContext } from "react";
   apiUrl: "",
 }); */
 
-export const Context = createContext();
+export const Context = createContext({
+  apiUrl: '',
+  uploadVideo: false
+});
+
+
+export const AuthContext = createContext({
+  token: null,
+  userId: null,
+})

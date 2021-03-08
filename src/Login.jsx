@@ -10,6 +10,7 @@ import {
   Typography,
   Row,
   Col,
+  Icon
 } from "antd";
 import axios from "axios";
 import qs from "qs";
@@ -22,33 +23,48 @@ const Login = (props) => {
   const [signup, setSignup] = useState(false);
   const [commonError, setCommonError] = useState("");
 
-  const phoneRegex = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  const passwordRegEx = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[a-zA-Z!#$%&? "])[a-zA-Z0-9!#$%&?]{8,20}$/;
 
-  const signUpPassword = (rule, value, callback) => {};
+  /* const signUpPassword = (rule, value, callback) => { }; */
+  const loginHeaders = {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Accept: "application/json",
+    },
+  };
+
 
   const setSignedIn = (values) => {
     console.log(values);
 
-    const loginHeaders = {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json",
-      },
-    };
 
-    const loginBody = qs.stringify({
-      email: values.email,
-      password: values.password,
+
+    const loginBody = JSON.stringify({
+      username: values.signupName,
+      email: values.signupEmail,
+      password: values.signupPassword,
     });
 
-    props.onSubmit({ token: "sadf233ddws" });
+    /* props.onSubmit({ token: "sadf233ddws" }); */
 
-    /* axios
-      .post(url + "/token", loginBody, loginHeaders)
-      .then((loginRes) => {
-        console.log(loginRes);
-        localStorage.setItem("token", loginRes.data.access_token);
-        props.onSubmit({ token: loginRes.data.access_token });
+    const signupHeader = {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      }
+    }
+
+
+    axios
+      .post(url + "/signup", loginBody, signupHeader)
+      .then((signupRes) => {
+        console.log('Signup Res - ', signupRes);
+
+        loginNow({
+          loginEmail: values.signupEmail,
+          loginPassword: values.signupPassword
+        });
+
       })
       .catch((err) => {
         console.log("Login Error - ", err);
@@ -57,8 +73,30 @@ const Login = (props) => {
         setTimeout(() => {
           setCommonError("");
         }, 5000);
-      }); */
+      });
   };
+
+  const loginNow = (values) => {
+    const loginBody = qs.stringify({
+      email: values.loginEmail,
+      password: values.loginPassword,
+    });
+    axios
+      .post(url + "/token", loginBody, loginHeaders)
+      .then((loginRes) => {
+        console.log('Login Res - ', loginRes);
+        //sessionStorage.setItem("token", loginRes.data.access_token);
+        props.onSubmit({ token: loginRes.data.access_token, userId: loginRes.data.id });
+      })
+      .catch((err) => {
+        console.log("Login Error - ", err);
+        setCommonError("Account not found");
+
+        setTimeout(() => {
+          setCommonError("");
+        }, 5000);
+      });
+  }
 
   if (signup) {
     return (
@@ -79,49 +117,46 @@ const Login = (props) => {
           <Card style={{ width: 400 }}>
             <Form
               name="basic"
-              initialValues={{ remember: true }}
+              initialValues={{ signupName: '', signupEmail: '', signupPassword: '' }}
               onFinish={setSignedIn}
               layout="vertical"
             >
               <Form.Item
                 label="Name"
-                name="name"
+                name="signupName"
                 rules={[
                   { required: true, message: "Please enter your email!" },
                 ]}
               >
-                <Input value="abcd@abcd.com" />
+                <Input />
               </Form.Item>
               <Form.Item
                 label="Email"
-                name="email"
+                name="signupEmail"
                 rules={[
                   {
-                    type: "email",
                     required: true,
-                    message: "Please enter your email!",
+                    message: "Please enter correct email!",
                   },
                 ]}
               >
-                <Input value="" name="signupEmail" id="signupEmail" />
+                <Input type="email" />
               </Form.Item>
 
               <Form.Item
                 label="Password"
-                name="password"
+                name="signupPassword"
                 rules={[
                   {
-                    validator: signUpPassword,
                     required: true,
-                    message: "Please enter your password!",
-                  },
+                    message: 'Channel ID is required',
+                  }, {
+                    pattern: /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+                    message: 'Please enter minimum 8 letter password, with at least a symbol, upper and lower case letters and a number ',
+                  }
                 ]}
               >
-                <Input
-                  type="password"
-                  name="signupPassword"
-                  id="signupPassword"
-                />
+                <Input.Password name="signupPassword" id="signupPassword" />
               </Form.Item>
 
               <Form.Item>
@@ -147,6 +182,7 @@ const Login = (props) => {
     );
   } else {
     return (
+
       <Layout style={{ minHeight: "100vh" }}>
         <Content
           style={{
@@ -173,10 +209,10 @@ const Login = (props) => {
               <Form
                 name="basic"
                 initialValues={{
-                  loginEmail: "abcd@abcd.com",
-                  loginPassword: "asdfASDF@#343",
+                  loginEmail: "",
+                  loginPassword: "",
                 }}
-                onFinish={setSignedIn}
+                onFinish={loginNow}
                 layout="vertical"
               >
                 <Form.Item
@@ -191,10 +227,6 @@ const Login = (props) => {
                   ]}
                 >
                   <Input
-                    type="email"
-                    value=""
-                    name="loginEmail"
-                    id="loginEmail"
                   />
                 </Form.Item>
 
@@ -208,17 +240,12 @@ const Login = (props) => {
                     },
                   ]}
                 >
-                  <Input
-                    type="password"
-                    value=""
-                    name="loginPassword"
-                    id="loginPassword"
-                  />
+                  <Input.Password />
                 </Form.Item>
 
-                <Form.Item name="remember" valuePropName="checked">
+                {/* <Form.Item name="remember" valuePropName="checked">
                   <Checkbox>Remember me</Checkbox>
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item style={{ textAlign: "center" }}>
                   <Button
                     type="primary"

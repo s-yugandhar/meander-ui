@@ -1,27 +1,56 @@
+@import "../../assets/styles/mixins";
+
 .upload-blocks {
-   position: relative;
+  position: relative;
 }
 
 .each-upload-block {
-   width: 100%;
-   border: 1px dashed #ddd;
-   height: 200px;
-   position: relative;
-   margin-bottom: 16px;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   flex-wrap: wrap;
+  width: 100%;
+  border: 1px dashed #ddd;
+  height: 200px;
+  position: relative;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 
-   .upload-btn {
-      width: 230px;
-   }
+  .upload-btn {
+    width: 230px;
+  }
 }
 
 .infoBlock {
-   font-size: 13px;
-   color: #777;
-   font-style: italic;
-   line-height: 1.7;
-   text-align: center;
+  font-size: 13px;
+  color: #777;
+  font-style: italic;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.videoUpload {
+  height: 300px;
+  position: relative;
+
+  > div {
+    height: 100%;
+    position: relative;
+  }
+}
+
+.uploadThumbnailBlock {
+  margin-top: 30px;
+
+  .imageUpload {
+    border: 1px dashed #ddd;
+    border-radius: 3px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @include bp(lg) {
+    margin-top: 0;
+  }
 }

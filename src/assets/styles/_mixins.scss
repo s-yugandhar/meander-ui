@@ -1,0 +1,60 @@
+:root {
+
+}
+
+@mixin bp($point) {
+  $sm: "(min-width: 576px)";
+  $md: "(min-width: 768px)";
+  $lg: "(min-width: 992px)";
+  $xl: "(max-width: 1200px)";
+  $xxl: "(max-width: 1600px)";
+
+  @if $point == lg {
+    @media #{$lg} {
+      @content;
+    }
+  } @else if $point == xl {
+    @media #{$xl} {
+      @content;
+    }
+  } @else if $point == md {
+    @media #{$md} {
+      @content;
+    }
+  } @else if $point == sm {
+    @media #{$sm} {
+      @content;
+    }
+  }
+}
+
+@mixin full-width {
+  float: left;
+  width: 100%;
+}
+
+@mixin scrollbars(
+  $size,
+  $foreground-color,
+  $background-color: mix($foreground-color, white, 50%)
+) {
+  // For Google Chrome
+  &::-webkit-scrollbar {
+    width: $size;
+    height: $size;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $foreground-color;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $background-color;
+  }
+
+  // For Internet Explorer
+  & {
+    scrollbar-face-color: $foreground-color;
+    scrollbar-track-color: $background-color;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Layout,
   Menu,
@@ -8,49 +8,112 @@ import {
   Form,
   Input,
   notification,
+  Alert,
 } from "antd";
 import {
   PlusCircleFilled,
   FolderAddOutlined,
   CheckCircleOutlined,
+  FolderOutlined,
 } from "@ant-design/icons";
 
-const SideNav = ({ updateTab }) => {
-  const [selectedKeys, setSelectedKeys] = useState([]);
+import axios from "axios";
+
+import { url } from '../API/index';
+import { AuthContext, Context } from '../../context';
+
+const SideNav = ({ updateTab, openUploadVideo }) => {
+  const [selectedKeys, setSelectedKeys] = useState(['my-videos']);
+  const [errMsg, setErrMsg] = useState(null);
   /* const [api, contextHolder] = notification.useNotification(); */
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [folderSubmitBtn, setFolderSubmitBtn] = useState(false);
+  const [folders, setFolders] = useState([]);
 
   const { Sider } = Layout;
   const { SubMenu } = Menu;
+
+  const context = useContext(Context);
+  const auth = useContext(AuthContext);
 
   const showCreateFolder = () => {
     setIsModalVisible(true);
   };
 
   const createNewFolder = (value) => {
-    setIsModalVisible(false);
-    notification.open({
-      message: `Successfully created`,
-      description: `Successfully ${value.folderName} created`,
-      icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
+    console.log(auth);
+    setFolderSubmitBtn(true);
+    axios.post(url + '/create_folder?id=' + auth.userId + '&foldername=' + value.folderName, null, {
+      headers: {
+        accept: 'application/json'
+      }
+    }).then(res => {
+      console.log('Create Folder Res - ', res);
+
+      if (res.data.status_code === 200) {
+        setErrMsg(res.data.detail);
+        setFolderSubmitBtn(false);
+      } else {
+        setIsModalVisible(false);
+        notification.open({
+          message: `Successfully created`,
+          description: `Successfully ${value.folderName} created`,
+          icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
+        });
+        updateTab('my-videos');
+        setErrMsg(null);
+      }
+
+    }).catch(err => {
+
     });
+
+
   };
+
+  const createFolderModalClose = () => {
+    setIsModalVisible(false);
+    setErrMsg(null);
+  }
+
+  const getFolders = () => {
+    axios.post(url + '/list_objects?id=' + auth.userId + '&recursive=true', null, {
+      headers: {
+        accept: 'application/json',
+      }
+    }).then(res => {
+      console.log(res.data);
+      let tempFolders = [];
+      res.data.map(Ob => {
+        if (Ob._object_name.includes('temp.dod')) {
+          tempFolders.push(Ob._object_name);
+        }
+      });
+      setFolders(tempFolders);
+    })
+
+
+  }
+
+  useEffect(() => {
+    getFolders();
+  }, []);
 
   return (
     <>
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
-          defaultSelectedKeys={["my-videos"]}
+          defaultOpenKeys={['my-videos-submenu']}
           selectedKeys={selectedKeys}
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}
           style={{ height: "100%", borderRight: 0 }}
         >
-          {/* <Menu.Item key="my-videos" onClick={() => updateTab("my-videos")}>
-            My Videos
-          </Menu.Item> */}
-          <SubMenu key="sub1" title="My Videos">
-            <Menu.Item key="cf" style={{ paddingLeft: 0, textAlign: "center" }}>
+          <SubMenu key="my-videos-submenu" title="My Videos">
+
+            <Menu.Item key="my-videos" onClick={() => updateTab("my-videos")}>All Videos</Menu.Item>
+
+            <Menu.Item disabled={true} key="cf" style={{ paddingLeft: '0 !important', textAlign: "center", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Button
                 type="primary"
                 shape="round"
@@ -61,19 +124,36 @@ const SideNav = ({ updateTab }) => {
                 Create Folder
               </Button>
             </Menu.Item>
-            <Menu.Item key="folder-1">Folder 1</Menu.Item>
-            <Menu.Item key="folder-2">Folder 2</Menu.Item>
+
+
+            {folders.map((folder, index) => {
+              return (
+                <Menu.Item key={index} onClick="" title={folder.replace('temp.dod', '')}>
+                  <FolderOutlined /> {folder.split('/')[0]}
+
+                </Menu.Item>
+              )
+
+            }
+            )}
+
+
+
+
+
           </SubMenu>
-          <Menu.Item key="add-videos" onClick={() => updateTab("add-video")}>
+          <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
             Add Video
           </Menu.Item>
+
         </Menu>
       </Sider>
       <Modal
         title="Create New Folder"
+        destroyOnClose={true}
         visible={isModalVisible}
         onOk=""
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={createFolderModalClose}
         footer={null}
       >
         <Form
@@ -82,22 +162,27 @@ const SideNav = ({ updateTab }) => {
           onFinish={createNewFolder}
           layout="vertical"
         >
+          {errMsg ? <Alert message={errMsg} closable
+            onClose={() => setErrMsg(null)} type="error" style={{ marginBottom: '20px' }} /> : null}
           <Form.Item
             label="Folder Name"
             name="folderName"
             rules={[
               {
-                type: "string",
                 required: true,
-                message: "Please enter any name!",
+                message: 'Please enter any name!',
+              }, {
+                pattern: /^[A-Za-z0-9 ]+$/,
+                message: 'Special characters are not allowed',
               },
+              { max: 35, message: 'Maximum 35 characters' },
             ]}
           >
-            <Input value="" type="text" name="folderName" id="folderName" />
+            <Input />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" size="large">
+            <Button type="primary" htmlType="submit" size="large" disabled={folderSubmitBtn}>
               Create Folder
             </Button>
           </Form.Item>

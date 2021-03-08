@@ -1,3 +1,5 @@
+@import "./assets/styles/common";
+
 .full-width {
   float: left;
   width: 100%;
@@ -46,20 +48,6 @@
   font-size: 14px;
 }
 
-.videoDuration {
-  position: absolute;
-  right: 10px;
-  top: 5px;
-  background-color: rgba(0,0,0,0.6);
-  line-height: 1;
-  padding: 3px 5px;
-  border-radius: 4px;
-  color: white;
-  font-size: 12px;
-  font-weight: 500;
-
-}
-
 .floating-btn {
   font-size: 30px;
   position: fixed;
@@ -91,4 +79,116 @@
   }
 }
 
-@import 'assets/styles/mixins';
+@import "assets/styles/mixins";
+
+.cardVideo {
+  position: relative;
+  height: 100%;
+  min-height: 240px;
+  .ant-card-body {
+    padding: 0;
+  }
+}
+
+.videoCardBlock {
+  float: left;
+  width: 100%;
+  position: relative;
+
+  .videoDuration {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    line-height: 1;
+    padding: 3px 5px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .videoCardInfoBlock {
+    float: left;
+    width: 100%;
+    padding: 15px;
+  }
+
+  .videoInfoImageBlock {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    float: left;
+    width: 100%;
+
+    img {
+      width: 100%;
+    }
+  }
+}
+
+.cardFolder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* .folderCardBlock {
+    text-align: center;
+    padding-top: 45px;
+    padding-bottom: 45px;
+  } */
+}
+
+.folderBtn {
+  float: left;
+  width: 100%;
+  height: auto;
+  border: none;
+  box-shadow: none;
+
+  .folderIcon {
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    .fodlerIcon {
+      transform: scale(1.3);
+    }
+  }
+}
+
+.folderIcon {
+  font-size: 70px;
+  color: #29b6f6;
+}
+
+.folderTitle {
+  text-align: center;
+}
+
+.folderInfo {
+  text-align: center;
+}
+
+.floatingFolderOptions {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 0;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .folderDropDownIcon {
+    color: #666;
+    font-size: 24px;
+  }
+}
+
+.delete-folder-btn {
+  color: #e64a19;
+}

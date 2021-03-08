@@ -7,24 +7,28 @@ const VideoCard = (props) => {
     <Card
       bordered={true}
       hoverable
-      cover={
-        <img
-          alt="example"
-          src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
-        />
-      }
       actions={[
         <DeleteOutlined key="delete" />,
         <EditOutlined key="edit" />,
         <LinkOutlined key="embed" />,
       ]}
+      className="cardVideo"
     >
-      <div className="videoDuration">10:00</div>
-      <div className="videoInfoBlock">
-        <div className="videoTitle">
-          Video title runs here like this and if extend looks like this
+
+      <div className="videoCardBlock">
+        <div className="videoDuration">10:00</div>
+        <div className="videoInfoImageBlock" style={{ backgroundImage: 'url("https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png")' }}>
+          {/* <img
+            alt="example"
+            src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+          /> */}
         </div>
-        <div className="publishedDate">12th Jan, 2021</div>
+        <div className="videoCardInfoBlock">
+          <div className="videoTitle">
+            Video title runs here like this and if extend looks like this
+        </div>
+          <div className="publishedDate">12th Jan, 2021</div>
+        </div>
       </div>
     </Card>
   );

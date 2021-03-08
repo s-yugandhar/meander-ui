@@ -33,7 +33,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   const { Sider } = Layout;
   const { SubMenu } = Menu;
 
-  const context = useContext(Context);
+
   const auth = useContext(AuthContext);
 
   const showCreateFolder = () => {
@@ -113,13 +113,14 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
 
             <Menu.Item key="my-videos" onClick={() => updateTab("my-videos")}>All Videos</Menu.Item>
 
-            <Menu.Item disabled={true} key="cf" style={{ paddingLeft: '0 !important', textAlign: "center", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Menu.Item disabled={true} className="createFolderMenuItem" key="cf">
               <Button
                 type="primary"
                 shape="round"
-                icon={<FolderAddOutlined />}
+                icon={<FolderAddOutlined className="createFolderBtnIcon" />}
                 size="middle"
                 onClick={showCreateFolder}
+                className="createFolderBtn"
               >
                 Create Folder
               </Button>
@@ -128,9 +129,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
 
             {folders.map((folder, index) => {
               return (
-                <Menu.Item key={index} onClick="" title={folder.replace('temp.dod', '')}>
+                <Menu.Item key={'folder-' + index} onClick="" title={folder.replace('temp.dod', '')}>
                   <FolderOutlined /> {folder.split('/')[0]}
-
                 </Menu.Item>
               )
 

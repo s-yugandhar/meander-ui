@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
 import axios from 'axios';
-import { PlusCircleFilled, CloudUploadOutlined } from "@ant-design/icons";
 
 import {
   Layout,
@@ -32,6 +31,8 @@ import "../MyVideos/MyVideos.scss";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import { url } from "../API/index";
 import { AuthContext } from '../../context';
+import FolderCard from "../Shared/FolderCard";
+import Loading from "../Loading";
 
 const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -42,6 +43,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const [ellipsis, setEllipsis] = useState(true);
   const [addVideo, setAddvideo] = useState("");
+  const [folders, setFolders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const auth = useContext(AuthContext);
 
@@ -51,7 +54,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
       opacity: 1,
       y: 0,
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren: 0.2,
       },
     },
   };
@@ -61,18 +64,36 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     show: { opacity: 1, y: 0 },
   };
 
-  useEffect(() => {
-    updateTab = addVideo;
-    console.log('All Videos updateTab - ', updateTab);
-
-    axios.post(url + '/list_objects?id=5&recursive=true', null, {
+  const getFolders = () => {
+    axios.post(url + '/list_objects?id=' + auth.userId + '&recursive=true', null, {
       headers: {
-        accept: 'application/json'
+        accept: 'application/json',
       }
+    }).then(res => {
+      console.log(res.data);
+      let tempFolders = [];
+      res.data.map(Ob => {
+        if (Ob._object_name.includes('temp.dod')) {
+          tempFolders.push(Ob._object_name);
+        }
+      });
+      setFolders(tempFolders);
+      setLoading(false);
     })
 
 
-  });
+
+  }
+
+
+  useEffect(() => {
+    setLoading(true);
+    updateTab = addVideo;
+    console.log('All Videos updateTab - ', updateTab);
+
+    getFolders();
+
+  }, []);
 
   return (
     <Layout style={{ padding: "24px" }}>
@@ -110,14 +131,26 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
         </Row>
         <Divider orientation="left"></Divider>
         <motion.div
-          className="ant-row"
+          className="ant-row ant-row-stretch position-relative"
           variants={container}
           initial="hidden"
           animate="show"
         >
+
+          {folders.length ? folders.map((folder, index) => {
+            return (
+              <motion.div key={'folder-' + index} className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
+                <FolderCard folderName={folder.split('/')[0]} videosCount={0} />
+              </motion.div>
+            )
+          }
+          ) :
+            <Loading show={loading} />}
           <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
             <VideoCard />
           </motion.div>
+
+
         </motion.div>
       </Content>
     </Layout>

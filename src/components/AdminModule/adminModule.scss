@@ -72,3 +72,24 @@
     width: 500px !important;
   }
 }
+
+.createFolderMenuItem {
+  padding: 10px 0 !important;
+  height: auto !important;
+  background-color: #e5e5e5;
+  margin-top: -8px !important;
+  margin-bottom: 4px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .createFolderBtn {
+    display: flex;
+    align-items: center;
+  }
+
+  .createFolderBtnIcon {
+    font-size: 19px;
+    margin-right: 5px;
+  }
+}

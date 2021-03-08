@@ -28,12 +28,12 @@ import {
   DownOutlined
 } from "@ant-design/icons";
 
-/* import Uppy from '@uppy/core';
+import Uppy from '@uppy/core';
 import 'uppy/dist/uppy.min.css';
 import '@uppy/core/dist/style.css'
 import '@uppy/drag-drop/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
-import { Dashboard, useUppy } from '@uppy/react'; */
+import { Dashboard, useUppy } from '@uppy/react';
 
 import { Context, AuthContext } from '../../context';
 import "./adminModule.scss";
@@ -59,7 +59,7 @@ const AdminModule = (props) => {
   const context = useContext(Context);
   const auth = useContext(AuthContext);
 
-  /* const uppy = useUppy(() => {
+  const uppy = useUppy(() => {
     return new Uppy({
       meta: {
         userId: 5,
@@ -73,26 +73,13 @@ const AdminModule = (props) => {
         return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
       }
     })
-  }); */
+  });
 
-  /* const uppy = new Uppy({
-    id: 'uppycore',
-    autoProceed: false,
-    showProgressDetails: true,
-    meta: {
-      userId: 5,
-      foldername: 'Demo',
-    }
-  }).use(Dashboard, {
-    id: 'uppyDashboard',
-    target: '#videoU'
-  }); */
+
 
   const closeUploadVideo = () => {
     setUploadVideo(false);
   }
-
-
 
 
   const logout = () => {
@@ -131,7 +118,7 @@ const AdminModule = (props) => {
           <Col span={18}>
             <Row justify="end">
               <Col>
-                <Dropdown overlay={userMenu}>
+                <Dropdown overlay={userMenu} trigger={['click']}>
                   <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{ color: 'white', }}>
                     <Avatar
                       size={30}
@@ -151,7 +138,7 @@ const AdminModule = (props) => {
         {content[selectedTab] ||
           "You do not have permissions to view this module"}
 
-        {/*  <Drawer
+        <Drawer
           title="Upload Videos"
           placement="right"
           closable={true}
@@ -166,7 +153,7 @@ const AdminModule = (props) => {
             showProgressDetails={true}
           />
 
-        </Drawer> */}
+        </Drawer>
 
         <UploadVideoFloatingBtn onClick={() => setUploadVideo(true)} />
       </Layout>

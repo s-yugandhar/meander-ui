@@ -75,20 +75,20 @@
 
 
 
-    var uppy2 = new Uppy.Core({
+    var uppy2 = new window.Uppy.Core({
       meta: { userId: "369", foldername: "please", Bucket: "bucket-369" },
       debug: true, autoProceed: false,
       restrictions: { maxNumberOfFiles: 3, allowedFileTypes: ['*/*', 'video/*'] }
-    }).use(Uppy.Dashboard, {
+    }).use(window.Uppy.Dashboard, {
       inline: true, target: '#drag-drop-area-two', replaceTargetContent: true,
       showProgressDetails: true, height: 470,
       metaFields: [{ id: 'name', name: 'Name', placeholder: 'file name' },
       { id: 'caption', name: 'Caption', placeholder: 'describe what the image is about' }],
       browserBackButtonClose: false
-    }).use(Uppy.Webcam, { target: '#drag-drop-area-two' })
-      .use(Uppy.ScreenCapture, { target: Uppy.Dashboard })
-      .use(Uppy.ImageEditor, { target: Uppy.Dashboard })
-      .use(Uppy.AwsS3Multipart,
+    }).use(window.Uppy.Webcam, { target: '#drag-drop-area-two' })
+      .use(window.Uppy.ScreenCapture, { target: window.Uppy.Dashboard })
+      .use(window.Uppy.ImageEditor, { target: window.Uppy.Dashboard })
+      .use(window.Uppy.AwsS3Multipart,
         {
           limit: 3, companionUrl: cUrl,
           getChunkSize(file) {

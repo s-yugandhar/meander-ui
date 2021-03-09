@@ -44,7 +44,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [ellipsis, setEllipsis] = useState(true);
   const [addVideo, setAddvideo] = useState("");
   const [folders, setFolders] = useState([]);
+  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [levels, setLevels] = useState(null);
+
 
   const auth = useContext(AuthContext);
 
@@ -64,13 +67,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     show: { opacity: 1, y: 0 },
   };
 
-  const getFolders = () => {
-    axios.post(url + '/list_objects?id=' + auth.userId + '&recursive=true', null, {
+  const getFolders = (recursive) => {
+
+    axios.post(url + '/list_objects?id=' + auth.userId + '&recursive=' + recursive, null, {
       headers: {
         accept: 'application/json',
       }
     }).then(res => {
-      console.log(res.data);
+      console.log('get folders res - ', res.data);
       let tempFolders = [];
       res.data.map(Ob => {
         if (Ob._object_name.includes('temp.dod')) {
@@ -80,10 +84,44 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
       setFolders(tempFolders);
       setLoading(false);
     })
-
-
-
   }
+
+
+  const innerFolder = (folderName) => {
+    axios.post(url + '/list_objects?id=' + auth.userId + '&foldername=' + folderName + '&recursive=false', null, {
+      headers: {
+        accept: 'application/json',
+      }
+    }).then(res => {
+      console.log('get files res - ', res.data);
+      let tempFiles = [];
+      let tempFold = [];
+      res.data.map(Ob => {
+        if (!Ob._object_name.includes('temp.dod')) {
+          tempFiles.push(Ob._object_name);
+        } else {
+          tempFold.push(Ob._object_name);
+        }
+      });
+      setFiles(tempFiles);
+      console.log('Temp Fold - ', tempFold);
+      setFolders([]);
+      setLoading(false);
+      console.log('Files res - ', tempFiles);
+    })
+  }
+
+  const del = () => {
+    axios.get(url + '/users/' + auth.userId, null, {
+      headers: {
+        Authorization: 'Bearer ' + auth.token,
+        accept: 'application/json'
+      }
+    }).then(res => {
+      console.log('User Detials - ', res);
+    })
+  }
+
 
 
   useEffect(() => {
@@ -91,7 +129,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     updateTab = addVideo;
     console.log('All Videos updateTab - ', updateTab);
 
-    getFolders();
+    getFolders(true);
+    del();
 
   }, []);
 
@@ -140,15 +179,22 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           {folders.length ? folders.map((folder, index) => {
             return (
               <motion.div key={'folder-' + index} className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
-                <FolderCard folderName={folder.split('/')[0]} videosCount={0} />
+                <FolderCard folderName={folder.split('/')[0]} videosCount={0} folderOnClick={() => innerFolder(folder.split('/')[0])} />
               </motion.div>
             )
           }
           ) :
             <Loading show={loading} />}
-          <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
-            <VideoCard />
-          </motion.div>
+
+
+          {files.map((file, index) => (
+            <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item} key={'file-' + index}>
+              <VideoCard videoTitle={file.split('/')[1]} />
+            </motion.div>
+          ))
+          }
+
+
 
 
         </motion.div>

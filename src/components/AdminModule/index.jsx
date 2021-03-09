@@ -62,12 +62,12 @@ const AdminModule = (props) => {
   const uppy = useUppy(() => {
     return new Uppy({
       meta: {
-        userId: 5,
+        userId: auth.userId,
         foldername: 'Demo',
       }
     }).use(AwsS3Multipart, {
       limit: 4,
-      companionUrl: 'http://182.142.97.42:3020/',
+      companionUrl: 'http://188.42.97.42:8000/',
       getChunkSize(file) {
         var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
         return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
@@ -99,7 +99,7 @@ const AdminModule = (props) => {
     </Menu>
   )
 
-  useEffect(() => { }, [selectedTab]);
+  useEffect(() => { }, [selectedTab, uppy]);
 
   const content = {
     "my-videos": <MyVideos />,

@@ -25,9 +25,9 @@ const VideoCard = (props) => {
         </div>
         <div className="videoCardInfoBlock">
           <div className="videoTitle">
-            Video title runs here like this and if extend looks like this
-        </div>
-          <div className="publishedDate">12th Jan, 2021</div>
+            {props.videoTitle}
+          </div>
+          <div className="publishedDate">{props.postedOn}</div>
         </div>
       </div>
     </Card>

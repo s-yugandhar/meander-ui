@@ -29,7 +29,7 @@ const FolderCard = (props) => {
          className="cardVideo cardFolder"
       >
          <div className="videoCardBlock folderCardBlock">
-            <Button type="default" htmlType="button" className="folderBtn" onClick={() => console.log(props.folderName, '- clicked')}>
+            <Button type="default" htmlType="button" className="folderBtn" onClick={props.folderOnClick}>
 
                <FolderFilled className="folderIcon" />
 

@@ -22,6 +22,4 @@ export const getFolders = (userId) => {
 
    return tempFolders;
 
-
-
 }

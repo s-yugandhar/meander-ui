@@ -19,6 +19,7 @@ import {
   Card,
   Typography,
   Tooltip,
+  Empty
 } from "antd";
 import {
   EditOutlined,
@@ -30,7 +31,7 @@ import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import { url } from "../API/index";
-import { AuthContext } from '../../context';
+import { Context } from '../../Context';
 import FolderCard from "../Shared/FolderCard";
 import Loading from "../Loading";
 
@@ -48,8 +49,17 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [loading, setLoading] = useState(false);
   const [levels, setLevels] = useState(null);
 
+  const context = useContext(Context);
 
-  const auth = useContext(AuthContext);
+  const headersAuthorization = {
+    headers: {
+      'Authorization': 'bearer ' + context.state.token,
+      Accept: "application/json",
+    }
+  }
+
+
+
 
   const container = {
     hidden: { opacity: 0, y: 5 },
@@ -69,11 +79,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const getFolders = (recursive) => {
 
-    axios.post(url + '/list_objects?id=' + auth.userId + '&recursive=' + recursive, null, {
-      headers: {
-        accept: 'application/json',
-      }
-    }).then(res => {
+    axios.post(url + '/list_objects?id=' + context.state.userId + '&recursive=' + recursive, null, headersAuthorization).then(res => {
       console.log('get folders res - ', res.data);
       let tempFolders = [];
       res.data.map(Ob => {
@@ -88,7 +94,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
 
   const innerFolder = (folderName) => {
-    axios.post(url + '/list_objects?id=' + auth.userId + '&foldername=' + folderName + '&recursive=false', null, {
+    axios.post(url + '/list_objects?id=' + context.state.userId + '&foldername=' + folderName + '&recursive=false', null, {
       headers: {
         accept: 'application/json',
       }
@@ -112,13 +118,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   }
 
   const del = () => {
-    axios.get(url + '/users/' + auth.userId, null, {
-      headers: {
-        Authorization: 'Bearer ' + auth.token,
-        accept: 'application/json'
-      }
-    }).then(res => {
+    axios.get(url + '/users/' + context.state.userId, headersAuthorization).then(res => {
       console.log('User Detials - ', res);
+    })
+  };
+
+  const delTempFolder = (uploadId) => {
+    axios.delete(url + '/s3/multipart/' + uploadId, headersAuthorization).then(res => {
+      console.log('Delete Temp Folder Res - ', res);
     })
   }
 
@@ -169,35 +176,35 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           </Col>
         </Row>
         <Divider orientation="left"></Divider>
-        <motion.div
-          className="ant-row ant-row-stretch position-relative"
-          variants={container}
-          initial="hidden"
-          animate="show"
-        >
+        {folders.length > 0 || files.length > 0 ?
+          <motion.div
+            className="ant-row ant-row-stretch position-relative"
+            variants={container}
+            initial="hidden"
+            animate="show"
+          >
 
-          {folders.length ? folders.map((folder, index) => {
-            return (
-              <motion.div key={'folder-' + index} className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
-                <FolderCard folderName={folder.split('/')[0]} videosCount={0} folderOnClick={() => innerFolder(folder.split('/')[0])} />
+            {folders.length ? folders.map((folder, index) => {
+              return (
+                <motion.div key={'folder-' + index} className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
+                  <FolderCard folderName={folder.split('/')[0]} videosCount={0} folderOnClick={() => innerFolder(folder.split('/')[0])} />
+                </motion.div>
+              )
+            }
+            ) :
+              <Loading show={loading} />}
+
+
+            {files.map((file, index) => (
+              <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item} key={'file-' + index}>
+                <VideoCard videoTitle={file.split('/')[1]} />
               </motion.div>
-            )
-          }
-          ) :
-            <Loading show={loading} />}
+            ))
+            }
 
-
-          {files.map((file, index) => (
-            <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item} key={'file-' + index}>
-              <VideoCard videoTitle={file.split('/')[1]} />
-            </motion.div>
-          ))
-          }
-
-
-
-
-        </motion.div>
+          </motion.div>
+          : <Empty style={{ marginTop: '80px' }} />
+        }
       </Content>
     </Layout>
   );

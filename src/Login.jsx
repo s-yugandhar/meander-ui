@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Button,
   Form,
@@ -15,13 +15,20 @@ import {
 import axios from "axios";
 import qs from "qs";
 
+
 import { url } from "../src/components/API";
+import { CreateNewFolder } from './components/API';
+import { Context } from "./Context";
 
 const Login = (props) => {
+
   const { Header, Footer, Content } = Layout;
   const { Title, Text } = Typography;
   const [signup, setSignup] = useState(false);
   const [commonError, setCommonError] = useState("");
+
+  // Context
+  const { state, dispatch } = useContext(Context);
 
   const passwordRegEx = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[a-zA-Z!#$%&? "])[a-zA-Z0-9!#$%&?]{8,20}$/;
 
@@ -37,15 +44,11 @@ const Login = (props) => {
   const setSignedIn = (values) => {
     console.log(values);
 
-
-
     const loginBody = JSON.stringify({
       username: values.signupName,
       email: values.signupEmail,
       password: values.signupPassword,
     });
-
-    /* props.onSubmit({ token: "sadf233ddws" }); */
 
     const signupHeader = {
       headers: {
@@ -85,8 +88,24 @@ const Login = (props) => {
       .post(url + "/token", loginBody, loginHeaders)
       .then((loginRes) => {
         console.log('Login Res - ', loginRes);
-        //sessionStorage.setItem("token", loginRes.data.access_token);
         props.onSubmit({ token: loginRes.data.access_token, userId: loginRes.data.id });
+
+
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            token: loginRes.data.access_token ? loginRes.data.access_token : null,
+            userId: loginRes.data.id ? loginRes.data.id : null,
+            page: 'my-videos'
+          }
+        });
+
+
+        // Create New folder
+        CreateNewFolder(loginRes.data.id, 'default').then(res => {
+          console.log('Login Create folder res - ', res);
+        });
+
       })
       .catch((err) => {
         console.log("Login Error - ", err);
@@ -97,6 +116,10 @@ const Login = (props) => {
         }, 5000);
       });
   }
+
+  useEffect(() => {
+    console.log('login page context - ', state);
+  })
 
   if (signup) {
     return (

@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import { AuthContext } from "../../context";
 import "./addVideo.scss";
 
 import {
@@ -28,7 +27,6 @@ const AddVideo = () => {
   const [requiredMark, setRequiredMarkType] = useState("optional");
   const { Header, Footer, Sider, Content } = Layout;
 
-  const auth = useContext(AuthContext);
 
   /*  const uppy = new Uppy({
      id: 'videoUpload',

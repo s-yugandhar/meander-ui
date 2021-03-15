@@ -35,7 +35,7 @@ import '@uppy/drag-drop/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import { Dashboard, useUppy } from '@uppy/react';
 
-import { Context, AuthContext } from '../../context';
+import { Context } from '../../Context';
 import "./adminModule.scss";
 
 import SideNav from "../SideNav";
@@ -57,13 +57,12 @@ const AdminModule = (props) => {
   const [uploadVideo, setUploadVideo] = useState(false)
 
   const context = useContext(Context);
-  const auth = useContext(AuthContext);
 
   const uppy = useUppy(() => {
     return new Uppy({
       meta: {
-        userId: auth.userId,
-        foldername: 'Demo',
+        userId: context.state.userId,
+        foldername: '',
       }
     }).use(AwsS3Multipart, {
       limit: 4,
@@ -72,6 +71,8 @@ const AdminModule = (props) => {
         var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
         return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
       }
+    }).on('complete', result => {
+      console.log('Video result', result);
     })
   });
 
@@ -97,15 +98,37 @@ const AdminModule = (props) => {
         Logout
       </Menu.Item>
     </Menu>
-  )
+  );
 
-  useEffect(() => { }, [selectedTab, uppy]);
+  const page = () => {
+    switch (context.state.page) {
+      case 'my-videos':
+        <MyVideos />
+        break;
+      case 'add-video':
+        <AddVideo />
+        break;
+      case 'my-profile':
+        <MyProfile />
+        break;
+      default:
+        return <MyVideos />
+    }
+  }
 
-  const content = {
+
+  useEffect(() => {
+    console.log('Admin modules context - ', context);
+
+  }, [selectedTab, uppy]);
+
+  /* const content = {
     "my-videos": <MyVideos />,
     "add-video": <AddVideo />,
     "my-profile": <MyProfile />,
-  };
+  }; */
+
+
 
   return (
 
@@ -135,7 +158,9 @@ const AdminModule = (props) => {
       <Layout style={{ paddingBottom: "50px" }}>
 
         <SideNav updateTab={(tab) => setSelectedTab(tab)} openUploadVideo={(toggle) => setUploadVideo(toggle)} />
-        {content[selectedTab] ||
+        {
+          page
+          ||
           "You do not have permissions to view this module"}
 
         <Drawer

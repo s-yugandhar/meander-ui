@@ -1,6 +1,5 @@
 
 import axios from 'axios';
-import { AuthContext, Context } from '../../context';
 export const url = "http://188.42.97.42:8000";
 
 
@@ -23,3 +22,19 @@ export const getFolders = (userId) => {
    return tempFolders;
 
 }
+
+
+export const CreateNewFolder = (userId, value) => {
+   axios.post(url + '/create_folder?id=' + userId + '&foldername=' + value, null, {
+      headers: {
+         accept: 'application/json'
+      }
+   }).then(res => {
+      console.log('Create Folder Res - ', res);
+      return res.data;
+   }).catch(err => {
+
+   });
+
+
+};

@@ -20,7 +20,7 @@ import {
 import axios from "axios";
 
 import { url } from '../API/index';
-import { AuthContext, Context } from '../../context';
+import { Context } from '../../Context';
 
 const SideNav = ({ updateTab, openUploadVideo }) => {
   const [selectedKeys, setSelectedKeys] = useState(['my-videos']);
@@ -34,16 +34,16 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   const { SubMenu } = Menu;
 
 
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
 
   const showCreateFolder = () => {
     setIsModalVisible(true);
   };
 
   const createNewFolder = (value) => {
-    console.log(auth);
+    console.log(context);
     setFolderSubmitBtn(true);
-    axios.post(url + '/create_folder?id=' + auth.userId + '&foldername=' + value.folderName, null, {
+    axios.post(url + '/create_folder?id=' + context.state.userId + '&foldername=' + value.folderName, null, {
       headers: {
         accept: 'application/json'
       }
@@ -77,7 +77,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   }
 
   const getFolders = () => {
-    axios.post(url + '/list_objects?id=' + auth.userId + '&recursive=true', null, {
+    axios.post(url + '/list_objects?id=' + context.state.userId + '&recursive=true', null, {
       headers: {
         accept: 'application/json',
       }

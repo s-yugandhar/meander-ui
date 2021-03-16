@@ -1,0 +1,19 @@
+version: 3
+jobs:
+- name: meander-ui
+  image: node:14
+  commands:
+  - npm install
+  - npm start
+  triggers:
+  - !BranchUpdateTrigger
+    paths: src/*
+    projects: Meander-ui
+  retrieveSource: true
+  cloneCredential: !DefaultCredential {}
+  cpuRequirement: 250m
+  memoryRequirement: 128m
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 3600

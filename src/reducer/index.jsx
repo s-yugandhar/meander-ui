@@ -1,7 +1,9 @@
 import {
    LOGIN_SUCCESS,
    LOGOUT_SUCCESS,
-   PAGE
+   PAGE,
+   FOLDER_CREATED,
+   FILE_UPLOADED
 } from './types'
 
 
@@ -9,7 +11,9 @@ export const initialState = {
    token: null,
    userId: null,
    userName: null,
-   page: 'login'
+   page: 'login',
+   folderCreated: null,
+   fileUploaded: null,
 }
 
 export const reducer = (state = initialState, action) => {
@@ -21,7 +25,7 @@ export const reducer = (state = initialState, action) => {
          return {
             ...state,
             token: action.payload.token,
-            userId: action.payload.userid,
+            userId: action.payload.userId,
             userName: action.payload.userName,
             page: action.payload.page
          }
@@ -41,6 +45,18 @@ export const reducer = (state = initialState, action) => {
          return {
             ...state,
             page: action.payload.page
+         }
+
+      case FOLDER_CREATED:
+         return {
+            ...state,
+            folderCreated: action.payload.folderCreated
+         }
+
+      case FILE_UPLOADED:
+         return {
+            ...state,
+            fileUploaded: action.payload.fileUploaded
          }
 
       default:

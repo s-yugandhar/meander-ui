@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useContext } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { Layout } from "antd";
 import "./App.scss";
 /* import "antd/dist/antd.css"; */
@@ -17,9 +17,6 @@ const App = (props) => {
   } else if (process.env.NODE_ENV === "production") {
     apiUrl = "https://api.aaonxt.com";
   }
-
-  // Context
-  const context = useContext(Context);
 
   // Reduer
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -59,9 +56,11 @@ const App = (props) => {
 
   return (
     <Context.Provider value={{ state: state, dispatch: dispatch }}>
-      {signedIn ?
+      {/* {signedIn ?
         <AdminModule />
-        : <Login />}
+        : <Login onSubmit={onSubmit} />} */}
+
+      <AdminModule />
     </Context.Provider>
   );
 };

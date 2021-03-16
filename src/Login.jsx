@@ -80,6 +80,9 @@ const Login = (props) => {
   };
 
   const loginNow = (values) => {
+
+    console.log('Login Values - ', values);
+
     const loginBody = qs.stringify({
       email: values.loginEmail,
       password: values.loginPassword,
@@ -88,9 +91,7 @@ const Login = (props) => {
       .post(url + "/token", loginBody, loginHeaders)
       .then((loginRes) => {
         console.log('Login Res - ', loginRes);
-        props.onSubmit({ token: loginRes.data.access_token, userId: loginRes.data.id });
-
-
+        // props.onSubmit({ token: loginRes.data.access_token, userId: loginRes.data.id });
         dispatch({
           type: 'LOGIN_SUCCESS',
           payload: {
@@ -100,11 +101,8 @@ const Login = (props) => {
           }
         });
 
-
         // Create New folder
-        CreateNewFolder(loginRes.data.id, 'default').then(res => {
-          console.log('Login Create folder res - ', res);
-        });
+        CreateNewFolder(loginRes.data.id, 'default');
 
       })
       .catch((err) => {

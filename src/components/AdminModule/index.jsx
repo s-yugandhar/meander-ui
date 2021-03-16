@@ -43,6 +43,7 @@ import MyVideos from "../MyVideos";
 import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
+import Login from "../../Login";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -51,17 +52,17 @@ const AdminModule = (props) => {
   const { Option } = Select;
   const { Paragraph, Text } = Typography;
 
-  const [ellipsis, setEllipsis] = useState(true);
-  const [addVideo, setAddvideo] = useState(false);
   const [selectedTab, setSelectedTab] = useState("my-videos");
-  const [uploadVideo, setUploadVideo] = useState(false)
+  const [uploadVideo, setUploadVideo] = useState(false);
+  const [logedIn, setLogedIn] = useState(false);
 
-  const context = useContext(Context);
+  const { state, dispatch } = useContext(Context);
+
 
   const uppy = useUppy(() => {
     return new Uppy({
       meta: {
-        userId: context.state.userId,
+        userId: state.userId,
         foldername: '',
       }
     }).use(AwsS3Multipart, {
@@ -84,9 +85,12 @@ const AdminModule = (props) => {
 
 
   const logout = () => {
-    localStorage.removeItem('token');
+    /* localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    window.location.reload();
+    window.location.reload(); */
+    dispatch({
+      type: 'LOGOUT_SUCCESS'
+    })
   }
 
   const userMenu = (
@@ -100,25 +104,34 @@ const AdminModule = (props) => {
     </Menu>
   );
 
-  const page = () => {
-    switch (context.state.page) {
-      case 'my-videos':
-        <MyVideos />
-        break;
-      case 'add-video':
-        <AddVideo />
-        break;
-      case 'my-profile':
-        <MyProfile />
-        break;
+  const page = {
+    'my-videos': <MyVideos />,
+    'add-video': <AddVideo />,
+    'my-profile': <MyProfile />,
+
+    /* switch (context.state.page) {
+      case "my-videos":
+        return <MyVideos />
+      case "add-video":
+        return <AddVideo />
+      case "my-profile":
+        return <MyProfile />
+
       default:
         return <MyVideos />
-    }
+    } */
   }
 
+  const localUserId = localStorage.getItem('userId');
 
   useEffect(() => {
-    console.log('Admin modules context - ', context);
+    console.log('Admin modules context - ', state);
+    console.log('Page name - ', state.page);
+    console.log('Got user id - ', state.userId);
+
+    localUserId ? setLogedIn(true) : setLogedIn(false);
+
+
 
   }, [selectedTab, uppy]);
 
@@ -131,59 +144,64 @@ const AdminModule = (props) => {
 
 
   return (
-
-    <Layout>
-      <Header className="header">
-        <Row>
-          <Col span={6}>
-            <div style={{ color: "white" }}>Logo</div>
-          </Col>
-          <Col span={18}>
-            <Row justify="end">
-              <Col>
-                <Dropdown overlay={userMenu} trigger={['click']}>
-                  <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{ color: 'white', }}>
-                    <Avatar
-                      size={30}
-                      icon={<UserOutlined />}
-                      style={{ marginRight: '5px' }}
-                    /> My Account <DownOutlined />
-                  </a>
-                </Dropdown>
+    <>
+      {state.userId ?
+        <Layout>
+          <Header className="header">
+            <Row>
+              <Col span={6}>
+                <div style={{ color: "white" }}>Logo</div>
+              </Col>
+              <Col span={18}>
+                <Row justify="end">
+                  <Col>
+                    <Dropdown overlay={userMenu} trigger={['click']}>
+                      <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{ color: 'white', }}>
+                        <Avatar
+                          size={30}
+                          icon={<UserOutlined />}
+                          style={{ marginRight: '5px' }}
+                        /> My Account <DownOutlined />
+                      </a>
+                    </Dropdown>
+                  </Col>
+                </Row>
               </Col>
             </Row>
-          </Col>
-        </Row>
-      </Header>
-      <Layout style={{ paddingBottom: "50px" }}>
+          </Header>
+          <Layout style={{ paddingBottom: "50px" }}>
 
-        <SideNav updateTab={(tab) => setSelectedTab(tab)} openUploadVideo={(toggle) => setUploadVideo(toggle)} />
-        {
-          page
-          ||
-          "You do not have permissions to view this module"}
+            <SideNav updateTab={(tab) => setSelectedTab(tab)} openUploadVideo={(toggle) => setUploadVideo(toggle)} />
+            {
+              page[state.page]
+              ||
+              "You do not have permissions to view this module"
+            }
 
-        <Drawer
-          title="Upload Videos"
-          placement="right"
-          closable={true}
-          onClose={closeUploadVideo}
-          visible={uploadVideo}
-          key="right"
-          mask={false}
-          className="uploadVideoDrawer"
-        >
-          <Dashboard
-            uppy={uppy}
-            showProgressDetails={true}
-          />
+            <Drawer
+              title="Upload Videos"
+              placement="right"
+              closable={true}
+              onClose={closeUploadVideo}
+              visible={uploadVideo}
+              key="right"
+              mask={false}
+              className="uploadVideoDrawer"
+            >
+              <Dashboard
+                uppy={uppy}
+                showProgressDetails={true}
+              />
 
-        </Drawer>
+            </Drawer>
 
-        <UploadVideoFloatingBtn onClick={() => setUploadVideo(true)} />
-      </Layout>
-    </Layout >
-
+            <UploadVideoFloatingBtn onClick={() => setUploadVideo(true)} />
+          </Layout>
+        </Layout >
+        :
+        <Login />
+      }
+    </>
   );
 };
 

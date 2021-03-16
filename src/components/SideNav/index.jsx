@@ -19,7 +19,7 @@ import {
 
 import axios from "axios";
 
-import { url } from '../API/index';
+import { url, GetFolders, GetFiles, CreateNewFolder } from '../API/index';
 import { Context } from '../../Context';
 
 const SideNav = ({ updateTab, openUploadVideo }) => {
@@ -33,28 +33,23 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   const { Sider } = Layout;
   const { SubMenu } = Menu;
 
-
-  const context = useContext(Context);
+  const { state, dispatch } = useContext(Context);
 
   const showCreateFolder = () => {
     setIsModalVisible(true);
   };
 
   const createNewFolder = (value) => {
-    console.log(context);
+    console.log(state);
     setFolderSubmitBtn(true);
-    axios.post(url + '/create_folder?id=' + context.state.userId + '&foldername=' + value.folderName, null, {
-      headers: {
-        accept: 'application/json'
-      }
-    }).then(res => {
-      console.log('Create Folder Res - ', res);
 
-      if (res.data.status_code === 200) {
-        setErrMsg(res.data.detail);
+    CreateNewFolder(state.userId, value.folderName).then(res => {
+      if (res.status_code === 200) {
+        setErrMsg(res.detail);
         setFolderSubmitBtn(false);
-      } else {
+      } else if (res.status_code === 201) {
         setIsModalVisible(false);
+
         notification.open({
           message: `Successfully created`,
           description: `Successfully ${value.folderName} created`,
@@ -62,11 +57,12 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
         });
         updateTab('my-videos');
         setErrMsg(null);
+        dispatch({ type: "FOLDER_CREATED", payload: { folderCreated: value.folderName } });
+        setFolderSubmitBtn(false);
+      } else {
+        setErrMsg('Unknown error occured');
       }
-
-    }).catch(err => {
-
-    });
+    })
 
 
   };
@@ -76,28 +72,23 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     setErrMsg(null);
   }
 
-  const getFolders = () => {
-    axios.post(url + '/list_objects?id=' + context.state.userId + '&recursive=true', null, {
-      headers: {
-        accept: 'application/json',
-      }
-    }).then(res => {
-      console.log(res.data);
-      let tempFolders = [];
-      res.data.map(Ob => {
-        if (Ob._object_name.includes('temp.dod')) {
-          tempFolders.push(Ob._object_name);
-        }
-      });
-      setFolders(tempFolders);
-    })
 
+  const folderDetail = () => {
 
   }
 
-  useEffect(() => {
-    getFolders();
-  }, []);
+  // const sidenavFolders = GetFolders(state.userId);
+
+  useEffect((prevState) => {
+    //getFolders();
+    GetFolders(state.userId).then(res => {
+      console.log('Get Folders res - ', res);
+      setFolders(res);
+    });
+
+
+
+  }, [state]);
 
   return (
     <>
@@ -129,7 +120,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
 
             {folders.map((folder, index) => {
               return (
-                <Menu.Item key={'folder-' + index} onClick="" title={folder.replace('temp.dod', '')}>
+                <Menu.Item key={'folder-' + index} onClick={folderDetail(folder.split('/')[0])} title={folder.replace('temp.dod', '')}>
                   <FolderOutlined /> {folder.split('/')[0]}
                 </Menu.Item>
               )

@@ -4,7 +4,7 @@ jobs:
   image: node:14
   commands:
   - npm install
-  - npm start
+  - npm start --port 3000
   triggers:
   - !BranchUpdateTrigger
     paths: src/*

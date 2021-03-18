@@ -1,6 +1,9 @@
 
 import axios from 'axios';
+
+
 export const url = "http://188.42.97.42:8000";
+
 
 
 export const GetFolders = async (userId) => {
@@ -11,7 +14,6 @@ export const GetFolders = async (userId) => {
          accept: 'application/json',
       }
    }).then(res => {
-      console.log(res.data);
 
       res.data.map(Ob => {
          if (Ob._object_name.includes('temp.dod')) {
@@ -19,34 +21,34 @@ export const GetFolders = async (userId) => {
          }
       });
 
+      console.log('Get Folders after filter - ', tempFolders);
+
       return tempFolders;
    })
 
    return getFolders;
 
-
-
-
-
 }
 
 export const GetFiles = async (userId, folderName) => {
    let tempFiles = [];
-   await axios.post(url + '/list_objects?id=' + userId + '&recursive=false&foldername=' + folderName, null, {
+   const getFiles = await axios.post(url + '/list_objects?id=' + userId + '&recursive=false&foldername=' + folderName, null, {
       headers: {
          accept: 'application/json',
       }
    }).then(res => {
-      console.log(res.data);
-
       res.data.map(Ob => {
          if (!Ob._object_name.includes('temp.dod')) {
             tempFiles.push(Ob._object_name);
          }
       });
 
+      console.log('Get Files after filter - ', tempFiles);
+
       return tempFiles;
-   })
+   });
+
+   return getFiles;
 
 }
 

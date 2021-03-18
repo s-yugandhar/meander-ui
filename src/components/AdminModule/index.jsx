@@ -58,12 +58,13 @@ const AdminModule = (props) => {
 
   const { state, dispatch } = useContext(Context);
 
+  const localUserId = localStorage.getItem('userId');
 
   const uppy = useUppy(() => {
     return new Uppy({
       meta: {
-        userId: state.userId,
-        foldername: '',
+        userId: localUserId,
+        foldername: 'default',
       }
     }).use(AwsS3Multipart, {
       limit: 4,
@@ -74,6 +75,12 @@ const AdminModule = (props) => {
       }
     }).on('complete', result => {
       console.log('Video result', result);
+      dispatch({
+        type: 'FILE_UPLOADED',
+        payload: {
+          fileName: 'abcd'
+        }
+      })
     })
   });
 
@@ -122,7 +129,7 @@ const AdminModule = (props) => {
     } */
   }
 
-  const localUserId = localStorage.getItem('userId');
+
 
   useEffect(() => {
     console.log('Admin modules context - ', state);
@@ -132,8 +139,7 @@ const AdminModule = (props) => {
     localUserId ? setLogedIn(true) : setLogedIn(false);
 
 
-
-  }, [selectedTab, uppy]);
+  }, [selectedTab, uppy, state, localUserId]);
 
   /* const content = {
     "my-videos": <MyVideos />,
@@ -145,7 +151,7 @@ const AdminModule = (props) => {
 
   return (
     <>
-      {state.userId ?
+      {localUserId ?
         <Layout>
           <Header className="header">
             <Row>

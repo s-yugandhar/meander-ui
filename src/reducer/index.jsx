@@ -3,17 +3,22 @@ import {
    LOGOUT_SUCCESS,
    PAGE,
    FOLDER_CREATED,
-   FILE_UPLOADED
+   FILE_UPLOADED,
+   FOLDER_NAME
 } from './types'
 
+const localUserId = localStorage.getItem('userId');
+const localToken = localStorage.getItem('token');
+const localUserName = localStorage.getItem('userName');
 
 export const initialState = {
-   token: null,
-   userId: null,
-   userName: null,
-   page: 'login',
+   token: localToken ? localUserId : null,
+   userId: localUserId ? localUserId : null,
+   userName: localUserName ? localUserName : null,
+   page: 'my-videos',
    folderCreated: null,
    fileUploaded: null,
+   folderName: ''
 }
 
 export const reducer = (state = initialState, action) => {
@@ -56,7 +61,13 @@ export const reducer = (state = initialState, action) => {
       case FILE_UPLOADED:
          return {
             ...state,
-            fileUploaded: action.payload.fileUploaded
+            fileUploaded: action.payload.fileName
+         }
+
+      case FOLDER_NAME:
+         return {
+            ...state,
+            folderName: action.payload.folderName
          }
 
       default:

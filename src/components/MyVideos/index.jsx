@@ -30,10 +30,17 @@ import {
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
-import { url } from "../API/index";
+import Loading from '../Loading';
+import {
+  FOLDER_CREATED,
+  FILE_UPLOADED,
+  FOLDER_NAME
+} from '../../reducer/types'
+import { url, GetFolders, GetFiles } from "../API/index";
 import { Context } from '../../Context';
 import FolderCard from "../Shared/FolderCard";
-import Loading from "../Loading";
+
+
 
 const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -77,58 +84,33 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     show: { opacity: 1, y: 0 },
   };
 
-  const getFolders = (recursive) => {
+  const getFolders = () => {
 
-    axios.post(url + '/list_objects?id=' + state.userId + '&recursive=' + recursive, null, headersAuthorization).then(res => {
-      console.log('get folders res - ', res.data);
-      let tempFolders = [];
-      res.data.map(Ob => {
-        if (Ob._object_name.includes('temp.dod')) {
-          tempFolders.push(Ob._object_name);
-        }
-      });
-      setFolders(tempFolders);
-      setLoading(false);
-    })
+    GetFolders(state.userId).then(res => {
+      setFolders(res);
+    });
+
   }
 
 
   const innerFolder = (folderName) => {
-    axios.post(url + '/list_objects?id=' + state.userId + '&foldername=' + folderName + '&recursive=false', null, {
-      headers: {
-        accept: 'application/json',
-      }
-    }).then(res => {
-      console.log('get files res - ', res.data);
-      let tempFiles = [];
-      let tempFold = [];
-      res.data.map(Ob => {
-        if (!Ob._object_name.includes('temp.dod')) {
-          tempFiles.push(Ob._object_name);
-        } else {
-          tempFold.push(Ob._object_name);
-        }
-      });
-      setFiles(tempFiles);
-      console.log('Temp Fold - ', tempFold);
+    setLoading(true);
+    GetFiles(state.userId, folderName).then(res => {
+      console.log('My Videos Files res - ', res);
       setFolders([]);
       setLoading(false);
-      console.log('Files res - ', tempFiles);
-    })
+      setFiles(res);
+      /* dispatch({
+        type: FOLDER_NAME,
+        payload: {
+          folderName: folderName
+        }
+      }); */
+    }).catch(err => {
+      setLoading(false);
+    });
+
   }
-
-  const del = () => {
-    axios.get(url + '/users/' + state.userId, headersAuthorization).then(res => {
-      console.log('User Detials - ', res);
-    })
-  };
-
-  const delTempFolder = (uploadId) => {
-    axios.delete(url + '/s3/multipart/' + uploadId, headersAuthorization).then(res => {
-      console.log('Delete Temp Folder Res - ', res);
-    })
-  }
-
 
 
   useEffect(() => {
@@ -136,8 +118,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     updateTab = addVideo;
     console.log('All Videos updateTab - ', updateTab);
 
-    getFolders(true);
-    del();
+    getFolders();
 
   }, [state]);
 
@@ -200,15 +181,17 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
               {
                 // Showing Files
-                files.map((file, index) => (
-                  <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item} key={'file-' + index}>
-                    <VideoCard videoTitle={file.split('/')[1]} />
-                  </motion.div>
-                ))
+                files.length ?
+                  files.map((file, index) => (
+                    <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item} key={'file-' + index}>
+                      <VideoCard videoTitle={file.split('/')[1]} />
+                    </motion.div>
+                  )) : ""
               }
 
             </motion.div>
             : <Empty style={{ marginTop: '80px' }} />
+
         }
       </Content>
     </Layout>

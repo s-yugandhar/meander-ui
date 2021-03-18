@@ -19,7 +19,13 @@ import {
 
 import axios from "axios";
 
+import {
+  FOLDER_CREATED,
+  FILE_UPLOADED,
+  FOLDER_NAME
+} from '../../reducer/types';
 import { url, GetFolders, GetFiles, CreateNewFolder } from '../API/index';
+
 import { Context } from '../../Context';
 
 const SideNav = ({ updateTab, openUploadVideo }) => {
@@ -57,7 +63,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
         });
         updateTab('my-videos');
         setErrMsg(null);
-        dispatch({ type: "FOLDER_CREATED", payload: { folderCreated: value.folderName } });
+        dispatch({ type: FOLDER_CREATED, payload: { folderCreated: value.folderName } });
         setFolderSubmitBtn(false);
       } else {
         setErrMsg('Unknown error occured');
@@ -72,20 +78,28 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     setErrMsg(null);
   }
 
+  const folderDetail = (folderName) => {
+    dispatch({
+      type: FOLDER_NAME, payload: {
+        folderName: folderName
+      }
+    })
+  }
 
-  const folderDetail = () => {
 
+  const showAllvideos = () => {
+    GetFolders(state.userId).then(res => {
+      console.log('Get Folders res - ', res);
+      setFolders(res);
+    });
   }
 
   // const sidenavFolders = GetFolders(state.userId);
 
   useEffect((prevState) => {
     //getFolders();
-    GetFolders(state.userId).then(res => {
-      console.log('Get Folders res - ', res);
-      setFolders(res);
-    });
 
+    showAllvideos();
 
 
   }, [state]);
@@ -102,8 +116,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
         >
           <SubMenu key="my-videos-submenu" title="My Videos">
 
-            <Menu.Item key="my-videos" onClick={() => updateTab("my-videos")}>All Videos</Menu.Item>
-
+            <Menu.Item key="my-videos" onClick={() => showAllvideos('default')}>All Videos</Menu.Item>
+̉̉
             <Menu.Item disabled={true} className="createFolderMenuItem" key="cf">
               <Button
                 type="primary"
@@ -120,7 +134,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
 
             {folders.map((folder, index) => {
               return (
-                <Menu.Item key={'folder-' + index} onClick={folderDetail(folder.split('/')[0])} title={folder.replace('temp.dod', '')}>
+                <Menu.Item key={'folder-' + index} onClick={() => folderDetail(folder.split('/')[0])} title={folder.replace('temp.dod', '')}>
                   <FolderOutlined /> {folder.split('/')[0]}
                 </Menu.Item>
               )

@@ -4,9 +4,8 @@ jobs:
   image: node:14
   commands:
   - npm install
-  - npm install -g serve
   - npm run build
-  - serve -s build -l 3002
+  - node 'server.js'
   triggers:
   - !BranchUpdateTrigger
     paths: src/*

@@ -4,7 +4,7 @@ jobs:
   image: node:14
   commands:
   - npm install
-  - npm install serve
+  - npm install -g serve
   - npm run build
   - serve -s build -l 3002
   triggers:

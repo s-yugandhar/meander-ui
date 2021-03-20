@@ -5,7 +5,7 @@ jobs:
   commands:
   - npm install
   - npm install serve
-  - npm build
+  - npm run build
   - serve -s build -l 3002
   triggers:
   - !BranchUpdateTrigger

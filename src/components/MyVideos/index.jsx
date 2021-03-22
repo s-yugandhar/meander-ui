@@ -8,7 +8,7 @@ import "../MyVideos/MyVideos.scss";
 import Loading from '../Loading';
 import { FOLDER_LIST  ,FILE_LIST , FOLDER_NAME } from '../../reducer/types';
 import { url, GetFolders, GetFiles } from "../API/index";
-import { Context } from '../../Context';
+import { Context } from '../../Context.jsx';
 import FolderCard from "../Shared/FolderCard";
 
 

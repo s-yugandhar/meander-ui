@@ -8,7 +8,7 @@ import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import { Dashboard, useUppy } from '@uppy/react'
 import './uppyUpload.scss';
 import { Drawer } from 'antd';
-import {Context} from '../../Context';
+import {Context} from '../../Context.jsx';
 
 const UppyUpload = (props) => {
    const [visible, setVisible] = useState(props.visible);

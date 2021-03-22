@@ -4,7 +4,7 @@ import axios from "axios";
 import qs from "qs";
 import { url } from "../src/components/API";
 import { CreateNewFolder } from './components/API';
-import { Context } from "./Context";
+import { Context } from "./Context.jsx";
 
 const Login = (props) => {
 

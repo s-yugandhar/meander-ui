@@ -7,7 +7,7 @@ import '@uppy/core/dist/style.css'
 import '@uppy/drag-drop/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import { Dashboard, useUppy } from '@uppy/react';
-import { Context } from '../../Context/index.js';
+import { Context } from '../../Context.jsx';
 import "./adminModule.scss";
 import SideNav from "../SideNav/index.js";
 import MyVideos from "../MyVideos/index.js";

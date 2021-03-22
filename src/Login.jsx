@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import {  Button,  Form,  Input,  Layout,  Card,   Typography,  Row,  Col} from "antd";
 import axios from "axios";
 import qs from "qs";
-import { url } from "../src/components/API";
+import { url } from "./components/API";
 import { CreateNewFolder } from './components/API';
-import { Context } from "./Context.jsx";
+import { Context } from "./context";
 
 const Login = (props) => {
 

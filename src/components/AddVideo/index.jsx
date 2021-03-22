@@ -1,20 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
-
 import "./addVideo.scss";
-
-import {
-  Divider,
-  Layout,
-  Row,
-  Col,
-  Form,
-  Input,
-  Button,
-  Select,
-  Upload,
+import {  Divider,  Layout,  Row,  Col,  Form,  Input,  Button,  Select,  Upload,
 } from "antd";
-
-
 
 import { UploadOutlined } from "@ant-design/icons";
 

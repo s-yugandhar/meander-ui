@@ -5,7 +5,7 @@ import "./App.scss";
 
 import AdminModule from "./components/AdminModule";
 
-import { Context } from "./Context.jsx";
+import { Context } from "./context";
 import { initialState, reducer } from './reducer';
 import Login from "./Login";
 

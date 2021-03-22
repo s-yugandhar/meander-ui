@@ -1,19 +1,7 @@
 import React, { useState } from "react";
 import "./myProfile.scss";
-
 import {
-   Divider,
-   Layout,
-   Row,
-   Col,
-   Form,
-   Input,
-   Button,
-   Radio,
-   Select,
-   Upload,
-} from "antd";
-
+   Divider,Layout, Row, Col, Form, Input,   Button, Radio,   Select, Upload,} from "antd";
 
 const MyProfile = () => {
    const [requiredMark, setRequiredMarkType] = useState("optional");

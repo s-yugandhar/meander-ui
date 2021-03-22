@@ -7,10 +7,10 @@ import '@uppy/core/dist/style.css'
 import '@uppy/drag-drop/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import { Dashboard, useUppy } from '@uppy/react';
-import { Context } from '../../Context.jsx';
+import { Context } from '../../context';
 import "./adminModule.scss";
-import SideNav from "../SideNav/index.js";
-import MyVideos from "../MyVideos/index.js";
+import SideNav from "../SideNav";
+import MyVideos from "../MyVideos";
 import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";

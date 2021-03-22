@@ -5,7 +5,7 @@ import {  FolderAddOutlined,  CheckCircleOutlined,  FolderOutlined,} from "@ant-
 import {  FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST, FOLDER_LIST} from '../../reducer/types';
 import { url, GetFolders, GetFiles, CreateNewFolder } from '../API/index';
 
-import { Context } from '../../Context.jsx';
+import { Context } from '../../context';
 
 const SideNav = ({ updateTab, openUploadVideo }) => {
   const [selectedKeys, setSelectedKeys] = useState(['my-videos']);

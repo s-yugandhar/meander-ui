@@ -1,49 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
-
-import {
-  Layout,
-  Breadcrumb,
-  Menu,
-  Dropdown,
-  List,
-  Avatar,
-  Button,
-  Skeleton,
-  Row,
-  Col,
-  Divider,
-  Input,
-  Select,
-  Image,
-  Card,
-  Typography,
-  Drawer,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  LinkOutlined,
-  PlusOutlined,
-  UserOutlined,
-  DownOutlined
-} from "@ant-design/icons";
-
+import {  Layout, Menu,  Dropdown, Avatar,   Row,  Col, Input,  Select, Typography,  Drawer,} from "antd";
+import {  UserOutlined,  DownOutlined} from "@ant-design/icons";
 import Uppy from '@uppy/core';
 import 'uppy/dist/uppy.min.css';
 import '@uppy/core/dist/style.css'
 import '@uppy/drag-drop/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import { Dashboard, useUppy } from '@uppy/react';
-
 import { Context } from '../../Context';
 import "./adminModule.scss";
-
 import SideNav from "../SideNav";
 import MyVideos from "../MyVideos";
 import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
+import { FOLDER_NAME } from "../../reducer/types";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -60,14 +32,12 @@ const AdminModule = (props) => {
 
   const localUserId = localStorage.getItem('userId');
 
+  
   const uppy = useUppy(() => {
-    return new Uppy({
-      meta: {
-        userId: localUserId,
-        foldername: 'default',
-      }
+    return new Uppy({   
+      autoProceed : true,debug:true 
     }).use(AwsS3Multipart, {
-      limit: 4,
+      limit: 1,
       companionUrl: 'http://188.42.97.42:8000/',
       getChunkSize(file) {
         var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
@@ -78,7 +48,7 @@ const AdminModule = (props) => {
       dispatch({
         type: 'FILE_UPLOADED',
         payload: {
-          fileName: 'abcd'
+          fileName: ""
         }
       })
     })
@@ -102,7 +72,7 @@ const AdminModule = (props) => {
 
   const userMenu = (
     <Menu>
-      <Menu.Item onClick={() => setSelectedTab('my-proifle')}>
+      <Menu.Item onClick={() => setSelectedTab('my-profile')}>
         My Profile
       </Menu.Item>
       <Menu.Item onClick={logout}>
@@ -138,8 +108,8 @@ const AdminModule = (props) => {
 
     localUserId ? setLogedIn(true) : setLogedIn(false);
 
-
-  }, [selectedTab, uppy, state, localUserId]);
+      uppy.setMeta( {  userId: localUserId,     foldername: state.folderName  })
+  }, [ state.folderName ]);
 
   /* const content = {
     "my-videos": <MyVideos />,
@@ -194,6 +164,15 @@ const AdminModule = (props) => {
               mask={false}
               className="uploadVideoDrawer"
             >
+           <Row>   <Select style={{ width: 200 }}
+    placeholder="search folder"    optionFilterProp="children"  value = {state.folderName}
+    onChange={(value)=> dispatch({  type : FOLDER_NAME , payload : { folderName : value }  })  } 
+  >
+       { state.folderList.map((obj , ind) =>{
+          return obj._object_name.includes("temp.dod") ?  (<Option key={obj._object_name.split("/")[0]} 
+            value={obj._object_name.split("/")[0]}> { obj._object_name.split("/")[0] } </Option>) : null  } )
+       }
+  </Select> {"selected --->"+ state.folderName}</Row>
               <Dashboard
                 uppy={uppy}
                 showProgressDetails={true}

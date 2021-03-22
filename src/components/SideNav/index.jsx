@@ -1,29 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  Layout,
-  Menu,
-  Modal,
-  Divider,
-  Button,
-  Form,
-  Input,
-  notification,
-  Alert,
-} from "antd";
-import {
-  PlusCircleFilled,
-  FolderAddOutlined,
-  CheckCircleOutlined,
-  FolderOutlined,
-} from "@ant-design/icons";
-
-import axios from "axios";
-
-import {
-  FOLDER_CREATED,
-  FILE_UPLOADED,
-  FOLDER_NAME
-} from '../../reducer/types';
+import {  Layout,  Menu,  Modal,  Divider,  Button,
+  Form,  Input,  notification,  Alert,} from "antd";
+import {  FolderAddOutlined,  CheckCircleOutlined,  FolderOutlined,} from "@ant-design/icons";
+import {  FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST, FOLDER_LIST} from '../../reducer/types';
 import { url, GetFolders, GetFiles, CreateNewFolder } from '../API/index';
 
 import { Context } from '../../Context';
@@ -45,7 +24,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     setIsModalVisible(true);
   };
 
-  const createNewFolder = (value) => {
+  const callCreateFolder = (value) => {
     console.log(state);
     setFolderSubmitBtn(true);
 
@@ -83,26 +62,34 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       type: FOLDER_NAME, payload: {
         folderName: folderName
       }
-    })
-  }
+    });
+    GetFiles(state.userId, folderName).then(res => {
+      console.log('My Videos Files in sidenav - ', res);
+       dispatch({
+        type: FILE_LIST,
+        payload: {
+          fileList: res
+        }});
+  });  }
 
 
   const showAllvideos = () => {
     GetFolders(state.userId).then(res => {
       console.log('Get Folders res - ', res);
-      setFolders(res);
+      dispatch({  type : FOLDER_LIST ,  payload : { folderList : res  }});
+      dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
     });
   }
 
   // const sidenavFolders = GetFolders(state.userId);
 
-  useEffect((prevState) => {
+  useEffect(() => {
     //getFolders();
 
     showAllvideos();
 
 
-  }, [state]);
+  }, []);
 
   return (
     <>
@@ -116,7 +103,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
         >
           <SubMenu key="my-videos-submenu" title="My Videos">
 
-            <Menu.Item key="my-videos" onClick={() => showAllvideos('default')}>All Videos</Menu.Item>
+            <Menu.Item key="my-videos" onClick={() => showAllvideos()}>All Videos</Menu.Item>
 ̉̉
             <Menu.Item disabled={true} className="createFolderMenuItem" key="cf">
               <Button
@@ -132,19 +119,16 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             </Menu.Item>
 
 
-            {folders.map((folder, index) => {
-              return (
-                <Menu.Item key={'folder-' + index} onClick={() => folderDetail(folder.split('/')[0])} title={folder.replace('temp.dod', '')}>
-                  <FolderOutlined /> {folder.split('/')[0]}
+            {state.folderList.map((folder, index) => {
+              return  folder._object_name.includes("temp.dod")?  (
+                <Menu.Item key={'folder-' + index} 
+                onClick={() => folderDetail(folder._object_name.split('/')[0])} title={folder._object_name.split('/')[0]}>
+                  <FolderOutlined /> {folder._object_name.split('/')[0]}
                 </Menu.Item>
-              )
+              ) : null
 
             }
             )}
-
-
-
-
 
           </SubMenu>
           <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
@@ -164,7 +148,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
         <Form
           name="basic"
           initialValues={{}}
-          onFinish={createNewFolder}
+          onFinish={callCreateFolder}
           layout="vertical"
         >
           {errMsg ? <Alert message={errMsg} closable

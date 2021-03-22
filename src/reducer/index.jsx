@@ -4,7 +4,9 @@ import {
    PAGE,
    FOLDER_CREATED,
    FILE_UPLOADED,
-   FOLDER_NAME
+   FOLDER_NAME ,
+   FOLDER_LIST ,
+   FILE_LIST
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -18,7 +20,9 @@ export const initialState = {
    page: 'my-videos',
    folderCreated: null,
    fileUploaded: null,
-   folderName: ''
+   folderName: '' ,
+   folderList : [],
+   fileList : []
 }
 
 export const reducer = (state = initialState, action) => {
@@ -69,6 +73,12 @@ export const reducer = (state = initialState, action) => {
             ...state,
             folderName: action.payload.folderName
          }
+      
+      case FOLDER_LIST:
+         return {   ...state,  folderList : action.payload.folderList}
+      
+      case FILE_LIST:
+         return {   ...state,  fileList : action.payload.fileList}
 
       default:
          return state;

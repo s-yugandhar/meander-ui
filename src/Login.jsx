@@ -1,21 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  Button,
-  Form,
-  Input,
-  Layout,
-  Card,
-  Checkbox,
-  Divider,
-  Typography,
-  Row,
-  Col,
-  Icon
-} from "antd";
+import {  Button,  Form,  Input,  Layout,  Card,   Typography,  Row,  Col} from "antd";
 import axios from "axios";
 import qs from "qs";
-
-
 import { url } from "../src/components/API";
 import { CreateNewFolder } from './components/API';
 import { Context } from "./Context";

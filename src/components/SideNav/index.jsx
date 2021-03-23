@@ -24,34 +24,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     setIsModalVisible(true);
   };
 
-  const callCreateFolder = (value) => {
-    console.log(state);
-    setFolderSubmitBtn(true);
-
-    CreateNewFolder(state.userId, value.folderName).then(res => {
-      if (res.status_code === 200) {
-        setErrMsg(res.detail);
-        setFolderSubmitBtn(false);
-      } else if (res.status_code === 201) {
-        setIsModalVisible(false);
-
-        notification.open({
-          message: `Successfully created`,
-          description: `Successfully ${value.folderName} created`,
-          icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
-        });
-        updateTab('my-videos');
-        setErrMsg(null);
-        dispatch({ type: FOLDER_CREATED, payload: { folderCreated: value.folderName } });
-        setFolderSubmitBtn(false);
-      } else {
-        setErrMsg('Unknown error occured');
-      }
-    })
-
-
-  };
-
+  
   const createFolderModalClose = () => {
     setIsModalVisible(false);
     setErrMsg(null);
@@ -81,7 +54,32 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     });
   }
 
-  // const sidenavFolders = GetFolders(state.userId);
+  const callCreateFolder = (value) => {
+    console.log(state);
+    setFolderSubmitBtn(true);
+
+    CreateNewFolder(state.userId, value.folderName).then(res => {
+      if (res.status_code === 200) {
+        setErrMsg(res.detail);
+        setFolderSubmitBtn(false);
+      } else if (res.status_code === 201) {
+        setIsModalVisible(false);
+
+        notification.open({
+          message: `Successfully created`,
+          description: `Successfully ${value.folderName} created`,
+          icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
+        });
+        updateTab('my-videos');
+        setErrMsg(null);
+        showAllvideos();
+        dispatch({ type: FOLDER_CREATED, payload: { folderCreated: value.folderName } });
+        setFolderSubmitBtn(false);
+      } else {
+        setErrMsg('Unknown error occured');
+      }
+    })
+  };
 
   useEffect(() => {
     //getFolders();

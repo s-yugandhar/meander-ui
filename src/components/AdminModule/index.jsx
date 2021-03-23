@@ -15,7 +15,8 @@ import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
-import { FOLDER_NAME } from "../../reducer/types";
+import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED } from "../../reducer/types";
+import { deleteAfterUpload , GetFiles}  from '../API'
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -32,7 +33,16 @@ const AdminModule = (props) => {
 
   const localUserId = localStorage.getItem('userId');
 
-  
+  function updateFiles(id , folderName){
+    GetFiles(id , folderName).then(res => {
+       console.log('My Videos Files in sidenav - ', res);
+        dispatch({
+         type: FILE_LIST,
+         payload: {
+           fileList: res
+         }}); });
+       }
+
   const uppy = useUppy(() => {
     return new Uppy({   
       autoProceed : true,debug:true 
@@ -44,13 +54,22 @@ const AdminModule = (props) => {
         return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
       }
     }).on('complete', result => {
-      console.log('Video result', result);
-      dispatch({
-        type: 'FILE_UPLOADED',
-        payload: {
-          fileName: ""
-        }
-      })
+      console.log(result , "inside uppy complete event")
+      let succes = result.successful;
+      let failed = result.failed;
+      let batchId = result.uploadID;
+      succes.map((obj,ind)=>{
+         if( obj.progress.uploadComplete=== true){
+            dispatch({ type: FILE_UPLOADED,  payload: { fileNmae:  obj.name }   })
+            deleteAfterUpload(obj.s3Multipart.uploadId);
+         }
+      });
+
+      dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   })
+      dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   })
+      dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   })
+      updateFiles(state.userId,state.folderName);
+
     })
   });
 

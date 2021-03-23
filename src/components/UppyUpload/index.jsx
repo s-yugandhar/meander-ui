@@ -9,6 +9,8 @@ import { Dashboard, useUppy } from '@uppy/react'
 import './uppyUpload.scss';
 import { Drawer } from 'antd';
 import {Context} from '../../context';
+import { FILE_UPLOADED , FILE_LIST, UPPY_SUCCESS, UPPY_FAILED ,UPPY_BATCHID } from '../../reducer/types';
+import { GetFiles , deleteAfterUpload } from '../API';
 
 const UppyUpload = (props) => {
    const [visible, setVisible] = useState(props.visible);
@@ -32,13 +34,38 @@ const UppyUpload = (props) => {
       })
    });
 
+  function updateFiles(id , folderName){
+   GetFiles(id , folderName).then(res => {
+      console.log('My Videos Files in sidenav - ', res);
+       dispatch({
+        type: FILE_LIST,
+        payload: {
+          fileList: res
+        }}); });
+      }
+
+   uppy.on('complete', (result) => {
+      console.log(result , "inside uppy complete event")
+      let succes = result.successful;
+      let failed = result.failed;
+      let batchId = result.uploadID;
+      succes.map((obj,ind)=>{
+         if( obj.progress.uploadComplete=== true){
+            dispatch({ type: FILE_UPLOADED,  payload: { fileNmae:  obj.name }   })
+            deleteAfterUpload(obj.s3Multipart.uploadId);
+         }
+      });
+
+      dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   })
+      dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   })
+      dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   })
+      updateFiles(state.userId,state.folderName);
+    });
+
    useEffect(()=>{
       uppy.setMeta( { userId: localUserId , foldername : state.folderName})
 
    },[state.folderName,localUserId])
-
-
-
 
    return (
       <Drawer

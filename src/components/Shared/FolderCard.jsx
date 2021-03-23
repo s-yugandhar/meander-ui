@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Button, Card, Dropdown, Menu } from "antd";
 import {
    EditOutlined,
@@ -8,17 +8,25 @@ import {
    EllipsisOutlined,
    DeleteFilled
 } from "@ant-design/icons";
+import {deleteFile_Folder} from '../API';
+import { Context} from '../../context'
 
 const FolderCard = (props) => {
 
-   const deleteFolder = () => {
-      alert('Do you really want to delte folder?');
+   const {state,dispatch}= useContext(Context);
+
+   const deleteFolder = (id , folder) => {
+      alert('Do you really want to delte folder and its content ?');
+      if( folder._object_name.includes("temp.dod")   )
+      deleteFile_Folder(id , folder._object_name.split("/")[0] , true  );
+      else 
+      alert("this is not a folder to delete")
    }
 
    const menu = (
       <Menu>
          <Menu.Item key="delete-folder">
-            <Button type="link" className="delete-folder-btn" onClick={deleteFolder}><DeleteFilled /> Delete</Button>
+            <Button type="link" className="delete-folder-btn" onClick={(e)=>deleteFolder(props.userId,props.folderObject )}><DeleteFilled /> Delete</Button>
          </Menu.Item>
       </Menu>
    );

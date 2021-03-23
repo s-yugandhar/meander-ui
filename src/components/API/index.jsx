@@ -60,6 +60,36 @@ export const CreateNewFolder = async (userId, folderName) => {
    });
 
    return crtFolder;
-
-
 };
+
+
+export const deleteAfterUpload = async (uploadId) => {
+   const crtFolder = await axios.delete(url + '/s3/multipart/' + uploadId , null, {
+      headers: {
+         accept: 'application/json'
+      }
+   }).then(res => {
+      console.log('Create Folder Res - ', res);
+      alert("delete after upload ",res);
+   }).catch(err => {
+      alert("delete after upload ", err);
+   });
+
+   return crtFolder;
+};
+
+
+export const deleteFile_Folder = async ( userId,objectName , recursive) => {
+   let recflag = recursive === false ? '&recursive=false&object_name=' : '&recursive=true&object_name='
+   if (objectName === '') return null;
+   const getFiles = await axios.delete(url + '/delete_objects?id=' + userId + recflag + objectName, null, {
+      headers: {
+         accept: 'application/json',
+      }
+   }).then(res => {
+      console.log(  "delete success" , res , objectName , recursive , userId);      
+   }).then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );
+
+   return getFiles;
+
+}

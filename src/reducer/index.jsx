@@ -6,7 +6,10 @@ import {
    FILE_UPLOADED,
    FOLDER_NAME ,
    FOLDER_LIST ,
-   FILE_LIST
+   FILE_LIST,
+   UPPY_SUCCESS,
+   UPPY_FAILED,
+   UPPY_BATCHID
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -22,7 +25,10 @@ export const initialState = {
    fileUploaded: null,
    folderName: '' ,
    folderList : [],
-   fileList : []
+   fileList : [],
+   uppySuccess : [],
+   uppyFailed : [],
+   uppyBatchId : null 
 }
 
 export const reducer = (state = initialState, action) => {
@@ -79,7 +85,16 @@ export const reducer = (state = initialState, action) => {
       
       case FILE_LIST:
          return {   ...state,  fileList : action.payload.fileList}
+      
+      case UPPY_SUCCESS:
+         return {   ...state,  uppySuccess : action.payload.uppySuccess}
 
+      case UPPY_FAILED:
+         return {   ...state,  uppyFailed : action.payload.uppyFailed}
+
+      case UPPY_BATCHID:
+         return {  ...state,  uppyBatchId: action.payload.uppyBatchId}
+      
       default:
          return state;
    }

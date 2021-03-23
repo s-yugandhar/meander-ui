@@ -61,13 +61,13 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           folderList: res
         }   });
     });
-
   }
 
   function countVideos(val){
     let cnt = 0;
     state.folderList.map((obj , ind)=>{
-        if( obj._object_name.includes(val) && obj._object_name.includes(state.userId) === false  ) cnt = cnt + 1;
+      //&& obj._object_name.includes(state.userId) === false
+        if( obj._object_name.includes(val)   ) cnt = cnt + 1;
     });
     return cnt-1;
   }
@@ -143,16 +143,17 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
                 return  folder._object_name.includes("temp.dod") ?    (
                   <motion.div key={'folder-' + index} className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item}>
-                    <FolderCard folderName={folder._object_name.split('/')[0]} videosCount={ countVideos(folder._object_name.split('/')[0])} folderOnClick={() => innerFolder(folder._object_name.split('/')[0])} />
+                    <FolderCard folderName={folder._object_name.split('/')[0]}  folderObject ={folder} userId={state.userId}
+                    videosCount={ countVideos(folder._object_name.split('/')[0])} folderOnClick={() => innerFolder(folder._object_name.split('/')[0])} />
                   </motion.div>
                 ) : null
               })   }
 
               { state.folderName === '' && state.folderList.map((folder, index) => {
-
-              return  folder._object_name.includes("temp.dod") === false && folder._object_name.includes(state.userId) === false   ?    (
+                  //&& folder._object_name.includes(state.userId) === false
+              return  folder._object_name.includes("temp.dod") === false    ?    (
                 <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item} key={'file-' + index}>
-                <VideoCard videoTitle={folder._object_name.split('/')[1]} />
+                <VideoCard videoTitle={folder._object_name.split('/')[1]}   fileObject={folder} userId={state.userId} />
               </motion.div>
         ) : null
               })   }
@@ -162,7 +163,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                 state.folderName !== '' && state.fileList.length > 0 ?
                   state.fileList.map((file, index) => (
                     <motion.div className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo" variants={item} key={'file-' + index}>
-                      <VideoCard videoTitle={file._object_name.split('/')[1]} />
+                      <VideoCard videoTitle={file._object_name.split('/')[1]} fileObject={file} userId={state.userId}/>
                     </motion.div>
                   )) : ""
               }

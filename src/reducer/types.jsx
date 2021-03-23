@@ -6,3 +6,6 @@ export const FILE_UPLOADED = "FILE_UPLOADED";
 export const FOLDER_NAME = "FOLDER_NAME";
 export const FOLDER_LIST = "FOLDER_LIST";
 export const FILE_LIST = "FILE_LIST";
+export const UPPY_SUCCESS = "UPPY_SUCCESS";
+export const UPPY_FAILED = "UPPY_FAILED";
+export const UPPY_BATCHID = "UPPY_BATCHID";

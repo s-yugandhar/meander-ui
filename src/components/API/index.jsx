@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 export const url = "http://188.42.97.42:8000";
-
+//export const url = "http://127.0.0.1:8002";
 
 
 export const GetFolders = async (userId) => {
@@ -70,9 +70,9 @@ export const deleteAfterUpload = async (uploadId) => {
       }
    }).then(res => {
       console.log('Create Folder Res - ', res);
-      alert("delete after upload ",res);
+      alert("delete after upload success");
    }).catch(err => {
-      alert("delete after upload ", err);
+      alert("delete temporary objects after upload failed");
    });
 
    return crtFolder;
@@ -88,7 +88,8 @@ export const deleteFile_Folder = async ( userId,objectName , recursive) => {
       }
    }).then(res => {
       console.log(  "delete success" , res , objectName , recursive , userId);      
-   }).then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );
+   });
+   /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
 
    return getFiles;
 

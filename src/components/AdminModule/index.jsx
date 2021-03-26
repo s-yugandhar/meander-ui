@@ -6,7 +6,8 @@ import 'uppy/dist/uppy.min.css';
 import '@uppy/core/dist/style.css'
 import '@uppy/drag-drop/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
-import { Dashboard, useUppy } from '@uppy/react';
+import ThumbnailGenerator from '@uppy/thumbnail-generator';
+import { Dashboard, useUppy    } from '@uppy/react';
 import { Context } from '../../context';
 import "./adminModule.scss";
 import SideNav from "../SideNav";
@@ -16,7 +17,7 @@ import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED } from "../../reducer/types";
-import { deleteAfterUpload , GetFiles}  from '../API'
+import { deleteAfterUpload , GetFiles  , url}  from '../API'
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -45,10 +46,12 @@ const AdminModule = (props) => {
 
   const uppy = useUppy(() => {
     return new Uppy({   
-      autoProceed : true,debug:true 
+      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ 'image/*','video/*']} 
+    }).use(ThumbnailGenerator,{ waitForThumbnailsBeforeUpload : false,
+      thumbnailWidth: 200,  thumbnailHeight: 200,  thumbnailType: 'image/jpeg',
     }).use(AwsS3Multipart, {
       limit: 1,
-      companionUrl: 'http://188.42.97.42:8000/',
+      companionUrl: url,
       getChunkSize(file) {
         var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
         return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
@@ -64,7 +67,6 @@ const AdminModule = (props) => {
             deleteAfterUpload(obj.s3Multipart.uploadId);
          }
       });
-
       dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   })
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   })
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   })
@@ -73,8 +75,11 @@ const AdminModule = (props) => {
     })
   });
 
+  uppy.on('thumbnail:generated', (file, preview) => {
+    console.log( " thumbnail generated"  , file , preview);
+  });
 
-
+  
   const closeUploadVideo = () => {
     setUploadVideo(false);
   }

@@ -57,10 +57,14 @@
 }
 
 .uploadVideoDrawer {
-  width: 100% !important;
+  /* width: 100% !important; */
 
   .ant-drawer-body {
     padding: 0;
+  }
+
+  &.ant-drawer-open {
+    width: 100% !important
   }
 
   .uppy-Dashboard-inner,
@@ -69,8 +73,15 @@
   }
 
   @include bp(md) {
-    width: 500px !important;
+    /* width: 500px !important; */
+    &.ant-drawer-open {
+    width: 500px !important
   }
+  }
+}
+
+.ant-drawer-open {
+
 }
 
 .createFolderMenuItem {
@@ -81,8 +92,7 @@
   margin-bottom: 4px !important;
   display: flex;
   align-items: center;
-  justify-content: center;
-
+  justify-content: center;;
   .createFolderBtn {
     display: flex;
     align-items: center;
@@ -91,5 +101,34 @@
   .createFolderBtnIcon {
     font-size: 19px;
     margin-right: 5px;
+  }
+}
+
+
+.uploadSelectfolderBlock {
+  padding: 7px;
+}
+
+.uploadFileUppyBlock {
+  height: calc(100% - 50px);
+  padding: 10px;
+
+  > div {
+    border: 2px dashed #eee;
+    border-radius: 5px;
+    background-color: #fafafa;
+  }
+
+  .uppy-Dashboard-AddFiles-title {
+    font-size: 30px;
+    color: #888;
+  }
+
+  .uppy-Dashboard-browse {
+    cursor: pointer;
+
+    &:hover {
+      color: #333;
+    }
   }
 }

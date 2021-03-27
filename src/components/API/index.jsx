@@ -3,6 +3,10 @@ import axios from 'axios';
 
 
 export const url = "http://188.42.97.42:8000";
+
+
+
+
 //export const url = "http://127.0.0.1:8002";
 
 
@@ -87,7 +91,7 @@ export const deleteFile_Folder = async ( userId,objectName , recursive) => {
          accept: 'application/json',
       }
    }).then(res => {
-      console.log(  "delete success" , res , objectName , recursive , userId);      
+      console.log(  "delete success" , res , objectName , recursive , userId);
    });
    /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
 

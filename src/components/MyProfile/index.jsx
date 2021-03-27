@@ -12,22 +12,22 @@ const MyProfile = () => {
    };
 
    return (
-      <Layout style={{ padding: "24px" }}>
-         <Content
-            className="site-layout-background"
-            style={{
-               padding: 24,
-               margin: 0,
-               minHeight: "100vh",
-            }}
-         >
-            <Row>
-               <Col>
-                  <h3 className="page-title">My Profile</h3>
-               </Col>
-            </Row>
-         </Content>
-      </Layout>
+     <Layout className="main">
+       <Content
+         className="site-layout-background"
+         style={{
+           padding: 24,
+           margin: 0,
+           minHeight: "100vh",
+         }}
+       >
+         <Row>
+           <Col>
+             <h3 className="page-title">My Profile</h3>
+           </Col>
+         </Row>
+       </Content>
+     </Layout>
    );
 };
 

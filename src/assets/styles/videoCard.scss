@@ -1,0 +1,62 @@
+.embed-code-block {
+  background-color: white;
+
+  .embed-code-input {
+    width: 100%;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    resize: none;
+    font-size: medium;
+    border-radius: 5px;
+    font-weight: 500;
+  }
+}
+
+.embed-copy-block {
+  margin-top: 10px;
+}
+
+.embed-copy-btn {
+  width: 100%;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 100px;
+}
+
+.videoBlock {
+  position: relative;
+  float: left;
+  width: 100%;
+  background-color: rgba(0,0,0,0.4);
+  .playBtn {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -25px 0 0 -25px;
+    z-index: 6;
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    display: flex;
+   align-items: center;
+   color: white;
+   justify-content: center;
+   opacity: 0.6;
+   cursor: pointer;
+
+   svg {
+      width: 50px;
+      height: 50px;
+   }
+
+   &:hover {
+      opacity: 1;
+   }
+  }
+}

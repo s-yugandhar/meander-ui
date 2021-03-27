@@ -24,7 +24,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     setIsModalVisible(true);
   };
 
-  
+
   const createFolderModalClose = () => {
     setIsModalVisible(false);
     setErrMsg(null);
@@ -94,16 +94,21 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
-          defaultOpenKeys={['my-videos-submenu']}
+          defaultOpenKeys={["my-videos-submenu"]}
           selectedKeys={selectedKeys}
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu key="my-videos-submenu" title="My Videos">
-
-            <Menu.Item key="my-videos" onClick={() => showAllvideos()}>All Videos</Menu.Item>
-̉̉
-            <Menu.Item disabled={true} className="createFolderMenuItem" key="cf">
+            <Menu.Item key="my-videos" onClick={() => showAllvideos()}>
+              All Videos
+            </Menu.Item>
+            ̉̉
+            <Menu.Item
+              disabled={true}
+              className="createFolderMenuItem"
+              key="cf"
+            >
               <Button
                 type="primary"
                 shape="round"
@@ -115,24 +120,23 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 Create Folder
               </Button>
             </Menu.Item>
-
-
             {state.folderList.map((folder, index) => {
-              return  folder._object_name.includes("temp.dod")?  (
-                <Menu.Item key={'folder-' + index} 
-                onClick={() => folderDetail(folder._object_name.split('/')[0])} title={folder._object_name.split('/')[0]}>
-                  <FolderOutlined /> {folder._object_name.split('/')[0]}
+              return folder._object_name.includes("temp.dod") ? (
+                <Menu.Item
+                  key={"folder-" + index}
+                  onClick={() =>
+                    folderDetail(folder._object_name.split("/")[0])
+                  }
+                  title={folder._object_name.split("/")[0]}
+                >
+                  <FolderOutlined /> {folder._object_name.split("/")[0]}
                 </Menu.Item>
-              ) : null
-
-            }
-            )}
-
+              ) : null;
+            })}
           </SubMenu>
           <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
             Add Video
           </Menu.Item>
-
         </Menu>
       </Sider>
       <Modal
@@ -149,27 +153,40 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           onFinish={callCreateFolder}
           layout="vertical"
         >
-          {errMsg ? <Alert message={errMsg} closable
-            onClose={() => setErrMsg(null)} type="error" style={{ marginBottom: '20px' }} /> : null}
+          {errMsg ? (
+            <Alert
+              message={errMsg}
+              closable
+              onClose={() => setErrMsg(null)}
+              type="error"
+              style={{ marginBottom: "20px" }}
+            />
+          ) : null}
           <Form.Item
             label="Folder Name"
             name="folderName"
             rules={[
               {
                 required: true,
-                message: 'Please enter any name!',
-              }, {
-                pattern: /^[A-Za-z0-9 ]+$/,
-                message: 'Special characters are not allowed',
+                message: "Please enter any name!",
               },
-              { max: 35, message: 'Maximum 35 characters' },
+              {
+                pattern: /^[A-Za-z0-9 ]+$/,
+                message: "Special characters are not allowed",
+              },
+              { max: 35, message: "Maximum 35 characters" },
             ]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" size="large" disabled={folderSubmitBtn}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              disabled={folderSubmitBtn}
+            >
               Create Folder
             </Button>
           </Form.Item>

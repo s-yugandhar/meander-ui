@@ -1,0 +1,19 @@
+.edit-video-block {
+   position: relative;
+   height: 100%;
+
+   .video-container {
+      position: relative;
+   }
+
+   .video {
+      width: 100%;
+      height: 300px;
+      background-color: #ddd;
+      margin-top: 30px;
+   }
+}
+
+.edit-video-actions {
+   margin-top: 10px;
+}

@@ -18,6 +18,7 @@ import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED } from "../../reducer/types";
 import { deleteAfterUpload , GetFiles  , url}  from '../API'
+import EditVideo from "../EditVideo";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -45,8 +46,8 @@ const AdminModule = (props) => {
        }
 
   const uppy = useUppy(() => {
-    return new Uppy({   
-      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ 'image/*','video/*']} 
+    return new Uppy({
+      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ 'image/*','video/*']}
     }).use(ThumbnailGenerator,{ waitForThumbnailsBeforeUpload : false,
       thumbnailWidth: 200,  thumbnailHeight: 200,  thumbnailType: 'image/jpeg',
     }).use(AwsS3Multipart, {
@@ -79,9 +80,9 @@ const AdminModule = (props) => {
     console.log( " thumbnail generated"  , file , preview);
   });
 
-  
+
   const closeUploadVideo = () => {
-    setUploadVideo(false);
+    setUploadVideo(!uploadVideo);
   }
 
 
@@ -106,9 +107,10 @@ const AdminModule = (props) => {
   );
 
   const page = {
-    'my-videos': <MyVideos />,
-    'add-video': <AddVideo />,
-    'my-profile': <MyProfile />,
+    "my-videos": <MyVideos />,
+    "add-video": <AddVideo />,
+    "my-profile": <MyProfile />,
+    "edit-video": <EditVideo />,
 
     /* switch (context.state.page) {
       case "my-videos":
@@ -121,7 +123,7 @@ const AdminModule = (props) => {
       default:
         return <MyVideos />
     } */
-  }
+  };
 
 
 
@@ -145,7 +147,7 @@ const AdminModule = (props) => {
 
   return (
     <>
-      {localUserId ?
+      {localUserId ? (
         <Layout>
           <Header className="header">
             <Row>
@@ -155,13 +157,18 @@ const AdminModule = (props) => {
               <Col span={18}>
                 <Row justify="end">
                   <Col>
-                    <Dropdown overlay={userMenu} trigger={['click']}>
-                      <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{ color: 'white', }}>
+                    <Dropdown overlay={userMenu} trigger={["click"]}>
+                      <a
+                        className="ant-dropdown-link"
+                        onClick={(e) => e.preventDefault()}
+                        style={{ color: "white" }}
+                      >
                         <Avatar
                           size={30}
                           icon={<UserOutlined />}
-                          style={{ marginRight: '5px' }}
-                        /> My Account <DownOutlined />
+                          style={{ marginRight: "5px" }}
+                        />{" "}
+                        My Account <DownOutlined />
                       </a>
                     </Dropdown>
                   </Col>
@@ -169,14 +176,13 @@ const AdminModule = (props) => {
               </Col>
             </Row>
           </Header>
-          <Layout style={{ paddingBottom: "50px" }}>
-
-            <SideNav updateTab={(tab) => setSelectedTab(tab)} openUploadVideo={(toggle) => setUploadVideo(toggle)} />
-            {
-              page[state.page]
-              ||
-              "You do not have permissions to view this module"
-            }
+          <Layout>
+            <SideNav
+              updateTab={(tab) => setSelectedTab(tab)}
+              openUploadVideo={() => setUploadVideo(!uploadVideo)}
+            />
+            {page[state.page] ||
+              "You do not have permissions to view this module"}
 
             <Drawer
               title="Upload Videos"
@@ -188,28 +194,45 @@ const AdminModule = (props) => {
               mask={false}
               className="uploadVideoDrawer"
             >
-           <Row>   <Select style={{ width: 200 }}
-    placeholder="search folder"    optionFilterProp="children"  value = {state.folderName}
-    onChange={(value)=> dispatch({  type : FOLDER_NAME , payload : { folderName : value }  })  } 
-  >
-       { state.folderList.map((obj , ind) =>{
-          return obj._object_name.includes("temp.dod") ?  (<Option key={obj._object_name.split("/")[0]} 
-            value={obj._object_name.split("/")[0]}> { obj._object_name.split("/")[0] } </Option>) : null  } )
-       }
-  </Select> {"selected --->"+ state.folderName}</Row>
-              <Dashboard
-                uppy={uppy}
-                showProgressDetails={true}
-              />
-
+              <div className="uploadSelectfolderBlock">
+                <Select
+                  size="large"
+                  style={{ width: "100%" }}
+                  placeholder="search folder"
+                  optionFilterProp="children"
+                  value={state.folderName}
+                  onChange={(value) =>
+                    dispatch({
+                      type: FOLDER_NAME,
+                      payload: { folderName: value },
+                    })
+                  }
+                >
+                  {state.folderList.map((obj, ind) => {
+                    return obj._object_name.includes("temp.dod") ? (
+                      <Option
+                        key={obj._object_name.split("/")[0]}
+                        value={obj._object_name.split("/")[0]}
+                      >
+                        {" "}
+                        {obj._object_name.split("/")[0]}{" "}
+                      </Option>
+                    ) : null;
+                  })}
+                </Select>{" "}
+                {/* {"selected --->" + state.folderName} */}
+              </div>
+              <div className="uploadFileUppyBlock">
+                <Dashboard uppy={uppy} showProgressDetails={true} />
+              </div>
             </Drawer>
 
             <UploadVideoFloatingBtn onClick={() => setUploadVideo(true)} />
           </Layout>
-        </Layout >
-        :
+        </Layout>
+      ) : (
         <Login />
-      }
+      )}
     </>
   );
 };

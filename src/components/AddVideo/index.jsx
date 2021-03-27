@@ -45,7 +45,7 @@ const AddVideo = () => {
   }, []);
 
   return (
-    <Layout style={{ padding: "24px" }}>
+    <Layout className="main">
       <Content
         className="site-layout-background"
         style={{
@@ -62,10 +62,7 @@ const AddVideo = () => {
         <Divider orientation="left" style={{ margin: "10px 0" }} />
         <Row>
           <Col span={24}>
-            <UppyUpload
-              height={350}
-              width="100%"
-            />
+            <UppyUpload height={350} width="100%" />
           </Col>
         </Row>
       </Content>

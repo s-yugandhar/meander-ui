@@ -1,21 +1,11 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import {
-  Layout,
-  Menu,
-  Row,
-  Col,
-  Divider,
-  Input,
-  Select,
-  Typography,
-  Empty,
-  Modal,
-  Form,
-  Button,
-  message,
-} from "antd";
+import {  Layout, Menu,  Row,
+  Col,  Divider,  Input,
+  Select,  Typography,  Empty,
+  Modal,  Form,  Button,
+  message,} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -110,9 +100,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   };
 
   // Show Embed code popup
-  const embedPopup = (text) => {
+  const embedPopup = (obj) => {
+    let frame = "<iframe src="+url+"'/player' width='1920' height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' allowfullscreen title='test_vimeo'></iframe>";
     setToggleEmbed(true);
-    setEmbedCode(text);
+    setEmbedCode(frame);
   };
 
   // close Embed Code Popup
@@ -246,7 +237,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                         fileObject={folder}
                         userId={state.userId}
                         embedClick={() =>
-                          embedPopup(folder._object_name.split("/")[1])
+                          embedPopup(folder)
                         }
                         editClick={() =>
                           editVideo(folder._object_name.split("/")[1])

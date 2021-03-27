@@ -37,13 +37,10 @@ const AdminModule = (props) => {
 
   function updateFiles(id , folderName){
     GetFiles(id , folderName).then(res => {
-       console.log('My Videos Files in sidenav - ', res);
-        dispatch({
-         type: FILE_LIST,
-         payload: {
-           fileList: res
-         }}); });
-       }
+      console.log('My Videos Files in sidenav - ', res);
+      dispatch({ type: FILE_LIST, payload: { fileList: res }});
+     });
+  }
 
   const uppy = useUppy(() => {
     return new Uppy({
@@ -87,9 +84,9 @@ const AdminModule = (props) => {
 
 
   const logout = () => {
-    /* localStorage.removeItem('token');
+     localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    window.location.reload(); */
+    window.location.reload(); 
     dispatch({
       type: 'LOGOUT_SUCCESS'
     })
@@ -100,7 +97,7 @@ const AdminModule = (props) => {
       <Menu.Item onClick={() => setSelectedTab('my-profile')}>
         My Profile
       </Menu.Item>
-      <Menu.Item onClick={logout}>
+      <Menu.Item onClick={(e)=>logout}>
         Logout
       </Menu.Item>
     </Menu>
@@ -208,7 +205,7 @@ const AdminModule = (props) => {
                     })
                   }
                 >
-                  {state.folderList.map((obj, ind) => {
+                  {state.folderList !== undefined ? state.folderList.map((obj, ind) => {
                     return obj._object_name.includes("temp.dod") ? (
                       <Option
                         key={obj._object_name.split("/")[0]}
@@ -217,8 +214,7 @@ const AdminModule = (props) => {
                         {" "}
                         {obj._object_name.split("/")[0]}{" "}
                       </Option>
-                    ) : null;
-                  })}
+                    ) : null }) : null}
                 </Select>{" "}
                 {/* {"selected --->" + state.folderName} */}
               </div>

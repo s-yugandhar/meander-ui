@@ -17,7 +17,7 @@ const localToken = localStorage.getItem('token');
 const localUserName = localStorage.getItem('userName');
 
 export const initialState = {
-   token: localToken ? localUserId : null,
+   token: localToken ? localToken : null,
    userId: localUserId ? localUserId : null,
    userName: localUserName ? localUserName : null,
    page: 'my-videos',

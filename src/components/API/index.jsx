@@ -1,33 +1,30 @@
 
 import axios from 'axios';
-
-
+import { useContext} from 'react';
+import {notification} from 'antd';
+import {Context} from '../../context'
 export const url = "http://188.42.97.42:8000";
-
-
-
 
 //export const url = "http://127.0.0.1:8002";
 
 
-export const GetFolders = async (userId) => {
-   let tempFolders = [];
-   let tempFiles= [];
-
+export const GetFolders= async (userId)=>{
    const getFolders = await axios.post(url + '/list_objects?id=' + userId + '&recursive=true', null, {
       headers: {
          accept: 'application/json',
       }
    }).then(res => {
-
+   
       return res.data;
-   })
 
+   })
    return getFolders;
 
 }
 
-export const GetFiles = async (userId, folderName) => {
+
+export async function GetFiles(userId, folderName) {
+
    let tempFiles = [];
    if (folderName === '') return [];
    const getFiles = await axios.post(url + '/list_objects?id=' + userId + '&recursive=false&foldername=' + folderName, null, {
@@ -42,7 +39,6 @@ export const GetFiles = async (userId, folderName) => {
       });
 
       console.log('Get Files after filter - ', tempFiles);
-
       return tempFiles;
    });
 
@@ -58,6 +54,7 @@ export const CreateNewFolder = async (userId, folderName) => {
       }
    }).then(res => {
       console.log('Create Folder Res - ', res);
+      GetFolders(userId);
       return res.data;
    }).catch(err => {
 
@@ -73,10 +70,13 @@ export const deleteAfterUpload = async (uploadId) => {
          accept: 'application/json'
       }
    }).then(res => {
-      console.log('Create Folder Res - ', res);
-      alert("delete after upload success");
+      console.log('delete after upload - ', res);
+      notification.open({message: "deleting temporary chunks after upload success"});
+      return "";
    }).catch(err => {
-      alert("delete temporary objects after upload failed");
+      notification.open({message: `deleting temporary chunks after upload Failed ,
+       please delete objects with number names manually` });
+       return "";
    });
 
    return crtFolder;
@@ -91,10 +91,12 @@ export const deleteFile_Folder = async ( userId,objectName , recursive) => {
          accept: 'application/json',
       }
    }).then(res => {
+      notification.open({ message : "Delete action succesful" });
       console.log(  "delete success" , res , objectName , recursive , userId);
-   });
+      return "";   });
    /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
 
    return getFiles;
 
 }
+

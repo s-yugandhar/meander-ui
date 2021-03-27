@@ -12,11 +12,6 @@ import Login from "./Login";
 const App = (props) => {
 
   let apiUrl = "";
-  if (process.env.NODE_ENV === "development") {
-    apiUrl = "http://localhost:3006";
-  } else if (process.env.NODE_ENV === "production") {
-    apiUrl = "https://api.aaonxt.com";
-  }
 
   // Reduer
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -26,26 +21,7 @@ const App = (props) => {
   const [auth, setAuth] = useState({ token: localStorage.getItem('token'), userId: localStorage.getItem('userId') });
   const { Header, Footer, Content } = Layout;
 
-  const onSubmit = (val) => {
-    console.log("Values from App.jsx - ", val);
-
-    /* context.dispatch({
-      type: 'LOGIN_SUCCESS',
-      payload: {
-        token: val.token ? val.token : null,
-        userId: val.userId ? val.userId : null,
-        page: 'my-videos'
-      }
-    }) */
-
-    setAuth({
-      token: val.token,
-      userId: val.userId
-    });
-
-  };
-
-
+  
   useEffect((prev) => {
     console.log('App page state - ', state);
     state.userId ?
@@ -56,10 +32,6 @@ const App = (props) => {
 
   return (
     <Context.Provider value={{ state: state, dispatch: dispatch }}>
-      {/* {signedIn ?
-        <AdminModule />
-        : <Login onSubmit={onSubmit} />} */}
-
       <AdminModule />
     </Context.Provider>
   );

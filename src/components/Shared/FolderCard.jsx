@@ -1,26 +1,32 @@
 import React, { useContext } from "react";
 import { Button, Card, Dropdown, Menu } from "antd";
-import {
-   EditOutlined,
-   DeleteOutlined,
-   LinkOutlined,
-   FolderFilled,
-   EllipsisOutlined,
-   DeleteFilled
-} from "@ant-design/icons";
-import {deleteFile_Folder} from '../API';
+import {   EditOutlined, DeleteOutlined,   LinkOutlined,
+   FolderFilled,   EllipsisOutlined,   DeleteFilled} from "@ant-design/icons";
+import {deleteFile_Folder , GetFolders} from '../API';
 import { Context} from '../../context'
+import {FOLDER_NAME , FOLDER_LIST} from '../../reducer/types';
 
 const FolderCard = (props) => {
 
    const {state,dispatch}= useContext(Context);
 
+   const showAllvideos = () => {
+      GetFolders(state.userId).then(res => {
+        console.log('Get Folders res - ', res);
+        dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
+        dispatch({  type : FOLDER_LIST ,  payload : { folderList : res  }});
+      });
+    }
+
+
    const deleteFolder = (id , folder) => {
-      alert('Do you really want to delte folder and its content ?');
+      let flag = window.confirm('Do you really want to delete folder and its content ?');
+    if (flag == false) return;
       if( folder._object_name.includes("temp.dod")   )
-      deleteFile_Folder(id , folder._object_name.split("/")[0] , true  );
+      deleteFile_Folder(id , folder._object_name.split("/")[0] , true  ).then((res)=>{ showAllvideos()});
       else 
-      alert("this is not a folder to delete")
+      alert("this is not a folder to delete");
+      showAllvideos();
    }
 
    const menu = (

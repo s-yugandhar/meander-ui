@@ -65,16 +65,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     show: { opacity: 1, y: 0 },
   };
 
-  const getFolders = () => {
-    GetFolders(state.userId).then((res) => {
-      dispatch({
-        type: FOLDER_LIST,
-        payload: {
-          folderList: res,
-        },
-      });
-    });
-  };
+  
 
   function countVideos(val) {
     let cnt = 0;
@@ -139,18 +130,13 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
    })
   };
 
-
+  window.addEventListener('load',(e)=>{GetFolders(state , dispatch,state.userId)}) ;
 
   useEffect(() => {
-
-
-
-
     setLoading(true);
     updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
-
-    getFolders();
+  
 
   }, []);
 

@@ -9,7 +9,9 @@ import {
    FILE_LIST,
    UPPY_SUCCESS,
    UPPY_FAILED,
-   UPPY_BATCHID
+   UPPY_BATCHID ,
+   VIDEO_LIST ,
+   EDIT_VIDEO
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -28,7 +30,9 @@ export const initialState = {
    fileList : [],
    uppySuccess : [],
    uppyFailed : [],
-   uppyBatchId : null 
+   uppyBatchId : null ,
+   videoList : [],
+   editVideo : null
 }
 
 export const reducer = (state = initialState, action) => {
@@ -94,7 +98,13 @@ export const reducer = (state = initialState, action) => {
 
       case UPPY_BATCHID:
          return {  ...state,  uppyBatchId: action.payload.uppyBatchId}
-      
+ 
+      case VIDEO_LIST :
+         return {  ...state,    videoList : action.payload.videoList }
+
+      case EDIT_VIDEO :
+         return {  ...state , editVideo : action.payload.editVideo }
+ 
       default:
          return state;
    }

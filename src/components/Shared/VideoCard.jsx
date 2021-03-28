@@ -48,19 +48,14 @@ const VideoCard = (props) => {
   });  }
 
   const showAllvideos = () => {
-    GetFolders(state.userId).then(res => {
-      console.log('Get Folders res - ', res);
-      dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
-      dispatch({  type : FOLDER_LIST ,  payload : { folderList : res  }});
-      dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
-    });
+    GetFolders(state, dispatch , state.userId);
   }
   
   async function deleteFile(id, file) {
     let flag = window.confirm("Do you really want to delete file ?");
     if (flag == false) return;
     if (!file._object_name.includes("temp.dod"))
-      deleteFile_Folder(id, file._object_name, false).
+      deleteFile_Folder(state,dispatch, id, file._object_name, false).
       then((res)=>{ state.folderName === "" ? showAllvideos() : folderDetail() ;});
     else alert("this is not a file to delete");
     

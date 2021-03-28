@@ -11,11 +11,7 @@ const FolderCard = (props) => {
    const {state,dispatch}= useContext(Context);
 
    const showAllvideos = () => {
-      GetFolders(state.userId).then(res => {
-        console.log('Get Folders res - ', res);
-        dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
-        dispatch({  type : FOLDER_LIST ,  payload : { folderList : res  }});
-      });
+      GetFolders(state,dispatch,state.userId);
     }
 
 
@@ -23,7 +19,7 @@ const FolderCard = (props) => {
       let flag = window.confirm('Do you really want to delete folder and its content ?');
     if (flag == false) return;
       if( folder._object_name.includes("temp.dod")   )
-      deleteFile_Folder(id , folder._object_name.split("/")[0] , true  ).then((res)=>{ showAllvideos()});
+      deleteFile_Folder(state , dispatch ,id , folder._object_name.split("/")[0] , true  ).then((res)=>{ showAllvideos()});
       else 
       alert("this is not a folder to delete");
       showAllvideos();

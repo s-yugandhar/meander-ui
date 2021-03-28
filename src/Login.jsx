@@ -88,7 +88,7 @@ const Login = (props) => {
         });
 
         // Create New folder
-        CreateNewFolder(loginRes.data.id, 'default');
+        //CreateNewFolder(loginRes.data.id, 'default');
 
       })
       .catch((err) => {

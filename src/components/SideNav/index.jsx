@@ -3,7 +3,7 @@ import {  Layout,  Menu,  Modal,  Divider,  Button,
   Form,  Input,  notification,  Alert,} from "antd";
 import {  FolderAddOutlined,  CheckCircleOutlined,  FolderOutlined,} from "@ant-design/icons";
 import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST, FOLDER_LIST} from '../../reducer/types';
-import { GetFolders, url, GetFiles, CreateNewFolder } from '../API/index';
+import { dbGetObjByPath ,GetFolders, url, GetFiles, CreateNewFolder } from '../API/index';
 
 import { Context } from '../../context';
 
@@ -11,73 +11,45 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   const [selectedKeys, setSelectedKeys] = useState(['my-videos']);
   const [errMsg, setErrMsg] = useState(null);
   /* const [api, contextHolder] = notification.useNotification(); */
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [folderSubmitBtn, setFolderSubmitBtn] = useState(false);
   const [folders, setFolders] = useState([]);
-
+  const [cModal , setCModal]  = useState(false);
   const { Sider } = Layout;
   const { SubMenu } = Menu;
-
+  
   const { state, dispatch } = useContext(Context);
 
   const showCreateFolder = () => {
-    setIsModalVisible(true);
+    setCModal(true);
   };
 
 
   const createFolderModalClose = () => {
-    setIsModalVisible(false);
+    setCModal(false);
     setErrMsg(null);
   }
 
   const folderDetail = (folderName) => {
     dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
     dispatch({type: FOLDER_NAME, payload: { folderName: folderName }});
+    dbGetObjByPath(state,dispatch , "bucket-"+state.userId+"/"+folderName  );
     GetFiles(state.userId, folderName).then(res => {
       console.log('My Videos Files in sidenav - ', res);
        dispatch({ type: FILE_LIST,payload: {   fileList: res   }});
   });  }
 
   const showAllvideos = () => {
-    GetFolders(state.userId).then(res => {
-      console.log('Get Folders res - ', res);
-      dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
-      dispatch({  type : FOLDER_LIST ,  payload : { folderList : res  }});
-      dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
-    });
+    GetFolders(state.userId);
   }
 
-  const callCreateFolder = (value) => {
+  const callCreateFolder = ( values) => {
     console.log(state);
-    setFolderSubmitBtn(true);
+    CreateNewFolder(state,dispatch,state.userId, values.folderName);
 
-    CreateNewFolder(state.userId, value.folderName).then(res => {
-      if (res.status_code === 200) {
-        setErrMsg(res.detail);
-        setFolderSubmitBtn(false);
-      } else if (res.status_code === 201) {
-        setIsModalVisible(false);
-        notification.open({
-          message: `Successfully created`,
-          description: `Successfully ${value.folderName} created`,
-          icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
-        });
-        updateTab('my-videos');
-        setErrMsg(null);
-        showAllvideos();
-        dispatch({ type: FOLDER_CREATED, payload: { folderCreated: value.folderName } });
-        setFolderSubmitBtn(false);
-      } else {
-        setErrMsg('Unknown error occured');
-      }
-    })
-  };
+  }
 
   useEffect(() => {
     //getFolders();
-
-    showAllvideos();
-
 
   }, []);
 
@@ -92,7 +64,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu key="my-videos-submenu" title="My Videos">
-            <Menu.Item key="my-videos" onClick={() => showAllvideos()}>
+            <Menu.Item key="my-videos" onClick={() => GetFolders(state,dispatch,state.userId)}>
               All Videos
             </Menu.Item>
             ̉̉
@@ -134,7 +106,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       <Modal
         title="Create New Folder"
         destroyOnClose={true}
-        visible={isModalVisible}
+        visible={cModal}
         onOk=""
         onCancel={createFolderModalClose}
         footer={null}
@@ -145,15 +117,13 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           onFinish={callCreateFolder}
           layout="vertical"
         >
-          {errMsg ? (
-            <Alert
-              message={errMsg}
-              closable
+          {/*errMsg ? (
+            <Alert   message={errMsg}
+              closable type="error"
               onClose={() => setErrMsg(null)}
-              type="error"
               style={{ marginBottom: "20px" }}
             />
-          ) : null}
+          ) : null */}
           <Form.Item
             label="Folder Name"
             name="folderName"
@@ -173,8 +143,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           </Form.Item>
 
           <Form.Item>
-            <Button
-              type="primary"
+            <Button  type="primary"
               htmlType="submit"
               size="large"
               disabled={folderSubmitBtn}

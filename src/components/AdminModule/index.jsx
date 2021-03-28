@@ -17,7 +17,7 @@ import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED } from "../../reducer/types";
-import { deleteAfterUpload , GetFiles  , url}  from '../API'
+import { dbAddObj,deleteAfterUpload , GetFiles  , url}  from '../API'
 import EditVideo from "../EditVideo";
 
 const AdminModule = (props) => {
@@ -59,12 +59,20 @@ const AdminModule = (props) => {
       let succes = result.successful;
       let failed = result.failed;
       let batchId = result.uploadID;
+      let insertObj = [];
       succes.map((obj,ind)=>{
+        
          if( obj.progress.uploadComplete=== true){
-            dispatch({ type: FILE_UPLOADED,  payload: { fileNmae:  obj.name }   })
-            deleteAfterUpload(obj.s3Multipart.uploadId);
+          let idt = obj.s3Multipart.uploadId;  
+            dispatch({ type: FILE_UPLOADED,  payload: { fileName:  obj.name }   });
+            deleteAfterUpload(idt);
+            let path = "bucket-"+idt.split("-")[0]+"/"+idt.split("-")[1]+"/"+idt.split("-")[2] ;
+            let builtObj= { "name":obj.name  ,"title" : obj.name , "itempath" : path ,
+          "itemtype": obj.type , "itemsize" : obj.size ,"upload_state":"complete" ,"scope":"private"  };
+            insertObj.push(builtObj);;
          }
       });
+       if (insertObj.length > 0) dbAddObj(state , dispatch , insertObj );
       dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   })
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   })
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   })
@@ -97,7 +105,7 @@ const AdminModule = (props) => {
       <Menu.Item onClick={() => setSelectedTab('my-profile')}>
         My Profile
       </Menu.Item>
-      <Menu.Item onClick={(e)=>logout}>
+      <Menu.Item onClick={(e)=>logout()}>
         Logout
       </Menu.Item>
     </Menu>
@@ -205,7 +213,7 @@ const AdminModule = (props) => {
                     })
                   }
                 >
-                  {state.folderList !== undefined ? state.folderList.map((obj, ind) => {
+                  {state.folderList !== undefined && state.folderList.length > 0? state.folderList.map((obj, ind) => {
                     return obj._object_name.includes("temp.dod") ? (
                       <Option
                         key={obj._object_name.split("/")[0]}

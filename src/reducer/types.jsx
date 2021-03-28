@@ -9,3 +9,5 @@ export const FILE_LIST = "FILE_LIST";
 export const UPPY_SUCCESS = "UPPY_SUCCESS";
 export const UPPY_FAILED = "UPPY_FAILED";
 export const UPPY_BATCHID = "UPPY_BATCHID";
+export const VIDEO_LIST = "VIDEO_LIST"
+export const EDIT_VIDEO = "EDIT_VIDEO"

@@ -2,7 +2,7 @@
 import axios from 'axios';
 import {notification } from 'antd';
 import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
-    VIDEO_LIST,FOLDER_LIST} from '../../reducer/types';
+    EDIT_VIDEO,VIDEO_LIST,FOLDER_LIST} from '../../reducer/types';
 import {  FolderAddOutlined,  CheckCircleOutlined, 
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
@@ -12,28 +12,24 @@ export const url = "http://188.42.97.42:8000";
 
 
 export const GetFolders= async (state,dispatch ,userId)=>{
- 
-
    if (userId === undefined ) 
       return []; 
-       //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
- 
+       //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }}); 
    const tempFolders = await axios.post(url + '/list_objects?id=' + userId + '&recursive=true', null, {
       headers: {
          accept: 'application/json', Authorization : "bearer "+state.token,
             }
    }).then(res => {   return res.data;   })
-   
+   console.log(" data in get folders", tempFolders);
    dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
-   dispatch({  type : FOLDER_LIST ,  payload : { folderList : tempFolders  }});
+   dispatch({  type : FOLDER_LIST ,  payload : { folderList : tempFolders.miniolist  }});
+   dispatch({ type : VIDEO_LIST , payload : {videoList : tempFolders.dblist} })
    dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
    return tempFolders;
-
 }
 
 
-export async function GetFiles(userId, folderName) {
-
+export async function GetFiles(state,dispatch,userId, folderName) {
    let tempFiles = [];
    if (folderName === '') return [];
    const getFiles = await axios.post(url + '/list_objects?id=' + userId + '&recursive=false&foldername=' + folderName, null, {
@@ -41,18 +37,16 @@ export async function GetFiles(userId, folderName) {
          accept: 'application/json', //Authorization : "bearer "+state.token,
       }
    }).then(res => {
-      res.data.map(Ob => {
+      res.data.miniolist.map(Ob => {
          if (!Ob._object_name.includes('temp.dod')) {
             tempFiles.push(Ob);
          }
       });
-
       console.log('Get Files after filter - ', tempFiles);
+      dispatch({type:VIDEO_LIST , payload : { videoList : res.data.dblist }});
       return tempFiles;
    });
-
    return getFiles;
-
 }
 
 
@@ -93,7 +87,6 @@ export const deleteAfterUpload = async (uploadId) => {
        please delete objects with number names manually` });
        return "";
    });
-
    return crtFolder;
 };
 
@@ -149,10 +142,9 @@ export const dbGetObjList=async(state,dispatch)=>{
    return getFiles;
 }
 
-
 export const dbUpdateObj=async(state,dispatch ,obj)=>{
-   const getFiles = await axios.delete(url + `/users/${state.userId}/video/${obj.obid}`, 
-   {"path": obj.itempath} , {
+   const getFiles = await axios.post(url + `/users/${state.userId}/video/update/`, 
+   obj , {
       headers: {
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
@@ -171,9 +163,9 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
 }
 
 
-export const dbGetObjByPath=async(state,dispatch , path )=>{
+export const dbGetObjByPath=async(state,dispatch , path , recursive )=>{
    const getFiles = await axios.post(url + `/users/${state.userId}/video/`, 
-   {"path": path , "recursive": true} , {
+   {"path": path , "recursive": recursive} , {
       headers: {
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
@@ -181,8 +173,9 @@ export const dbGetObjByPath=async(state,dispatch , path )=>{
       //notification.open({ message : "Get objects from db succesful" });
       //if(res.status === 200){ 
          console.log(  "get video obj in db" , res );
-      dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});
-      //return "";}
+  if( recursive === true) dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});
+      else  dispatch({ type : EDIT_VIDEO , payload :{ editVideo : res.data[0]   }});
+   //return "";}
       //else{
       //   console.log("Error in getting objects from db");
       // }
@@ -209,3 +202,5 @@ export const dbRemoveObj=async( state , dispatch ,path , recursive )=>{
    });
    return getFiles;
 }
+
+

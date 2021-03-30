@@ -1,10 +1,10 @@
 import React,{useContext} from "react";
-import { Card } from "antd";
+import { Card , Button } from "antd";
 import {
   EditOutlined,  DeleteOutlined,  LinkOutlined,  PlayCircleFilled,} from "@ant-design/icons";
 import { deleteFile_Folder } from "../API";
 import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST, FOLDER_LIST} from '../../reducer/types';
-import { GetFolders, url, GetFiles, CreateNewFolder } from '../API/index';
+import { dbGetObjByPath ,GetFolders, url, GetFiles, CreateNewFolder } from '../API/index';
 
 import { Context } from '../../context';
 
@@ -13,7 +13,7 @@ import "../../assets/styles/videoCard.scss";
 const VideoCard = (props) => {
 
   const {state,dispatch} = useContext(Context);
-
+  const { Meta }= Card;
   function getMp4Url(props , type ){
   let base_url = "https://meander.ibee.ai/bucket-" + props.userId + "/";
   let dash_base_url = "https://meander.ibee.ai/dash/bucket-" + props.userId + "/";
@@ -24,10 +24,10 @@ const VideoCard = (props) => {
   let img240 = "/thumbs/img240/frame_0000.jpg";
 
   let mp4 = {    "1080p": "/mp41080k.mp4",
-    "720p": "/mp4720k.mp4",    "480p": "mp4480k.mp4",
+    "720p": "/mp4720k.mp4",    "480p": "/mp4480k.mp4",
     "240p": "/mp4240k.mp4",  };
 
-  let bg_url = base_url + props.fileObject._object_name.split(".")[0] + img240;
+  let bg_url = base_url + props.fileObject._object_name.split(".")[0] + img1080;
   let mp4_url =    base_url + props.fileObject._object_name.split(".")[0] + mp4["1080p"];
   let dash_url =    dash_base_url +  props.fileObject._object_name.split(".")[0] +
     mp4["1080p"] +    "/manifest.mpd";
@@ -38,11 +38,23 @@ const VideoCard = (props) => {
     if(type == "dash") return dash_url;
     if(type == "hls")  return  hls_url;
   }
+
+  const getPlayUrl=(state,dispatch,url,props )=>{
+    let obj = props.fileObject;
+    let temppath = "bucket-"+state.userId+"/"+obj._object_name;
+    let dbobj = state.videoList.find((ob)=>ob.itempath === temppath );
+    if( dbobj !== undefined){
+    return `${url}/${state.userId}/player/${dbobj.id}`
+    }
+    else return null; 
+}
+
+
   
-  const folderDetail = (folderName) => {
+  const onSideNavFolderClick = (folderName) => {
     dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
     dispatch({type: FOLDER_NAME, payload: { folderName: folderName }});
-    GetFiles(state.userId, folderName).then(res => {
+    GetFiles(state,dispatch ,state.userId, folderName).then(res => {
       console.log('My Videos Files in sidenav - ', res);
        dispatch({ type: FILE_LIST,payload: {   fileList: res   }});
   });  }
@@ -51,60 +63,66 @@ const VideoCard = (props) => {
     GetFolders(state, dispatch , state.userId);
   }
   
-  async function deleteFile(id, file) {
+  async function deleteFile(state,dispatch,id, file) {
     let flag = window.confirm("Do you really want to delete file ?");
     if (flag == false) return;
     if (!file._object_name.includes("temp.dod"))
       deleteFile_Folder(state,dispatch, id, file._object_name, false).
-      then((res)=>{ state.folderName === "" ? showAllvideos() : folderDetail() ;});
+      then((res)=>{ state.folderName === "" ? showAllvideos() : onSideNavFolderClick(state.folderName) ;});
     else alert("this is not a file to delete");
-    
   }
-  
-  
-  
+
+  const editVideoFunc = (state,dispatch,userId , obj) => {
+    dispatch({ type: PAGE,payload:{page:'edit-video'} });
+    dispatch({ type: "EDIT_VIDEO",payload:{ editVideo: null } });
+    dbGetObjByPath(state , dispatch , "bucket-"+userId+"/"+obj._object_name , false );
+   };
   
   return (
     <Card
       bordered={true}
-      hoverable
-      actions={[
-        <DeleteOutlined
-          key="delete"
-          onClick={(e) => deleteFile(props.userId, props.fileObject)}
-        />,
-        <EditOutlined key="edit" onClick={props.editClick} />,
-        <LinkOutlined key="embed" onClick={props.embedClick} />,
-      ]}
+      hoverable={true}
+      title={props.videoTitle}
+      headStyle = {{height : "10%"  }}
+      bodyStyle={{ height : "70%"  }}
+      actions={ [
+         <DeleteOutlined     key="delete"
+          onClick={(e) => deleteFile(state,dispatch,props.userId, props.fileObject)}
+      />,
+        <EditOutlined key="edit" onClick={(e) => editVideoFunc(state,dispatch,props.userId, props.fileObject)} />
+      ,<LinkOutlined key="embed" onClick={props.embedClick} />  ]
+      }
       className="cardVideo"
     >
-      <div className="videoCardBlock">
-        <div className="videoDuration">10:00</div>
-        <div
-          className="videoBlock"
-          style={{ backgroundImage:  "url(" + getMp4Url(props,"img") + ")" }}
-        >
-          <button
+      <div className="videoCardBlock"  >
+        {/*<div className="videoDuration">10:00</div>
+        //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }} 
+        */}
+        <div  className="videoBlock">  
+             <Button
             className="playBtn"
             type="button"
-            onClick={props.playBtnClick}
+            htmlType="a"
+            href = {getPlayUrl(state,dispatch,url,props)}
+            target="_blank"
+            //onClick={props.playBtnClick}
           >
             <PlayCircleFilled width={40} height={40} />
-          </button>
-          {
-            /*<img alt="example"  src={bg_url}         />*/
-            <video
+          </Button>
+          
+           <img alt="Thumbnail"  src={getMp4Url(props,"img")}   style={{ width:"100%",height:"inherit" }}  />
+           {  /*  <video
               id = {props.fileObject._object_name}
               src={getMp4Url(props,"mp4")}
               controls
               className="videoInfoImageBlock"
-            ></video>
+            ></video>*/
           }
         </div>
-        <div className="videoCardInfoBlock">
-          <div className="videoTitle">{props.videoTitle}</div>
-          <div className="publishedDate">{props.postedOn}</div>
-        </div>
+        {/*<div className="videoCardInfoBlock" style={{  }}>ss
+          <div className="videoTitle">{ props.videoTitle}</div>
+          <div className="publishedDate">{props.postedOn}</div> 
+        </div> */}
       </div>
     </Card>
   );

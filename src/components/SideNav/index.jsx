@@ -23,7 +23,6 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     setCModal(true);
   };
 
-
   const createFolderModalClose = () => {
     setCModal(false);
     setErrMsg(null);
@@ -32,8 +31,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   const folderDetail = (folderName) => {
     dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
     dispatch({type: FOLDER_NAME, payload: { folderName: folderName }});
-    dbGetObjByPath(state,dispatch , "bucket-"+state.userId+"/"+folderName  );
-    GetFiles(state.userId, folderName).then(res => {
+    dbGetObjByPath(state,dispatch , "bucket-"+state.userId+"/"+folderName , true  );
+    GetFiles( state,dispatch ,state.userId, folderName).then(res => {
       console.log('My Videos Files in sidenav - ', res);
        dispatch({ type: FILE_LIST,payload: {   fileList: res   }});
   });  }

@@ -35,7 +35,7 @@ const UppyUpload = (props) => {
    });
 
   function updateFiles(id , folderName){
-   GetFiles(id , folderName).then(res => {
+   GetFiles( state , dispatch ,id , folderName).then(res => {
       console.log('My Videos Files in sidenav - ', res);
        dispatch({
         type: FILE_LIST,

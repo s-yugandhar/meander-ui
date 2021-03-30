@@ -1,32 +1,73 @@
-import React from "react";
-import {
-  Layout,
-  Menu,
-  Row,
-  Col,
-  Divider,
-  Input,
-  Select,
-  Typography,
-  Empty,
-  Modal,
-  Form,
-  Button,
-  message,
-  Switch,
-  Tooltip,
-} from "antd";
+import React , { useEffect,useContext , useState} from "react";
+import {  Layout,  Menu,  Row,  Col,  Divider,  Input,
+  Select,  Typography,  Empty,  Modal,  Form,
+  Button,  message,  Switch,  Tooltip,} from "antd";
 
-import {
-  ReloadOutlined,
-  DeleteOutlined,
-  DownloadOutlined,
-} from "@ant-design/icons";
+import {  ReloadOutlined,  DeleteOutlined,
+  DownloadOutlined } from "@ant-design/icons";
 import "./editVideo.scss";
+import {dbUpdateObj} from '../API';
+import { Context } from '../../context';
 
-const EditVideo = () => {
+const EditVideo = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
   const { Option } = Select;
+  const [form]= Form.useForm();
+  const {state , dispatch} = useContext(Context);
+  const [quality , setQuality] = useState("480p");
+  let editV = { ...state.editVideo };
+
+  let mp4 = {    "1080p": "/mp41080k.mp4",
+      "720p": "/mp4720k.mp4",    "480p": "/mp4480k.mp4",
+      "240p": "/mp4240k.mp4",  };
+  
+  
+  function getMp4Url(props , type ){
+    let base_url = "https://meander.ibee.ai/bucket-" + props.userId + "/";
+    let dash_base_url = "https://meander.ibee.ai/dash/bucket-" + props.userId + "/";
+    let hls_base_url = "https://meander.ibee.ai/hls/bucket-" + props.userId + "/";
+    let img1080 = "/thumbs/img1080/frame_0000.jpg";
+    let img720 = "/thumbs/img720/frame_0000.jpg";
+    let img480 = "/thumbs/img480/frame_0000.jpg";
+    let img240 = "/thumbs/img240/frame_0000.jpg";
+  
+    
+    let bg_url = base_url + props.fileObject._object_name.split(".")[0] + img240;
+    let mp4_url =    base_url + props.fileObject._object_name.split(".")[0] + mp4["1080p"];
+    let dash_url =    dash_base_url +  props.fileObject._object_name.split(".")[0] +
+      mp4["1080p"] +    "/manifest.mpd";
+    let hls_url =    hls_base_url +  props.fileObject._object_name.split(".")[0] +
+      mp4["1080p"] +    "/index.m3u8";
+      if (type =="mp4") return mp4_url;
+      if(type == "img") return bg_url;
+      if(type == "dash") return dash_url;
+      if(type == "hls")  return  hls_url;
+    }
+
+    const updateState=(values)=>{
+      console.log(values);
+      let obj = { ...state.editVideo};
+      let ke = Object.keys(values);
+      ke.forEach((ke,index)=>{
+          obj[ke] = values[ke];
+      });
+      //obj['owner_id'] = state.userId;
+      console.log(obj);
+      dbUpdateObj(state,dispatch,  obj  );
+      }
+
+      useEffect(()=>{
+
+        form.setFieldsValue({ 
+          'title' : state.editVideo ===  null ? null : state.editVideo.title,
+          'description' : state.editVideo ===  null ? null : state.editVideo.description,
+          'maturity' : state.editVideo ===  null ? null : state.editVideo.maturity,
+          'scope' : state.editVideo ===  null ? null : state.editVideo.scope,
+          });
+
+      },[state.editVideo])
+
+      
   return (
     <Layout className="main">
       <Content
@@ -42,71 +83,66 @@ const EditVideo = () => {
             <div className="editVideoFormBlock full-width">
               <Form
                 name="basic"
-                initialValues={{}}
-                onFinish=""
+                form={form}
+                onFinish={(values)=> updateState(values)}
                 layout="vertical"
               >
                 <h3>
-                  <strong>General Info</strong>
+                <strong>General Info </strong>
                 </h3>
                 <Form.Item
                   label="Video Title"
-                  name="folderName"
+                  name={'title'}
                   className="editFormItem"
                 >
-                  <Input />
+                  <Input  value={state.editVideo ===  null ? null : state.editVideo.title}/>
                 </Form.Item>
                 <Form.Item
                   label="Video Description"
-                  name="folderName"
+                  name={'description'}
                   className="editFormItem"
                 >
-                  <Input.TextArea rows="3" />
+                  <Input.TextArea rows="3"  />
                 </Form.Item>
                 <Form.Item
                   label="Video Maturity"
-                  name="folderName"
+                  name={'maturity'}
                   className="editFormItem"
                 >
                   <Select
-                    showSearch
                     placeholder="Select Maturity"
-                    onChange=""
-                    onFocus=""
-                    onBlur=""
-                    onSearch=""
                   >
-                    <Option value="u">U</Option>
-                    <Option value="pg">PG</Option>
-                    <Option value="a">A</Option>
-                    <Option value="18+">18+</Option>
+                    <Option value="U">U (Kids)</Option>
+                    <Option value="UA">UA (Teens)</Option>
+                    <Option value="A"> Adults</Option>
+                    <Option value="S"> Adults</Option>
+                    <Option value="13+"> 13+</Option>
+                    <Option value="16+"> 16+</Option>
+                    <Option value="18+"> 18+</Option>
                   </Select>
                 </Form.Item>
                 <Divider />
-                <h3>
+                {/*<h3>
                   <strong>Privacy</strong>
                   <Switch
                     defaultChecked
-                    onChange=""
+                    name="privacy"  
                     style={{ marginLeft: "20px" }}
                   />
-                </h3>
+                </h3>*/}
                 <Form.Item
                   label="Who can see?"
-                  name="folderName"
+                  name={'scope'}
                   className="editFormItem"
                 >
                   <Select
-                    showSearch
                     placeholder="Select Maturity"
-                    onChange=""
-                    onFocus=""
-                    onBlur=""
-                    onSearch=""
                   >
-                    <Option value="u">Shared</Option>
-                    <Option value="pg">Loggedin</Option>
-                    <Option value="a">EveryOne</Option>
+                    <Option value="public">Public</Option>
+                    <Option value="private"> Private</Option>
+                    <Option value="teamonly"> Team</Option>
+                    <Option value="apponly"> App User</Option>
+                    <Option value="inactive"> Inactive</Option>
                   </Select>
                 </Form.Item>
                 <Form.Item>
@@ -153,23 +189,39 @@ const EditVideo = () => {
           <Col span={13}>
             <div className="full-width edit-video-block">
               <h3>
-                <strong>Your Video</strong>
+              <strong>Your Video Name : {  JSON.stringify(editV.name)}</strong>
               </h3>
-              <div className="video-container">
-                <video className="video" />
+              {editV !== null && editV.itempath !== undefined?
+              <><div className="video-container">              
+              <video className="video" controls>
+                    <source label={quality} id={quality} src={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]} 
+                    type="video/mp4"/>
+                </video> 
               </div>
               <div className="edit-video-actions">
+                <Select onChange={(value)=> setQuality(value) } value={quality}
+                style={{float : "right"}}  size="small" shape="round" > 
+                <Option value="1080p"> 1080p</Option>
+                <Option value="720p"> 720p</Option>
+                <Option value="480p"> 480p</Option>
+                <Option value="240p"> 240p</Option>
+                </Select>
+                
                 <Button
                   type="primary"
                   icon={<DownloadOutlined />}
                   size="small"
                   style={{ float: "right" }}
                   shape="round"
-                  ghost
+                  htmlType={"a"}
+                  href={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]}
+                  //sssstarget={"_blank"}
+                  download={ editV.title+".mp4"}
+                  //onClick={(e)=>{;}}
                 >
-                  Download
+                  {editV.name.split(".")[0]+".mp4 "+ quality}
                 </Button>
-              </div>
+              </div> </>: null}
             </div>
           </Col>
         </Row>

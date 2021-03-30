@@ -5,7 +5,8 @@ import {  Layout, Menu,  Row,
   Col,  Divider,  Input,
   Select,  Typography,  Empty,
   Modal,  Form,  Button,
-  message,} from "antd";
+  message,
+  notification,} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -15,8 +16,8 @@ import {
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import Loading from "../Loading";
-import { FOLDER_LIST, FILE_LIST, FOLDER_NAME, PAGE } from "../../reducer/types";
-import { url, GetFolders, GetFiles } from "../API/index";
+import { EDIT_VIDEO , FOLDER_LIST, FILE_LIST, FOLDER_NAME, PAGE } from "../../reducer/types";
+import { dbGetObjByPath ,url, GetFolders, GetFiles } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
 
@@ -51,12 +52,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const container = {
     hidden: { opacity: 0, y: 5 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        staggerChildren: 0.2,
-      },
+    show: { opacity: 1,      y: 0,
+      transition: { staggerChildren: 0.2,   },
     },
   };
 
@@ -65,7 +62,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     show: { opacity: 1, y: 0 },
   };
 
-  
 
   function countVideos(val) {
     let cnt = 0;
@@ -78,7 +74,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const innerFolder = (folderName) => {
     setLoading(true);
-    GetFiles(state.userId, folderName)
+    GetFiles(state,dispatch ,state.userId, folderName)
       .then((res) => {
         console.log("My Videos Files res - ", res);
         setLoading(false);
@@ -91,10 +87,18 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   };
 
   // Show Embed code popup
-  const embedPopup = (obj) => {
-    let frame = "<iframe src="+url+"'/player' width='1920' height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' allowfullscreen title='test_vimeo'></iframe>";
+  const embedPopup = (state,dispatch,obj) => {
+    let temppath = "bucket-"+state.userId+"/"+obj._object_name;
+    console.log( state.videoList );
+    let dbobj = state.videoList.find((ob)=>ob.itempath === temppath );
+    console.log( dbobj );
+    if( dbobj !== undefined){
+    let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='1920' height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' allowfullscreen title='test_vimeo'></iframe>`;
     setToggleEmbed(true);
-    setEmbedCode(frame);
+    setEmbedCode(frame); }
+    else{
+      notification.open({message:"sorry Embed code is not available now"});
+    }
   };
 
   // close Embed Code Popup
@@ -114,22 +118,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   };
 
   // Go to Edit video page
-  const editVideo = (videoName) => {
-    /* dispatch({
-      type: FOLDER_NAME,
-      payload: {
-        folderName: folderName,
-      },
-    });
-    */
-   dispatch({
-     type: PAGE,
-     payload: {
-       page: 'edit-video'
-     }
-   })
-  };
-
+  
   window.addEventListener('load',(e)=>{GetFolders(state , dispatch,state.userId)}) ;
 
   useEffect(() => {
@@ -155,7 +144,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           <Row align="middle">
             <Col span={12}>
               <h2 className="page-title">
-                Your Uploaded Videos - {state.folderList.length}
+                Videos in current folder - {state.videoList.length}
               </h2>
             </Col>
             <Col span={6} style={{ paddingRight: "15px" }}>
@@ -210,24 +199,22 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                 })}
 
               {state.folderName === "" &&
-                state.folderList.map((folder, index) => {
+                state.folderList.map((obj, index) => {
                   //&& folder._object_name.includes(state.userId) === false
-                  return folder._object_name.includes("temp.dod") === false ? (
+                  return obj._object_name.includes("temp.dod") === false ? (
                     <motion.div
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                       variants={item}
                       key={"file-" + index}
                     >
                       <VideoCard
-                        videoTitle={folder._object_name.split("/")[1]}
-                        fileObject={folder}
+                        videoTitle={ obj._object_name.split("/")[1]}
+                        fileObject={obj}
                         userId={state.userId}
                         embedClick={() =>
-                          embedPopup(folder)
+                          embedPopup(state,dispatch,obj)
                         }
-                        editClick={() =>
-                          editVideo(folder._object_name.split("/")[1])
-                        }
+                        
                       />
                     </motion.div>
                   ) : null;
@@ -247,7 +234,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                           fileObject={file}
                           userId={state.userId}
                           embedClick={() =>
-                            embedPopup(file._object_name.split("/")[1])
+                            embedPopup(state,dispatch,file)
                           }
                         />
                       </motion.div>

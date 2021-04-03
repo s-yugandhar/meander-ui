@@ -92,8 +92,8 @@ const VideoCard = (props) => {
       hoverable={true}
       title={<>{props.videoTitle}
             <h6>{new Date(props.fileObject.name.split(".")[0]*1).toLocaleString() }</h6></>}
-      headStyle = {{height : "auto"  }}
-      bodyStyle={{ height : "auto"  }}
+      headStyle = {{height : "25%"  }}
+      bodyStyle={{ height : "55%"  }}
       actions={ [
          <DeleteOutlined     key="delete"
           onClick={(e) => deleteFile(state,dispatch,props.userId, props.fileObject)}

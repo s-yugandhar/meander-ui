@@ -91,7 +91,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     let temppath = obj.itempath;
     console.log( state.videoList );
     let dbobj = state.videoList.find((ob)=>ob.itempath === temppath );
-    console.log( dbobj );
     if( dbobj !== undefined){
     let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='1920' 
     height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' 
@@ -99,7 +98,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     setToggleEmbed(true);
     setEmbedCode(frame); }
     else{
-      notification.open({message:"sorry Embed code is not available now"});
+      notification.open({message:"Sorry, Embed code is not available now"});
     }
   };
 

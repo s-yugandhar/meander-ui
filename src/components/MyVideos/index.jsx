@@ -5,7 +5,7 @@ import {  Layout, Menu,  Row,
   Col,  Divider,  Input,
   Select,  Typography,  Empty,
   Modal,  Form,  Button,
-  message,
+  message, Card ,
   notification,} from "antd";
 import {
   EditOutlined,
@@ -92,8 +92,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     console.log( state.videoList );
     let dbobj = state.videoList.find((ob)=>ob.itempath === temppath );
     if( dbobj !== undefined){
-    let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='1920' 
-    height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' 
+    let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='560' 
+    height='315' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' 
     allowfullscreen title='${dbobj.title}'></iframe>`;
     setToggleEmbed(true);
     setEmbedCode(frame); }
@@ -216,7 +216,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       key={"file-" + index}
                     >
                       <VideoCard
-                        videoTitle={ obj.itempath.split("/")[2]}
+                        videoTitle={ obj.title}
                         fileObject={obj}
                         userId={state.userId}
                         embedClick={() =>
@@ -238,7 +238,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                         key={"file-" + index}
                       >
                         <VideoCard
-                          videoTitle={file.itempath.split("/")[2]}
+                          videoTitle={file.title}
                           fileObject={file}
                           userId={state.userId}
                           embedClick={() =>
@@ -249,6 +249,33 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                     ))
                   : ""
               }
+            <Divider></Divider>
+              
+            {/* 
+            // build a board to provide to delete temporary files when upload fails
+            <h2>{"Failed upload temporary files"}</h2>
+              {
+                // Showing Files
+                 state.fileList.length > 0
+                  ?  
+                  state.fileList.map((file, index) => (
+                     file._object_name.includes(state.userId) ?
+                    <motion.div
+                        className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
+                        variants={item}
+                        key={"file-" + index}
+                      >
+                        <Card
+                          title={file._object_name}
+                        > 
+                        <Button   onClick={(e)=>{ }}> "Delete"</Button>
+                        </Card>
+                      </motion.div>: null 
+                    ))
+                  : ""
+              } */}
+
+
             </motion.div>
           ) : (
             <Empty style={{ marginTop: "80px" }} />

@@ -156,7 +156,7 @@ const EditVideo = (props) => {
                       Update Information
                     </Button>
                   </div>
-                  <div style={{ float: "left", paddingTop: "5px" }}>
+                  {/*<div style={{ float: "left", paddingTop: "5px" }}>
                     <Button
                       type="ghost"
                       danger
@@ -178,7 +178,7 @@ const EditVideo = (props) => {
                     >
                       Replace Video <ReloadOutlined />
                     </Button>
-                  </div>
+              </div>*/}
                 </Form.Item>
 
                 <Form.Item></Form.Item>

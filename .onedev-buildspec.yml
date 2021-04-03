@@ -11,7 +11,7 @@ jobs:
     projects: Meander-ui
   retrieveSource: true
   cloneCredential: !DefaultCredential {}
-  cpuRequirement: 250m
+  cpuRequirement: 260m
   memoryRequirement: 128m
   retryCondition: never
   maxRetries: 3

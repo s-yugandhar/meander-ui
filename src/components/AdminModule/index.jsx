@@ -144,7 +144,7 @@ const AdminModule = (props) => {
       {  'dropPaste' :state.folderName === ""?
       `Drop files here or paste or %{browse} to upload files to default` :
        `Drop files here or paste or %{browse} to upload files to `+state.folderName      }} })
-      uppy.setMeta( { userId: localUserId, foldername: state.folderName === "" ? "default" : state.folderName })
+      uppy.setMeta( { userId: state.userId, foldername: state.folderName === "" ? "default" : state.folderName })
   }, [ state.folderName ]);
 
   /* const content = {

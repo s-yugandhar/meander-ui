@@ -26,7 +26,8 @@ const AdminModule = (props) => {
   const { Search } = Input;
   const { Option } = Select;
   const { Paragraph, Text } = Typography;
-
+  const videomime = "video/*";
+  const audiomime = "audio/*";
   const [selectedTab, setSelectedTab] = useState("my-videos");
   const [uploadVideo, setUploadVideo] = useState(false);
   const [logedIn, setLogedIn] = useState(false);
@@ -44,7 +45,7 @@ const AdminModule = (props) => {
 
   const uppy = useUppy(() => {
     return new Uppy({
-      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ 'image/*','video/*']}
+      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ videomime , audiomime ]}
     }).use(ThumbnailGenerator,{ waitForThumbnailsBeforeUpload : false,
       thumbnailWidth: 200,  thumbnailHeight: 200,  thumbnailType: 'image/jpeg',
     }).use(AwsS3Multipart, {
@@ -61,7 +62,6 @@ const AdminModule = (props) => {
       let batchId = result.uploadID;
       let insertObj = [];
       succes.map((obj,ind)=>{
-        
          if( obj.progress.uploadComplete=== true){
           let idt = obj.s3Multipart.uploadId;  
             dispatch({ type: FILE_UPLOADED,  payload: { fileName:  obj.name }   });
@@ -77,7 +77,6 @@ const AdminModule = (props) => {
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   })
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   })
       updateFiles(state.userId,state.folderName);
-
     })
   });
 
@@ -94,7 +93,10 @@ const AdminModule = (props) => {
   const logout = () => {
      localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    window.location.reload(); 
+    dispatch({  type: 'FOLDER_LIST', payload:{ folderList : []} });
+    dispatch({  type: 'FILE_LIST', payload:{ fileList : []} });
+    dispatch({  type: 'VIDEO_LIST', payload:{ videoList : []} });
+    //window.location.reload(); 
     dispatch({
       type: 'LOGOUT_SUCCESS'
     })
@@ -136,10 +138,13 @@ const AdminModule = (props) => {
     console.log('Admin modules context - ', state);
     console.log('Page name - ', state.page);
     console.log('Got user id - ', state.userId);
-
     localUserId ? setLogedIn(true) : setLogedIn(false);
-
-      uppy.setMeta( {  userId: localUserId,     foldername: state.folderName  })
+    //Dashboard( { locale :{ strings : { dropHere : "hint"} }        } )
+    uppy.setOptions( {  locale : {strings : 
+      {  'dropPaste' :state.folderName === ""?
+      `Drop files here or paste or %{browse} to upload files to default` :
+       `Drop files here or paste or %{browse} to upload files to `+state.folderName      }} })
+      uppy.setMeta( { userId: localUserId, foldername: state.folderName === "" ? "default" : state.folderName })
   }, [ state.folderName ]);
 
   /* const content = {
@@ -205,16 +210,17 @@ const AdminModule = (props) => {
                   style={{ width: "100%" }}
                   placeholder="search folder"
                   optionFilterProp="children"
-                  value={state.folderName}
+                  value={state.folderName === "" ? "default" : state.folderName}
                   onChange={(value) =>
                     dispatch({
                       type: FOLDER_NAME,
                       payload: { folderName: value },
                     })
                   }
-                >
+                > 
                   {state.folderList !== undefined && state.folderList.length > 0? state.folderList.map((obj, ind) => {
                     return obj._object_name.includes("temp.dod") ? (
+                      
                       <Option
                         key={obj._object_name.split("/")[0]}
                         value={obj._object_name.split("/")[0]}
@@ -224,14 +230,18 @@ const AdminModule = (props) => {
                       </Option>
                     ) : null }) : null}
                 </Select>{" "}
-                {/* {"selected --->" + state.folderName} */}
               </div>
-              <div className="uploadFileUppyBlock">
-                <Dashboard uppy={uppy} showProgressDetails={true} />
+              <div className="uploadFileUppyBlock" >
+                <Dashboard uppy={uppy} showProgressDetails={true} 
+                proudlyDisplayPoweredByUppy={false} 
+                showRemoveButtonAfterComplete= {true}
+                showLinkToFileUploadResult={false}
+                fileManagerSelectionType={'files'}
+                />
               </div>
             </Drawer>
 
-            <UploadVideoFloatingBtn onClick={() => setUploadVideo(true)} />
+            {/*<UploadVideoFloatingBtn onClick={() => setUploadVideo(true)} />*/}
           </Layout>
         </Layout>
       ) : (

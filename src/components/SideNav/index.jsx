@@ -44,7 +44,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   const callCreateFolder = ( values) => {
     console.log(state);
     CreateNewFolder(state,dispatch,state.userId, values.folderName);
-
+    createFolderModalClose();
   }
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
         >
           <SubMenu key="my-videos-submenu" title="My Videos">
             <Menu.Item key="my-videos" onClick={() => GetFolders(state,dispatch,state.userId)}>
-              All Videos
+              All Items
             </Menu.Item>
             ̉̉
             <Menu.Item
@@ -73,14 +73,14 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               key="cf"
             >
               <Button
+                key={"xcvz"}
                 type="primary"
                 shape="round"
                 icon={<FolderAddOutlined className="createFolderBtnIcon" />}
                 size="middle"
                 onClick={showCreateFolder}
                 className="createFolderBtn"
-              >
-                Create Folder
+              >    Create Folder
               </Button>
             </Menu.Item>
             {state.folderList !== undefined ? state.folderList.map((folder, index) => {
@@ -96,12 +96,14 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 </Menu.Item>
               ) : null
             }) : null }
-          </SubMenu>
-          <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
-            Add Video
+            <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
+            Add Audio/Video
           </Menu.Item>
+          </SubMenu>          
         </Menu>
+        
       </Sider>
+      
       <Modal
         title="Create New Folder"
         destroyOnClose={true}

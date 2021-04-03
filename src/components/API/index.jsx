@@ -6,9 +6,9 @@ import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
 import {  FolderAddOutlined,  CheckCircleOutlined, 
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
-export const url = "http://188.42.97.42:8000";
+//export const url = "http://188.42.97.42:8000";
 
-//export const url = "http://127.0.0.1:8002";
+export const url = "http://127.0.0.1:8002";
 
 
 export const GetFolders= async (state,dispatch ,userId)=>{
@@ -19,7 +19,9 @@ export const GetFolders= async (state,dispatch ,userId)=>{
       headers: {
          accept: 'application/json', Authorization : "bearer "+state.token,
             }
-   }).then(res => {   return res.data;   })
+   }).then(res => {   
+      console.log(res);
+      return res.data;   })
    console.log(" data in get folders", tempFolders);
    dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
    dispatch({  type : FOLDER_LIST ,  payload : { folderList : tempFolders.miniolist  }});
@@ -56,7 +58,8 @@ export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
          accept: 'application/json' ,Authorization : "bearer "+state.token,
       } }).then(res=>{
       if (res.data.status_code === 200 ) {
-      notification.open({message:res.data.detail ,
+      if( folderName !== "default")
+         notification.open({message:res.data.detail ,
           icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
     } else if (res.data.status_code === 201) {
       notification.open({

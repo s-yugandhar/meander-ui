@@ -193,13 +193,20 @@ const EditVideo = (props) => {
               </h3>
               {editV !== null && editV.itempath !== undefined?
               <><div className="video-container">              
-              <video className="video" controls>
+              { editV.itemtype.includes("video") ?
+              <video className="video" controls key={quality}>
                     <source label={quality} id={quality} src={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]} 
                     type="video/mp4"/>
-                </video> 
+                </video> :
+                <audio className="video" controls key={'keyaudio'}>
+                  <source label={"a4"} id={"a4"} 
+                   src={"https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"} />
+                  </audio> }
               </div>
               <div className="edit-video-actions">
-                <Select onChange={(value)=> setQuality(value) } value={quality}
+                {editV.itemtype.includes("video") ?
+                <>
+                  <Select onChange={(value)=> setQuality(value) } value={quality}
                 style={{float : "right"}}  size="small" shape="round" > 
                 <Option value="1080p"> 1080p</Option>
                 <Option value="720p"> 720p</Option>
@@ -214,13 +221,27 @@ const EditVideo = (props) => {
                   style={{ float: "right" }}
                   shape="round"
                   htmlType={"a"}
-                  href={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]}
+                  href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]}
                   //sssstarget={"_blank"}
                   download={ editV.title+".mp4"}
                   //onClick={(e)=>{;}}
                 >
                   {editV.name.split(".")[0]+".mp4 "+ quality}
-                </Button>
+                </Button> </>: 
+                <Button
+                type="primary"
+                icon={<DownloadOutlined />}
+                size="small"
+                style={{ float: "right" }}
+                shape="round"
+                htmlType={"a"}
+                href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"}
+                //sssstarget={"_blank"}
+                download={ editV.title+".mp3"}
+                //onClick={(e)=>{;}}
+              >
+                {editV.name.split(".")[0]+".mp3 "}                
+                </Button>}
               </div> </>: null}
             </div>
           </Col>

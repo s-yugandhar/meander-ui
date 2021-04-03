@@ -6,7 +6,7 @@ import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
 import {  FolderAddOutlined,  CheckCircleOutlined, 
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
-export const url = "//meander.video";
+export const url = "https://meander.video";
 
 //export const url = "http://127.0.0.1:8002";
 

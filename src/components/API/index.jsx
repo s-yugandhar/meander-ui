@@ -7,12 +7,7 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
 export const url = "//meander.video";
-
-<<<<<<< HEAD
-export const url = "https://meander.video";
-=======
-//export const url = "http://127.0.0.1:8002";
->>>>>>> c18677b7b175d748ef098179641e14de47758e2d
+//export const url = "https://meander.video";
 
 
 export const GetFolders= async (state,dispatch ,userId)=>{
@@ -77,7 +72,7 @@ export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
     } else {
       notification.open({message:'Unknown error occured in create Folder'});
     }});
-    
+
    return crtFolder;
 };
 
@@ -158,16 +153,7 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
    }).then(res => {
-<<<<<<< HEAD
-      //notification.open({ message : "Get objects from db succesful" });
-      //if(res.status === 200){
-         console.log(  "delete success" , res );
-      dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});
-      //return "";}
-      //else{
-      //   console.log("Error in getting objects from db");
-      // }
-=======
+
 
       if( res.data === true){
        notification.open({message : " Update succesful"});
@@ -177,8 +163,6 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
          notification.open({message : " Update failed"});
 
       }
-
->>>>>>> c18677b7b175d748ef098179641e14de47758e2d
    });
    /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
    return getFiles;

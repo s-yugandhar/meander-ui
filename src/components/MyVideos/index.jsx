@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-<<<<<<< HEAD
 import {
   Layout,
   Menu,
@@ -16,16 +15,10 @@ import {
   Form,
   Button,
   message,
+  Card,
   notification,
 } from "antd";
-=======
-import {  Layout, Menu,  Row,
-  Col,  Divider,  Input,
-  Select,  Typography,  Empty,
-  Modal,  Form,  Button,
-  message, Card ,
-  notification,} from "antd";
->>>>>>> c18677b7b175d748ef098179641e14de47758e2d
+
 import {
   EditOutlined,
   DeleteOutlined,
@@ -119,7 +112,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   // Show Embed code popup
   const embedPopup = (state, dispatch, obj) => {
     let temppath = obj.itempath;
-<<<<<<< HEAD
+
     console.log(state.videoList);
     let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
     console.log(dbobj);
@@ -130,19 +123,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
       setToggleEmbed(true);
       setEmbedCode(frame);
     } else {
-      notification.open({ message: "sorry Embed code is not available now" });
-=======
-    console.log( state.videoList );
-    let dbobj = state.videoList.find((ob)=>ob.itempath === temppath );
-    if( dbobj !== undefined){
-    let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='560' 
-    height='315' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' 
-    allowfullscreen title='${dbobj.title}'></iframe>`;
-    setToggleEmbed(true);
-    setEmbedCode(frame); }
-    else{
-      notification.open({message:"Sorry, Embed code is not available now"});
->>>>>>> c18677b7b175d748ef098179641e14de47758e2d
+      notification.open({ message: "Sorry, Embed code is not available now" });
     }
   };
 
@@ -269,11 +250,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       key={"file-" + index}
                     >
                       <VideoCard
-<<<<<<< HEAD
-                        videoTitle={obj.itempath.split("/")[2]}
-=======
                         videoTitle={ obj.title}
->>>>>>> c18677b7b175d748ef098179641e14de47758e2d
                         fileObject={obj}
                         userId={state.userId}
                         embedClick={() => embedPopup(state, dispatch, obj)}
@@ -302,14 +279,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                   : ""
               }
             <Divider></Divider>
-              
-            {/* 
+
+            {/*
             // build a board to provide to delete temporary files when upload fails
             <h2>{"Failed upload temporary files"}</h2>
               {
                 // Showing Files
                  state.fileList.length > 0
-                  ?  
+                  ?
                   state.fileList.map((file, index) => (
                      file._object_name.includes(state.userId) ?
                     <motion.div
@@ -319,10 +296,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       >
                         <Card
                           title={file._object_name}
-                        > 
+                        >
                         <Button   onClick={(e)=>{ }}> "Delete"</Button>
                         </Card>
-                      </motion.div>: null 
+                      </motion.div>: null
                     ))
                   : ""
               } */}

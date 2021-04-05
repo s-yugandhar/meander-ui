@@ -17,7 +17,7 @@ import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED } from "../../reducer/types";
-import { dbAddObj,deleteAfterUpload , GetFiles  , url}  from '../API'
+import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  , url}  from '../API'
 import EditVideo from "../EditVideo";
 
 const AdminModule = (props) => {
@@ -37,15 +37,30 @@ const AdminModule = (props) => {
   const localUserId = localStorage.getItem('userId');
 
   function updateFiles(id , folderName){
+    
     GetFiles(state,dispatch ,id , folderName).then(res => {
       console.log('My Videos Files in sidenav - ', res);
       dispatch({ type: FILE_LIST, payload: { fileList: res }});
      });
+     if( state.folderName === "")
+     dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );
+     else 
+     dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/"+state.folderName+"/" , true  );
   }
 
   const uppy = useUppy(() => {
     return new Uppy({
-      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ videomime , audiomime ]}
+      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ videomime , audiomime ]},
+      onBeforeFileAdded: (currentFile, files) => {
+        const modifiedFile = {
+          ...currentFile,
+          name: Date.now() + '.' + currentFile.name.split(".")[1],
+          meta : {title: currentFile.name ,
+          description : currentFile.name }
+        }
+        uppy.log(modifiedFile.name);
+        return modifiedFile;
+      }
     }).use(ThumbnailGenerator,{ waitForThumbnailsBeforeUpload : false,
       thumbnailWidth: 200,  thumbnailHeight: 200,  thumbnailType: 'image/jpeg',
     }).use(AwsS3Multipart, {
@@ -67,7 +82,7 @@ const AdminModule = (props) => {
             dispatch({ type: FILE_UPLOADED,  payload: { fileName:  obj.name }   });
             deleteAfterUpload(idt);
             let path = "bucket-"+idt.split("-")[0]+"/"+idt.split("-")[1]+"/"+idt.split("-")[2] ;
-            let builtObj= { "name":obj.name  ,"title" : obj.name , "itempath" : path ,
+            let builtObj= { "name":obj.name  ,"title" : obj.meta.title , "description" : obj.meta.description , "itempath" : path ,
           "itemtype": obj.type , "itemsize" : obj.size ,"upload_state":"complete" ,"scope":"private"  };
             insertObj.push(builtObj);;
          }
@@ -87,8 +102,8 @@ const AdminModule = (props) => {
 
   const closeUploadVideo = () => {
     setUploadVideo(!uploadVideo);
+    uppy.reset();
   }
-
 
   const logout = () => {
      localStorage.removeItem('token');
@@ -119,17 +134,6 @@ const AdminModule = (props) => {
     "my-profile": <MyProfile />,
     "edit-video": <EditVideo />,
 
-    /* switch (context.state.page) {
-      case "my-videos":
-        return <MyVideos />
-      case "add-video":
-        return <AddVideo />
-      case "my-profile":
-        return <MyProfile />
-
-      default:
-        return <MyVideos />
-    } */
   };
 
 
@@ -212,10 +216,7 @@ const AdminModule = (props) => {
                   optionFilterProp="children"
                   value={state.folderName === "" ? "default" : state.folderName}
                   onChange={(value) =>
-                    dispatch({
-                      type: FOLDER_NAME,
-                      payload: { folderName: value },
-                    })
+                    dispatch({ type: FOLDER_NAME, payload: { folderName: value }})
                   }
                 > 
                   {state.folderList !== undefined && state.folderList.length > 0? state.folderList.map((obj, ind) => {
@@ -231,12 +232,13 @@ const AdminModule = (props) => {
                     ) : null }) : null}
                 </Select>{" "}
               </div>
-              <div className="uploadFileUppyBlock" >
+              <div className="uploadFileUppyBlock" style={{ height : "80vh"}} >
                 <Dashboard uppy={uppy} showProgressDetails={true} 
                 proudlyDisplayPoweredByUppy={false} 
                 showRemoveButtonAfterComplete= {true}
                 showLinkToFileUploadResult={false}
                 fileManagerSelectionType={'files'}
+                inline = {true}
                 />
               </div>
             </Drawer>

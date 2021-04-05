@@ -6,9 +6,13 @@ import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
 import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
-//export const url = "//meander.video";
+export const url = "//meander.video";
 
+<<<<<<< HEAD
 export const url = "https://meander.video";
+=======
+//export const url = "http://127.0.0.1:8002";
+>>>>>>> c18677b7b175d748ef098179641e14de47758e2d
 
 
 export const GetFolders= async (state,dispatch ,userId)=>{
@@ -62,16 +66,18 @@ export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
          notification.open({message:res.data.detail ,
           icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
     } else if (res.data.status_code === 201) {
+      if( folderName !== "default")
       notification.open({
         message: `Successfully created`,
-        description: `Successfully ${folderName} created`,
+        description: `Successfully created folder : ${folderName} `,
         icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
       });
       dispatch({ type: FOLDER_CREATED, payload: { folderCreated: folderName } });
+      GetFolders(state,dispatch,state.userId);
     } else {
-      notification.open({message:'Unknown error occured'});
+      notification.open({message:'Unknown error occured in create Folder'});
     }});
-    GetFolders(state,dispatch,state.userId);
+    
    return crtFolder;
 };
 
@@ -152,6 +158,7 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
    }).then(res => {
+<<<<<<< HEAD
       //notification.open({ message : "Get objects from db succesful" });
       //if(res.status === 200){
          console.log(  "delete success" , res );
@@ -160,6 +167,18 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
       //else{
       //   console.log("Error in getting objects from db");
       // }
+=======
+
+      if( res.data === true){
+       notification.open({message : " Update succesful"});
+       console.log(  "update success" , res );
+      dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});}
+      else {
+         notification.open({message : " Update failed"});
+
+      }
+
+>>>>>>> c18677b7b175d748ef098179641e14de47758e2d
    });
    /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
    return getFiles;

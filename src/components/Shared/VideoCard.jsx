@@ -98,6 +98,7 @@ const VideoCard = (props) => {
     <Card
       bordered={true}
       hoverable={true}
+<<<<<<< HEAD
       title={props.videoTitle}
       actions={[
         <DeleteOutlined
@@ -114,6 +115,19 @@ const VideoCard = (props) => {
         />,
         <LinkOutlined key="embed" onClick={props.embedClick} />,
       ]}
+=======
+      title={<>{props.videoTitle}
+            <h6>{new Date(props.fileObject.name.split(".")[0]*1).toLocaleString() }</h6></>}
+      headStyle = {{height : "25%"  }}
+      bodyStyle={{ height : "55%"  }}
+      actions={ [
+         <DeleteOutlined     key="delete"
+          onClick={(e) => deleteFile(state,dispatch,props.userId, props.fileObject)}
+      />,
+        <EditOutlined key="edit" onClick={(e) => editVideoFunc(state,dispatch,props.userId, props.fileObject)} />
+      ,<LinkOutlined key="embed" onClick={props.embedClick} />  ]
+      }
+>>>>>>> c18677b7b175d748ef098179641e14de47758e2d
       className="cardVideo"
     >
       <div className="videoCardBlock">

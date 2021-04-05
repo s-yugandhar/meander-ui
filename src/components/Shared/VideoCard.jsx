@@ -1,7 +1,15 @@
 import React,{useContext} from "react";
 import { Card , Button } from "antd";
-import { SoundFilled,
-  EditOutlined,  DeleteOutlined,  LinkOutlined,  PlayCircleFilled,} from "@ant-design/icons";
+import {
+  SoundFilled,
+  EditOutlined,
+  DeleteOutlined,
+  LinkOutlined,
+  PlayCircleFilled,
+  VideoCameraOutlined,
+  AudioOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 import { deleteFile_Folder } from "../API";
 import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST, FOLDER_LIST} from '../../reducer/types';
 import { dbGetObjByPath ,GetFolders, url, GetFiles, CreateNewFolder } from '../API/index';
@@ -53,11 +61,11 @@ const VideoCard = (props) => {
     if( dbobj !== undefined){
     return `${url}/${state.userId}/player/${dbobj.id}`
     }
-    else return null; 
+    else return null;
 }
 
 
-  
+
   const onSideNavFolderClick = (folderName) => {
     dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
     dispatch({type: FOLDER_NAME, payload: { folderName: folderName }});
@@ -69,7 +77,7 @@ const VideoCard = (props) => {
   const showAllvideos = () => {
     GetFolders(state, dispatch , state.userId);
   }
-  
+
   async function deleteFile(state,dispatch,id, file) {
     let flag = window.confirm("Do you really want to delete file ?");
     if (flag == false) return;
@@ -85,53 +93,66 @@ const VideoCard = (props) => {
     dispatch({ type: "EDIT_VIDEO",payload:{ editVideo: obj } });
     //dbGetObjByPath(state , dispatch , "bucket-"obj.itempath , false );
    };
-  
+
   return (
     <Card
       bordered={true}
       hoverable={true}
       title={props.videoTitle}
-      headStyle = {{height : "10%"  }}
-      bodyStyle={{ height : "70%"  }}
-      actions={ [
-         <DeleteOutlined     key="delete"
-          onClick={(e) => deleteFile(state,dispatch,props.userId, props.fileObject)}
-      />,
-        <EditOutlined key="edit" onClick={(e) => editVideoFunc(state,dispatch,props.userId, props.fileObject)} />
-      ,<LinkOutlined key="embed" onClick={props.embedClick} />  ]
-      }
+      actions={[
+        <DeleteOutlined
+          key="delete"
+          onClick={(e) =>
+            deleteFile(state, dispatch, props.userId, props.fileObject)
+          }
+        />,
+        <EditOutlined
+          key="edit"
+          onClick={(e) =>
+            editVideoFunc(state, dispatch, props.userId, props.fileObject)
+          }
+        />,
+        <LinkOutlined key="embed" onClick={props.embedClick} />,
+      ]}
       className="cardVideo"
     >
-      <div className="videoCardBlock"  >
+      <div className="videoCardBlock">
         {/*<div className="videoDuration">10:00</div>
-        //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }} 
+        //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }}
         */}
-        <div  className="videoBlock">  
-             <Button
+        <div className="videoBlock">
+          <Button
             className="playBtn"
             type="button"
             htmlType="a"
-            href = {getPlayUrl(state,dispatch,url,props)}
+            href={getPlayUrl(state, dispatch, url, props)}
             target="_blank"
             //onClick={props.playBtnClick}
           >
             <PlayCircleFilled width={40} height={40} />
           </Button>
-          
-          <img alt="Thumbnail"  src={ props.fileObject.itemtype.includes("audio") ? mp3img: getMp4Url(props,"img")}   
-                  style={{ width:"100%",height:"inherit" }}  />
-           
-           {  /*  <video
+
+          <VideoCameraOutlined className="videoIconLoading" />
+          {/* <FileTextOutlined className="videoIconLoading" /> */}
+          <img
+            alt="Thumbnail"
+            src={
+              props.fileObject.itemtype.includes("audio")
+                ? mp3img
+                : getMp4Url(props, "img")
+            }
+          />
+
+          {/*  <video
               id = {props.fileObject.itempath}
               src={getMp4Url(props,"mp4")}
               controls
               className="videoInfoImageBlock"
-            ></video>*/
-          }
+            ></video>*/}
         </div>
         {/*<div className="videoCardInfoBlock" style={{  }}>ss
           <div className="videoTitle">{ props.videoTitle}</div>
-          <div className="publishedDate">{props.postedOn}</div> 
+          <div className="publishedDate">{props.postedOn}</div>
         </div> */}
       </div>
     </Card>

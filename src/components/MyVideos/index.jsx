@@ -1,12 +1,22 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import {  Layout, Menu,  Row,
-  Col,  Divider,  Input,
-  Select,  Typography,  Empty,
-  Modal,  Form,  Button,
+import {
+  Layout,
+  Menu,
+  Row,
+  Col,
+  Divider,
+  Input,
+  Select,
+  Typography,
+  Empty,
+  Modal,
+  Form,
+  Button,
   message,
-  notification,} from "antd";
+  notification,
+} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -16,10 +26,24 @@ import {
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import Loading from "../Loading";
-import { EDIT_VIDEO , FOLDER_LIST, FILE_LIST, FOLDER_NAME, PAGE } from "../../reducer/types";
-import { dbGetObjByPath ,url, GetFolders, GetFiles, CreateNewFolder } from "../API/index";
+import {
+  EDIT_VIDEO,
+  FOLDER_LIST,
+  FILE_LIST,
+  FOLDER_NAME,
+  PAGE,
+} from "../../reducer/types";
+import {
+  dbGetObjByPath,
+  url,
+  GetFolders,
+  GetFiles,
+  CreateNewFolder,
+} from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
+
+import PlayVideo from "../PlayVideo";
 
 const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -52,16 +76,13 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const container = {
     hidden: { opacity: 0, y: 5 },
-    show: { opacity: 1,      y: 0,
-      transition: { staggerChildren: 0.2,   },
-    },
+    show: { opacity: 1, y: 0, transition: { staggerChildren: 0.2 } },
   };
 
   const item = {
     hidden: { opacity: 0, y: 5 },
     show: { opacity: 1, y: 0 },
   };
-
 
   function countVideos(val) {
     let cnt = 0;
@@ -74,7 +95,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const innerFolder = (folderName) => {
     setLoading(true);
-    GetFiles(state,dispatch ,state.userId, folderName)
+    GetFiles(state, dispatch, state.userId, folderName)
       .then((res) => {
         console.log("My Videos Files res - ", res);
         setLoading(false);
@@ -87,19 +108,19 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   };
 
   // Show Embed code popup
-  const embedPopup = (state,dispatch,obj) => {
+  const embedPopup = (state, dispatch, obj) => {
     let temppath = obj.itempath;
-    console.log( state.videoList );
-    let dbobj = state.videoList.find((ob)=>ob.itempath === temppath );
-    console.log( dbobj );
-    if( dbobj !== undefined){
-    let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='1920' 
-    height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture' 
+    console.log(state.videoList);
+    let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
+    console.log(dbobj);
+    if (dbobj !== undefined) {
+      let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='1920'
+    height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture'
     allowfullscreen title='${dbobj.title}'></iframe>`;
-    setToggleEmbed(true);
-    setEmbedCode(frame); }
-    else{
-      notification.open({message:"sorry Embed code is not available now"});
+      setToggleEmbed(true);
+      setEmbedCode(frame);
+    } else {
+      notification.open({ message: "sorry Embed code is not available now" });
     }
   };
 
@@ -120,23 +141,24 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   };
 
   // Go to Edit video page
-  
+
   //window.addEventListener('load',(e)=>
   //{   GetFolders(state , dispatch,state.userId);
-   //   if(state.folderList.length === 0 ) CreateNewFolder(state,dispatch,state.userId ,"default");
+  //   if(state.folderList.length === 0 ) CreateNewFolder(state,dispatch,state.userId ,"default");
   //}) ;
 
   useEffect(() => {
     setLoading(true);
     updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
-    dispatch({ type:"VIDEO_LIST" , payload : { videoList : []}})
-    GetFolders(state , dispatch,state.userId);
-      if(state.folderList === undefined ||
-        (state.folderList !== undefined && state.folderList.length === 0) ) 
-      CreateNewFolder(state,dispatch,state.userId ,"default");
+    dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
+    GetFolders(state, dispatch, state.userId);
+    if (
+      state.folderList === undefined ||
+      (state.folderList !== undefined && state.folderList.length === 0)
+    )
+      CreateNewFolder(state, dispatch, state.userId, "default");
   }, []);
-
 
   return (
     <>
@@ -152,9 +174,11 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           <Row align="middle">
             <Col span={12}>
               <h2 className="page-title">
-                Videos in current folder - {state.videoList === undefined ? 0 : state.videoList.length}
+                Videos in current folder -{" "}
+                {state.videoList === undefined ? 0 : state.videoList.length}
               </h2>
             </Col>
+
             <Col span={6} style={{ paddingRight: "15px" }}>
               {/* <Row justify="end">
               <Button
@@ -176,8 +200,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
             </Col>
           </Row>
           <Divider orientation="left"></Divider>
-          {  ( state.folderList !== undefined && state.folderList.length > 0) 
-          || (state.fileList !== undefined && state.fileList.length > 0) ? (
+          {/* <Row>
+            <Col span={18}>
+              <PlayVideo />
+            </Col>
+          </Row> */}
+
+          {(state.folderList !== undefined && state.folderList.length > 0) ||
+          (state.fileList !== undefined && state.fileList.length > 0) ? (
             <motion.div
               className="ant-row ant-row-stretch position-relative"
               variants={container}
@@ -210,20 +240,17 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
               {state.folderName === "" &&
                 state.videoList.map((obj, index) => {
                   //&& folder._object_name.includes(state.userId) === false
-                  return  (
+                  return (
                     <motion.div
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                       variants={item}
                       key={"file-" + index}
                     >
                       <VideoCard
-                        videoTitle={ obj.itempath.split("/")[2]}
+                        videoTitle={obj.itempath.split("/")[2]}
                         fileObject={obj}
                         userId={state.userId}
-                        embedClick={() =>
-                          embedPopup(state,dispatch,obj)
-                        }
-                        
+                        embedClick={() => embedPopup(state, dispatch, obj)}
                       />
                     </motion.div>
                   );
@@ -242,9 +269,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                           videoTitle={file.itempath.split("/")[2]}
                           fileObject={file}
                           userId={state.userId}
-                          embedClick={() =>
-                            embedPopup(state,dispatch,file)
-                          }
+                          embedClick={() => embedPopup(state, dispatch, file)}
                         />
                       </motion.div>
                     ))

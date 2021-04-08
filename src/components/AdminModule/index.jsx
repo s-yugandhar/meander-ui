@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import {  Layout, Menu,  Dropdown, Avatar,   Row,  Col, Input,  Select, Typography,  Drawer,} from "antd";
+import {  Layout, Menu,  Dropdown, Avatar,   Row,  Col, Input,  Select, Typography,  Drawer, Button,} from "antd";
 import {  UserOutlined,  DownOutlined} from "@ant-design/icons";
 import Uppy from '@uppy/core';
 import 'uppy/dist/uppy.min.css';
@@ -19,6 +19,8 @@ import Login from "../../Login";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED } from "../../reducer/types";
 import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  , url}  from '../API'
 import EditVideo from "../EditVideo";
+import ManageVideos from "../ManageVideos";
+import ManageUsers from "../ManageUsers";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -37,14 +39,14 @@ const AdminModule = (props) => {
   const localUserId = localStorage.getItem('userId');
 
   function updateFiles(id , folderName){
-    
+
     GetFiles(state,dispatch ,id , folderName).then(res => {
       console.log('My Videos Files in sidenav - ', res);
       dispatch({ type: FILE_LIST, payload: { fileList: res }});
      });
      if( state.folderName === "")
      dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );
-     else 
+     else
      dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/"+state.folderName+"/" , true  );
   }
 
@@ -78,7 +80,7 @@ const AdminModule = (props) => {
       let insertObj = [];
       succes.map((obj,ind)=>{
          if( obj.progress.uploadComplete=== true){
-          let idt = obj.s3Multipart.uploadId;  
+          let idt = obj.s3Multipart.uploadId;
             dispatch({ type: FILE_UPLOADED,  payload: { fileName:  obj.name }   });
             deleteAfterUpload(idt);
             let path = "bucket-"+idt.split("-")[0]+"/"+idt.split("-")[1]+"/"+idt.split("-")[2] ;
@@ -111,7 +113,7 @@ const AdminModule = (props) => {
     dispatch({  type: 'FOLDER_LIST', payload:{ folderList : []} });
     dispatch({  type: 'FILE_LIST', payload:{ fileList : []} });
     dispatch({  type: 'VIDEO_LIST', payload:{ videoList : []} });
-    //window.location.reload(); 
+    //window.location.reload();
     dispatch({
       type: 'LOGOUT_SUCCESS'
     })
@@ -133,7 +135,8 @@ const AdminModule = (props) => {
     "add-video": <AddVideo />,
     "my-profile": <MyProfile />,
     "edit-video": <EditVideo />,
-
+    "manage-videos": <ManageVideos />,
+    "manage-users": <ManageUsers />,
   };
 
 
@@ -144,7 +147,7 @@ const AdminModule = (props) => {
     console.log('Got user id - ', state.userId);
     localUserId ? setLogedIn(true) : setLogedIn(false);
     //Dashboard( { locale :{ strings : { dropHere : "hint"} }        } )
-    uppy.setOptions( {  locale : {strings : 
+    uppy.setOptions( {  locale : {strings :
       {  'dropPaste' :state.folderName === ""?
       `Drop files here or paste or %{browse} to upload files to default` :
        `Drop files here or paste or %{browse} to upload files to `+state.folderName      }} })
@@ -172,7 +175,9 @@ const AdminModule = (props) => {
                 <Row justify="end">
                   <Col>
                     <Dropdown overlay={userMenu} trigger={["click"]}>
-                      <a
+                      <Button
+                        htmlType="button"
+                        type="link"
                         className="ant-dropdown-link"
                         onClick={(e) => e.preventDefault()}
                         style={{ color: "white" }}
@@ -183,7 +188,7 @@ const AdminModule = (props) => {
                           style={{ marginRight: "5px" }}
                         />{" "}
                         My Account <DownOutlined />
-                      </a>
+                      </Button>
                     </Dropdown>
                   </Col>
                 </Row>
@@ -218,10 +223,10 @@ const AdminModule = (props) => {
                   onChange={(value) =>
                     dispatch({ type: FOLDER_NAME, payload: { folderName: value }})
                   }
-                > 
+                >
                   {state.folderList !== undefined && state.folderList.length > 0? state.folderList.map((obj, ind) => {
                     return obj._object_name.includes("temp.dod") ? (
-                      
+
                       <Option
                         key={obj._object_name.split("/")[0]}
                         value={obj._object_name.split("/")[0]}
@@ -233,8 +238,8 @@ const AdminModule = (props) => {
                 </Select>{" "}
               </div>
               <div className="uploadFileUppyBlock" style={{ height : "80vh"}} >
-                <Dashboard uppy={uppy} showProgressDetails={true} 
-                proudlyDisplayPoweredByUppy={false} 
+                <Dashboard uppy={uppy} showProgressDetails={true}
+                proudlyDisplayPoweredByUppy={false}
                 showRemoveButtonAfterComplete= {true}
                 showLinkToFileUploadResult={false}
                 fileManagerSelectionType={'files'}

@@ -17,6 +17,10 @@ import {
   message,
   Card,
   notification,
+  Table,
+  Tag,
+  Space,
+  Switch,
 } from "antd";
 
 import {
@@ -61,8 +65,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [levels, setLevels] = useState(null);
   const [toggleEmbed, setToggleEmbed] = useState(false);
   const [embedCode, setEmbedCode] = useState(null);
+  const [tableCols, setTableCols] = useState([]);
 
   const { state, dispatch } = useContext(Context);
+  const { Column } = Table;
 
   let initialAnimate;
   let animateOpen;
@@ -144,11 +150,13 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   };
 
   // Go to Edit video page
-
   //window.addEventListener('load',(e)=>
   //{   GetFolders(state , dispatch,state.userId);
   //   if(state.folderList.length === 0 ) CreateNewFolder(state,dispatch,state.userId ,"default");
   //}) ;
+
+
+
 
   useEffect(() => {
     setLoading(true);
@@ -161,6 +169,17 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
       (state.folderList !== undefined && state.folderList.length === 0)
     )
       CreateNewFolder(state, dispatch, state.userId, "default");
+
+    console.log('State - ', state.videoList);
+
+
+
+
+
+
+
+
+
   }, []);
 
   return (
@@ -250,7 +269,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       key={"file-" + index}
                     >
                       <VideoCard
-                        videoTitle={ obj.title}
+                        videoTitle={obj.title}
                         fileObject={obj}
                         userId={state.userId}
                         embedClick={() => embedPopup(state, dispatch, obj)}
@@ -278,9 +297,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                     ))
                   : ""
               }
-            <Divider></Divider>
 
-            {/*
+              {/*
             // build a board to provide to delete temporary files when upload fails
             <h2>{"Failed upload temporary files"}</h2>
               {
@@ -303,8 +321,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                     ))
                   : ""
               } */}
-
-
             </motion.div>
           ) : (
             <Empty style={{ marginTop: "80px" }} />

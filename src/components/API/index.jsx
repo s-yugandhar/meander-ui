@@ -28,9 +28,6 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
 }
 
 
-
-
-
 export const GetFolders= async (state,dispatch ,userId)=>{
    if (userId === undefined )
       return [];

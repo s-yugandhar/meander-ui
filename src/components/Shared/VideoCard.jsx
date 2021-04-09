@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { Card, Button } from "antd";
+import { Card, Button , message } from "antd";
 import {
-  SoundFilled,
+  SwapOutlined,
   EditOutlined,
   DeleteOutlined,
   LinkOutlined,
@@ -115,13 +115,55 @@ const VideoCard = (props) => {
     else alert("this is not a file to delete");
   }
 
-  const editVideoFunc = (state, dispatch, userId, obj) => {
+  const embedCodeFunc = (state, dispatch, obj) => {
+    let temppath = obj.itempath;
+    console.log(state.videoList);
+    let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
+    if(dbobj === undefined)
+      return null;
+      let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='530'
+    height='315' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture'
+    allowfullscreen title='${dbobj.title}'></iframe>`;
+      return frame ;
+  };
+
+
+  const editVideoFunc = (state, dispatch, props, url , play) => {
+   let playUrl = play ?  getPlayUrl(state,dispatch,url,props) : null;
+   let embedUrl = embedCodeFunc(state,dispatch , props.fileObject);
+   let userId = props.userId;
+   let obj = props.fileObject;
+    obj.playUrl = playUrl ;
+    obj.embedCode =  embedUrl;
     dispatch({ type: PAGE, payload: { page: "edit-video" } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: null } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: obj } });
     //dbGetObjByPath(state , dispatch , "bucket-"obj.itempath , false );
   };
 
+
+  const copyCode = (state,dipatch,url,props) => {
+    let code =  getPlayUrl(state,dispatch,url,props);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code);
+      message.success(`Code Copied is: ${code}`);
+    } else {
+      alert(`Sorry your browser does not support, please copy here: ${code}`);
+    }
+  };
+
+
+  const copyEmbedCode = (state,dipatch,obj) => {
+    let code =  embedCodeFunc(state,dispatch,obj);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code);
+      message.success(`Code Copied is: ${code}`);
+    } else {
+      alert(`Sorry your browser does not support, please copy here: ${code}`);
+    }
+  };
+
+  
   return (
     <Card
       bordered={true}
@@ -139,32 +181,34 @@ const VideoCard = (props) => {
       actions={[
         <DeleteOutlined
           key="delete"
+          title={"click to delete object"}
           onClick={(e) =>
             deleteFile(state, dispatch, props.userId, props.fileObject)
           }
         />,
         <EditOutlined
           key="edit"
+          title={"Click to edit metadata"}
           onClick={(e) =>
-            editVideoFunc(state, dispatch, props.userId, props.fileObject)
+            editVideoFunc(state, dispatch, props, url , false)
           }
         />,
-        <LinkOutlined key="embed" onClick={props.embedClick} />,
+        <SwapOutlined key="embed" title={"copy embed code"} onClick={(e)=>  copyEmbedCode(state,dispatch,props.fileObject)} />,
+        <LinkOutlined key="link" title={"Copy link to video"} onClick={(e) => copyCode(state,dispatch,url,props)} />,
+
       ]}
       className="cardVideo"
     >
       <div className="videoCardBlock">
         {/*<div className="videoDuration">10:00</div>
         //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }}
+        href={getPlayUrl(state, dispatch, url, props)}
         */}
-        <div className="videoBlock">
+        <div className="videoBlock">        
           <Button
             className="playBtn"
             type="button"
-            htmlType="a"
-            href={getPlayUrl(state, dispatch, url, props)}
-            target="_blank"
-            //onClick={props.playBtnClick}
+            onClick={(e)=> editVideoFunc(state, dispatch, props, url , true)}
           >
             <PlayCircleFilled width={40} height={40} />
           </Button>

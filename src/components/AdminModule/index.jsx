@@ -16,7 +16,7 @@ import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
 import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
-import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED } from "../../reducer/types";
+import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED,PAGE } from "../../reducer/types";
 import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  , url}  from '../API'
 import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
@@ -121,7 +121,8 @@ const AdminModule = (props) => {
 
   const userMenu = (
     <Menu>
-      <Menu.Item onClick={() => setSelectedTab('my-profile')}>
+      <Menu.Item onClick={() => { setSelectedTab('my-profile') ; 
+      dispatch({ type: PAGE, payload: { page: 'my-profile' } }); }}>
         My Profile
       </Menu.Item>
       <Menu.Item onClick={(e)=>logout()}>
@@ -187,7 +188,7 @@ const AdminModule = (props) => {
                           icon={<UserOutlined />}
                           style={{ marginRight: "5px" }}
                         />{" "}
-                        My Account <DownOutlined />
+                        {state.userObj !== undefined && state.userObj !== null ? state.userObj.username:"My Account" }<DownOutlined />
                       </Button>
                     </Dropdown>
                   </Col>

@@ -2,12 +2,33 @@
 import axios from 'axios';
 import {notification } from 'antd';
 import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
-    EDIT_VIDEO,VIDEO_LIST,FOLDER_LIST} from '../../reducer/types';
+    EDIT_VIDEO,VIDEO_LIST,FOLDER_LIST,USER_OBJ }  from '../../reducer/types';
 import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
 export const url = "//meander.video";
-//export const url = "https://meander.video";
+
+//export const url = "http://127.0.0.1:8002";
+
+
+export const GetUserdetails= async (state,dispatch ,userId)=>{
+   if (userId === undefined )
+      return [];
+       //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
+   const tempFolders = await axios.get(url + `/users/${userId}`, {
+      headers: {
+         accept: 'application/json', Authorization : "bearer "+state.token,
+            }
+   }).then(res => {
+      console.log(res);
+      return res.data;   })
+   console.log(" userdata in get ", tempFolders);
+   dispatch({  type : USER_OBJ , payload : { userObj : tempFolders}});
+   return tempFolders;
+}
+
+
+
 
 
 export const GetFolders= async (state,dispatch ,userId)=>{

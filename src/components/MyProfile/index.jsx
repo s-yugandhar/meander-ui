@@ -1,15 +1,29 @@
-import React, { useState } from "react";
+import React, { useState , useContext, useEffect } from "react";
 import "./myProfile.scss";
 import {
    Divider,Layout, Row, Col, Form, Input,   Button, Radio,   Select, Upload,} from "antd";
+import {Context} from '../../context';
+import {USER_OBJ} from '../../reducer/types';
+import { GetUserdetails } from '../API/index';
+import ManageVideos from "../ManageVideos";
+import ManageUsers from "../ManageUsers";
+
 
 const MyProfile = () => {
    const [requiredMark, setRequiredMarkType] = useState("optional");
    const { Header, Footer, Sider, Content } = Layout;
+    const {state,dispatch} = useContext(Context);
 
    const onRequiredTypeChange = ({ requiredMark }) => {
       setRequiredMarkType(requiredMark);
    };
+
+   useEffect(()=>{
+
+    if( state.userId !== null && state.userId !== undefined)
+    GetUserdetails(state,dispatch,state.userId);
+   },[state.userId]);
+
 
    return (
      <Layout className="main">
@@ -26,6 +40,11 @@ const MyProfile = () => {
              <h3 className="page-title">My Profile</h3>
            </Col>
          </Row>
+         { state.userObj !== undefined ?
+        <Row> Welcome {state.userObj.username} - your Role is {state.userObj.roles}</Row> : null }
+        {/*<Row> {JSON.stringify(state.userObj)}</Row>
+        <ManageVideos></ManageVideos>
+         <ManageUsers></ManageUsers>*/}
        </Content>
      </Layout>
    );

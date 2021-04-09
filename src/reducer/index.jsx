@@ -11,7 +11,8 @@ import {
    UPPY_FAILED,
    UPPY_BATCHID ,
    VIDEO_LIST ,
-   EDIT_VIDEO
+   EDIT_VIDEO,
+   USER_OBJ
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -104,6 +105,9 @@ export const reducer = (state = initialState, action) => {
 
       case EDIT_VIDEO :
          return {  ...state , editVideo : action.payload.editVideo }
+ 
+      case USER_OBJ :
+         return { ...state , userObj : action.payload.userObj}
  
       default:
          return state;

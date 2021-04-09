@@ -222,11 +222,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
             </Col>
           </Row>
           <Divider orientation="left"></Divider>
-          {/* <Row>
-            <Col span={18}>
-              <PlayVideo />
-            </Col>
-          </Row> */}
 
           {(state.folderList !== undefined && state.folderList.length > 0) ||
           (state.fileList !== undefined && state.fileList.length > 0) ? (
@@ -297,7 +292,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                     ))
                   : ""
               }
-
+                  
               {/*
             // build a board to provide to delete temporary files when upload fails
             <h2>{"Failed upload temporary files"}</h2>

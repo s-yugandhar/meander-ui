@@ -142,7 +142,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
               Add Audio/Video
             </Menu.Item>
-            <Menu.Item
+           {/* <Menu.Item
               key="manage-videos"
               onClick={() => loadPage('manage-videos')}
             >
@@ -153,7 +153,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               onClick={() => loadPage("manage-users")}
             >
               Manage Users
-            </Menu.Item>
+              </Menu.Item>  */}
           </SubMenu>
         </Menu>
       </Sider>

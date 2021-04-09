@@ -8,6 +8,8 @@ import {  ReloadOutlined,  DeleteOutlined,
 import "./editVideo.scss";
 import {dbUpdateObj} from '../API';
 import { Context } from '../../context';
+import PlayVideo from "../PlayVideo";
+
 
 const EditVideo = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -70,7 +72,13 @@ const EditVideo = (props) => {
       
   return (
     <Layout className="main">
-      <Content
+      
+      {  state.editVideo !== null && state.editVideo.playUrl !== null   ?<Row>
+            <Col span={18}>
+              <PlayVideo   obj={state.editVideo}  />
+            </Col>
+          </Row> 
+      :<Content
         className="site-layout-background"
         style={{
           padding: 24,
@@ -245,8 +253,8 @@ const EditVideo = (props) => {
               </div> </>: null}
             </div>
           </Col>
-        </Row>
-      </Content>
+        </Row> 
+              </Content> }
     </Layout>
   );
 };

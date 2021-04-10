@@ -74,7 +74,7 @@ const EditVideo = (props) => {
   return (
     <Layout className="main">
       
-      {  state.editVideo !== null && state.editVideo.playUrl !== null 
+      {  state.editVideo !== null && state.editVideo !== undefined && state.editVideo.playUrl !== null 
           && state.editVideo.playUrl !== undefined   ?
       <Row>
             <Col span={18}>

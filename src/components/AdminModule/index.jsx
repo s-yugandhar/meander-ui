@@ -21,6 +21,7 @@ import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  , url}  from '../
 import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
+import Logo from "../../assets/images/Meander_Logo.svg";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -121,7 +122,7 @@ const AdminModule = (props) => {
 
   const userMenu = (
     <Menu>
-      <Menu.Item onClick={() => { setSelectedTab('my-profile') ; 
+      <Menu.Item onClick={() => { setSelectedTab('my-profile') ;
       dispatch({ type: PAGE, payload: { page: 'my-profile' } }); }}>
         My Profile
       </Menu.Item>
@@ -170,7 +171,9 @@ const AdminModule = (props) => {
           <Header className="header">
             <Row>
               <Col span={6}>
-                <div style={{ color: "white" }}>Logo</div>
+                <div style={{ color: "white" }} className="brandingLogoBlock">
+                  <img src={Logo} alt="" className="brandingLogo" />
+                </div>
               </Col>
               <Col span={18}>
                 <Row justify="end">
@@ -188,7 +191,10 @@ const AdminModule = (props) => {
                           icon={<UserOutlined />}
                           style={{ marginRight: "5px" }}
                         />{" "}
-                        {state.userObj !== undefined && state.userObj !== null ? state.userObj.username:"My Account" }<DownOutlined />
+                        {state.userObj !== undefined && state.userObj !== null
+                          ? state.userObj.username
+                          : "My Account"}
+                        <DownOutlined />
                       </Button>
                     </Dropdown>
                   </Col>
@@ -222,29 +228,36 @@ const AdminModule = (props) => {
                   optionFilterProp="children"
                   value={state.folderName === "" ? "default" : state.folderName}
                   onChange={(value) =>
-                    dispatch({ type: FOLDER_NAME, payload: { folderName: value }})
+                    dispatch({
+                      type: FOLDER_NAME,
+                      payload: { folderName: value },
+                    })
                   }
                 >
-                  {state.folderList !== undefined && state.folderList.length > 0? state.folderList.map((obj, ind) => {
-                    return obj._object_name.includes("temp.dod") ? (
-
-                      <Option
-                        key={obj._object_name.split("/")[0]}
-                        value={obj._object_name.split("/")[0]}
-                      >
-                        {" "}
-                        {obj._object_name.split("/")[0]}{" "}
-                      </Option>
-                    ) : null }) : null}
+                  {state.folderList !== undefined && state.folderList.length > 0
+                    ? state.folderList.map((obj, ind) => {
+                        return obj._object_name.includes("temp.dod") ? (
+                          <Option
+                            key={obj._object_name.split("/")[0]}
+                            value={obj._object_name.split("/")[0]}
+                          >
+                            {" "}
+                            {obj._object_name.split("/")[0]}{" "}
+                          </Option>
+                        ) : null;
+                      })
+                    : null}
                 </Select>{" "}
               </div>
-              <div className="uploadFileUppyBlock" style={{ height : "80vh"}} >
-                <Dashboard uppy={uppy} showProgressDetails={true}
-                proudlyDisplayPoweredByUppy={false}
-                showRemoveButtonAfterComplete= {true}
-                showLinkToFileUploadResult={false}
-                fileManagerSelectionType={'files'}
-                inline = {true}
+              <div className="uploadFileUppyBlock" style={{ height: "80vh" }}>
+                <Dashboard
+                  uppy={uppy}
+                  showProgressDetails={true}
+                  proudlyDisplayPoweredByUppy={false}
+                  showRemoveButtonAfterComplete={true}
+                  showLinkToFileUploadResult={false}
+                  fileManagerSelectionType={"files"}
+                  inline={true}
                 />
               </div>
             </Drawer>

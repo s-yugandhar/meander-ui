@@ -4,6 +4,7 @@ import { Layout, Row, Col, Divider } from "antd";
 import {Context} from '../../context';
 // Custom imports
 import "./playVideo.scss";
+import Logo from "../../assets/images/Meander_Logo.svg";
 
 const PlayVideo = (props) => {
   const {state,dispatch} = useContext(Context);

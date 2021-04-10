@@ -45,6 +45,7 @@ import {
   GetFolders,
   GetFiles,
   CreateNewFolder,
+  GetUserdetails,
 } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
@@ -167,20 +168,13 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     if (
       state.folderList === undefined ||
       (state.folderList !== undefined && state.folderList.length === 0)
-    )
+    ){
       CreateNewFolder(state, dispatch, state.userId, "default");
-
+      GetUserdetails(state,dispatch,state.userId);
+    }
     console.log('State - ', state.videoList);
 
-
-
-
-
-
-
-
-
-  }, []);
+ }, []);
 
   return (
     <>

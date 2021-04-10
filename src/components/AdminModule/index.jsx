@@ -176,7 +176,7 @@ const AdminModule = (props) => {
             <Row>
               <Col span={6}>
                 <div style={{ color: "white" }} className="brandingLogoBlock">
-                  <img src={Logo} alt="" className="brandingLogo" />
+                  <img src={Logo} alt=""  className="brandingLogo" />
                 </div>
               </Col>
               <Col span={18}>

@@ -9,6 +9,7 @@ import "./editVideo.scss";
 import {dbUpdateObj} from '../API';
 import { Context } from '../../context';
 import PlayVideo from "../PlayVideo";
+import Logo from "../../assets/images/Meander_Logo.svg";
 
 
 const EditVideo = (props) => {
@@ -73,7 +74,9 @@ const EditVideo = (props) => {
   return (
     <Layout className="main">
       
-      {  state.editVideo !== null && state.editVideo.playUrl !== null   ?<Row>
+      {  state.editVideo !== null && state.editVideo.playUrl !== null 
+          && state.editVideo.playUrl !== undefined   ?
+      <Row>
             <Col span={18}>
               <PlayVideo   obj={state.editVideo}  />
             </Col>
@@ -202,11 +205,11 @@ const EditVideo = (props) => {
               {editV !== null && editV.itempath !== undefined?
               <><div className="video-container">              
               { editV.itemtype.includes("video") ?
-              <video className="video" controls key={quality}>
+              <video className="video" controls key={quality} poster={Logo}>
                     <source label={quality} id={quality} src={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]} 
                     type="video/mp4"/>
                 </video> :
-                <audio className="video" controls key={'keyaudio'}>
+                <audio className="video" controls key={'keyaudio'} poster={Logo}>
                   <source label={"a4"} id={"a4"} 
                    src={"https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"} />
                   </audio> }

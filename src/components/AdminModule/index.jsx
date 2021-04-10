@@ -95,6 +95,7 @@ const AdminModule = (props) => {
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   });
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   });
       updateFiles(state.userId,state.folderName);
+      dispatch({ type: 'EDIT_VIDEO',  payload: { editVideo: null  }   });
      dbGetObjByPath(state,dispatch, insertObj[0].itempath,false);
       if (insertObj.length > 0) dispatch({ type: 'PAGE',  payload: { page : "edit-video"  }   });
           closeUploadVideo();      

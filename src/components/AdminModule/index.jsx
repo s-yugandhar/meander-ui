@@ -51,8 +51,8 @@ const AdminModule = (props) => {
   }
 
   const uppy = useUppy(() => {
-    return new Uppy({
-      autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ videomime , audiomime ]},
+    return new Uppy({allowMultipleUploads  : false
+      ,autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ videomime , audiomime ]},
       onBeforeFileAdded: (currentFile, files) => {
         const modifiedFile = {
           ...currentFile,
@@ -90,10 +90,13 @@ const AdminModule = (props) => {
          }
       });
        if (insertObj.length > 0) dbAddObj(state , dispatch , insertObj );
-      dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   })
-      dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   })
-      dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   })
+      dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   });
+      dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   });
+      dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   });
       updateFiles(state.userId,state.folderName);
+     dbGetObjByPath(state,dispatch, insertObj[0].itempath,false);
+      if (insertObj.length > 0) dispatch({ type: 'PAGE',  payload: { page : "edit-video"  }   });
+          closeUploadVideo();      
     })
   });
 
@@ -103,8 +106,9 @@ const AdminModule = (props) => {
 
 
   const closeUploadVideo = () => {
-    setUploadVideo(!uploadVideo);
     uppy.reset();
+    setUploadVideo(false);
+    
   }
 
   const logout = () => {
@@ -199,7 +203,7 @@ const AdminModule = (props) => {
           <Layout>
             <SideNav
               updateTab={(tab) => setSelectedTab(tab)}
-              openUploadVideo={() => setUploadVideo(!uploadVideo)}
+              openUploadVideo={() => setUploadVideo(true)}
             />
             {page[state.page] ||
               "You do not have permissions to view this module"}

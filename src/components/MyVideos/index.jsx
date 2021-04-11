@@ -33,24 +33,15 @@ import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import Loading from "../Loading";
 import {
-  EDIT_VIDEO,
-  FOLDER_LIST,
   FILE_LIST,
   FOLDER_NAME,
-  PAGE,
 } from "../../reducer/types";
 import {
-  dbGetObjByPath,
-  url,
-  GetFolders,
-  GetFiles,
-  CreateNewFolder,
-  GetUserdetails,
+  url, GetFolders,
+  GetFiles,  GetUserdetails,
 } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
-
-import PlayVideo from "../PlayVideo";
 
 const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -95,11 +86,11 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   function countVideos(val) {
     let cnt = 0;
-    state.folderList.map((obj, ind) => {
+    state.videoList.map((obj, ind) => {
       //&& obj._object_name.includes(state.userId) === false
-      if (obj._object_name.includes(val)) cnt = cnt + 1;
+      if (obj.itempath.includes("/"+val+"/")) cnt = cnt + 1;
     });
-    return cnt - 1;
+    return cnt;
   }
 
   const innerFolder = (folderName) => {
@@ -165,13 +156,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     GetFolders(state, dispatch, state.userId);
-    if (
-      state.folderList === undefined ||
-      (state.folderList !== undefined && state.folderList.length === 0)
-    ){
-      CreateNewFolder(state, dispatch, state.userId, "default");
+      //CreateNewFolder(state, dispatch, state.userId, "default");
       GetUserdetails(state,dispatch,state.userId);
-    }
     console.log('State - ', state.videoList);
 
  }, []);
@@ -218,7 +204,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           <Divider orientation="left"></Divider>
 
           {(state.folderList !== undefined && state.folderList.length > 0) ||
-          (state.fileList !== undefined && state.fileList.length > 0) ? (
+          (state.fileList !== undefined && state.videoList.length > 0) ? (
             <motion.div
               className="ant-row ant-row-stretch position-relative"
               variants={container}
@@ -227,25 +213,20 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
             >
               {state.folderName === "" &&
                 state.folderList.map((folder, index) => {
-                  return folder._object_name.includes("temp.dod") ? (
-                    <motion.div
+                    return <motion.div
                       key={"folder-" + index}
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                       variants={item}
                     >
                       <FolderCard
-                        folderName={folder._object_name.split("/")[0]}
-                        folderObject={folder}
+                        folderName={folder}
                         userId={state.userId}
-                        videosCount={countVideos(
-                          folder._object_name.split("/")[0]
-                        )}
+                        videosCount={countVideos( folder)}
                         folderOnClick={() =>
-                          innerFolder(folder._object_name.split("/")[0])
+                          innerFolder(folder)
                         }
                       />
                     </motion.div>
-                  ) : null;
                 })}
 
               {state.folderName === "" &&

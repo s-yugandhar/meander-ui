@@ -1,12 +1,13 @@
 import React , { useEffect,useContext , useState} from "react";
 import {  Layout,  Menu,  Row,  Col,  Divider,  Input,
   Select,  Typography,  Empty,  Modal,  Form,
-  Button,  message,  Switch,  Tooltip,} from "antd";
+  Button,  message,  Switch,  Tooltip,  Upload} from "antd";
 
-import {  ReloadOutlined,  DeleteOutlined,
+import { PlayCircleOutlined ,ReloadOutlined,  DeleteOutlined,
   DownloadOutlined } from "@ant-design/icons";
 import "./editVideo.scss";
-import {dbUpdateObj} from '../API';
+import axios from 'axios';
+import {dbUpdateObj , url} from '../API';
 import { Context } from '../../context';
 import PlayVideo from "../PlayVideo";
 import Logo from "../../assets/images/Meander_Logo.svg";
@@ -18,6 +19,9 @@ const EditVideo = (props) => {
   const [form]= Form.useForm();
   const {state , dispatch} = useContext(Context);
   const [quality , setQuality] = useState("480p");
+  const [ fileList, setFileList] = useState([]);
+  const [ previewImage , setPreviewImage] = useState(null);
+  const [seePreview , setSeePreview] = useState(false);
   let editV = { ...state.editVideo };
 
   let mp4 = {    "1080p": "/mp41080k.mp4",
@@ -59,13 +63,69 @@ const EditVideo = (props) => {
       dbUpdateObj(state,dispatch,  obj  );
       }
 
+      const uploadButton = (
+        <div>
+          <PlayCircleOutlined />
+          <div className="ant-upload-text">Upload</div>
+        </div>
+      );
+
+      const handleCancel = () => { setSeePreview(false); }
+
+  const handlePreview = file => {
+    setSeePreview(true);
+      setPreviewImage(file.thumbUrl);
+  }
+
+  const handleBeforeUpload = (fileList) =>{
+    fileList.fileList.map((obj,index)=>{
+      obj.originFileobj.name = "img"+String(index)+ obj.originFileobj.name.split(".")[1];
+   });
+   return false;
+  }
+
+
+  const handleUpload = (fileList) => {
+    console.log(JSON.stringify(fileList))
+    setFileList(fileList.fileList);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if ( state.editVideo === null || state.editVideo === undefined )
+      return "";
+    let formData = new FormData();
+    let foldername = state.editVideo.itempath.split("/")[1];
+    let filename = state.editVideo.itempath.split("/")[2];
+    let file = fileList[0].originFileObj
+    formData.append("file", file);
+    console.log(formData);
+    axios.post(url+`/uploadthumb/${state.userId}/${foldername}/${filename}`, formData)
+      .then(res => {
+        if(res.data.status_code === 200){
+        dispatch({type : "EDIT_VIDEO",payload :
+        { editVideo : { ...state.editVideo, thumbnail : res.data.uploadURL } }});
+          message.success("Thumbnail updated");}
+      })
+      .catch(err => {
+        console.log("err", err);
+        message.error("Error in Thumbnail updation");
+      });
+  };
+
       useEffect(()=>{
 
         form.setFieldsValue({ 
-          'title' : state.editVideo ===  null ? null : state.editVideo.title,
-          'description' : state.editVideo ===  null ? null : state.editVideo.description,
-          'maturity' : state.editVideo ===  null ? null : state.editVideo.maturity,
-          'scope' : state.editVideo ===  null ? null : state.editVideo.scope,
+          'title' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.title,
+          'description' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.description,
+          'maturity' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.maturity,
+          'scope' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.scope,
+          'thumbnail' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.thumbnail,
           });
 
       },[state.editVideo])
@@ -106,7 +166,8 @@ const EditVideo = (props) => {
                   name={'title'}
                   className="editFormItem"
                 >
-                  <Input  value={state.editVideo ===  null ? null : state.editVideo.title}/>
+                  <Input  value={state.editVideo ===  null || state.editVideo === undefined 
+                      ? null : state.editVideo.title}/>
                 </Form.Item>
                 <Form.Item
                   label="Video Description"
@@ -115,6 +176,15 @@ const EditVideo = (props) => {
                 >
                   <Input.TextArea rows="3"  />
                 </Form.Item>
+                <Form.Item
+                  label="Thumbnail"
+                  name={'thumbnail'}
+                  className="editFormItem"
+                >
+                  <Input value={state.editVideo ===  null || state.editVideo === undefined 
+                      ? null : state.editVideo.thumbnail}/>
+                </Form.Item>
+                
                 <Form.Item
                   label="Video Maturity"
                   name={'maturity'}
@@ -202,6 +272,31 @@ const EditVideo = (props) => {
               <h3>
               <strong>Your Video Name : {  JSON.stringify(editV.name)}</strong>
               </h3>
+              <div>
+        <Upload
+          listType="picture-card"
+          fileList={fileList}
+          onPreview={handlePreview}
+          onChange={handleUpload}
+          beforeUpload={() => false} // return false so that antd doesn't upload the picture right away
+        >
+          {uploadButton}
+        </Upload>
+
+        <Button onClick={handleSubmit} // this button click will trigger the manual upload
+        >
+            Submit
+        </Button>
+
+        <Modal
+          visible={seePreview}
+          footer={null}
+          onCancel={handleCancel}
+        >
+          <img alt="example" style={{ width: "100%" }} src={previewImage} />
+        </Modal>
+      </div>
+
               {editV !== null && editV.itempath !== undefined?
               <><div className="video-container">              
               { editV.itemtype.includes("video") ?

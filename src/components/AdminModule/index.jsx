@@ -55,11 +55,13 @@ const AdminModule = (props) => {
     return new Uppy({allowMultipleUploads  : false
       ,autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ videomime , audiomime ]},
       onBeforeFileAdded: (currentFile, files) => {
+        let time = Date.now();
+        let uuid = state.userId+String(time);
         const modifiedFile = {
           ...currentFile,
-          name: Date.now() + '.' + currentFile.name.split(".")[1],
+          name:  uuid+ '.' + currentFile.name.split(".")[1],
           meta : {title: currentFile.name ,
-          description : currentFile.name }
+          description : currentFile.name , time : time , uuidname : uuid }
         }
         uppy.log(modifiedFile.name);
         return modifiedFile;
@@ -239,17 +241,17 @@ const AdminModule = (props) => {
                     })
                   }
                 >
-                  {state.folderList !== undefined && state.folderList.length > 0
+                  { "length" in state.folderList
                     ? state.folderList.map((obj, ind) => {
-                        return obj._object_name.includes("temp.dod") ? (
+                        
                           <Option
-                            key={obj._object_name.split("/")[0]}
-                            value={obj._object_name.split("/")[0]}
+                            key={obj}
+                            value={obj}
                           >
                             {" "}
-                            {obj._object_name.split("/")[0]}{" "}
+                            {obj}{" "}
                           </Option>
-                        ) : null;
+                        
                       })
                     : null}
                 </Select>{" "}

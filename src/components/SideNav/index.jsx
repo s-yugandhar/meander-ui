@@ -124,19 +124,18 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 Create Folder
               </Button>
             </Menu.Item>
-            {state.folderList !== undefined
+            { state.folderList !== undefined && state.folderList.length > 0
               ? state.folderList.map((folder, index) => {
-                  return folder._object_name.includes("temp.dod") ? (
-                    <Menu.Item
+                    return <Menu.Item
                       key={"folder-" + index}
                       onClick={() =>
-                        folderDetail(folder._object_name.split("/")[0])
+                        folderDetail(folder)
                       }
-                      title={folder._object_name.split("/")[0]}
+                      title={folder}
                     >
-                      <FolderOutlined /> {folder._object_name.split("/")[0]}
+                      <FolderOutlined /> {folder}
                     </Menu.Item>
-                  ) : null;
+                  
                 })
               : null}
             <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>

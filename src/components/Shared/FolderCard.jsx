@@ -18,8 +18,8 @@ const FolderCard = (props) => {
    const deleteFolder = (id , folder) => {
       let flag = window.confirm('Do you really want to delete folder and its content ?');
     if (flag == false) return;
-      if( folder._object_name.includes("temp.dod")   )
-      deleteFile_Folder(state , dispatch ,id , folder._object_name.split("/")[0] , true  ).then((res)=>{ showAllvideos()});
+      if( folder in state.folderList   )
+      deleteFile_Folder(state , dispatch ,id , folder , true  ).then((res)=>{ showAllvideos()});
       else 
       alert("this is not a folder to delete");
       showAllvideos();
@@ -28,7 +28,7 @@ const FolderCard = (props) => {
    const menu = (
       <Menu>
          <Menu.Item key="delete-folder">
-            <Button type="link" className="delete-folder-btn" onClick={(e)=>deleteFolder(props.userId,props.folderObject )}><DeleteFilled /> Delete</Button>
+            <Button type="link" className="delete-folder-btn" onClick={(e)=>deleteFolder(props.userId,props.folderName )}><DeleteFilled /> Delete</Button>
          </Menu.Item>
       </Menu>
    );

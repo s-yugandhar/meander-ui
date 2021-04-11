@@ -6,9 +6,9 @@ import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
 import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
-export const url = "https://meander.video";
+//export const url = "https://meander.video";
 
-//export const url = "http://127.0.0.1:8002";
+export const url = "http://127.0.0.1:8002";
 
 
 export const GetUserdetails= async (state,dispatch ,userId)=>{
@@ -31,7 +31,8 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
 export const GetFolders= async (state,dispatch ,userId)=>{
    if (userId === undefined )
       return [];
-       //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
+   let setfolders = new Set();    
+   //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
    const tempFolders = await axios.post(url + '/list_objects?id=' + userId + '&recursive=true', null, {
       headers: {
          accept: 'application/json', Authorization : "bearer "+state.token,
@@ -39,11 +40,15 @@ export const GetFolders= async (state,dispatch ,userId)=>{
    }).then(res => {
       console.log(res);
       return res.data;   })
-   console.log(" data in get folders", tempFolders);
    dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
-   dispatch({  type : FOLDER_LIST ,  payload : { folderList : tempFolders.miniolist  }});
    dispatch({ type : VIDEO_LIST , payload : {videoList : tempFolders.dblist} })
+   tempFolders.dblist.map(obj=>{
+      setfolders.add( obj.itempath.split("/")[1]  );
+   });
+   setfolders.add("default");
    dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
+   dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });
+   console.log(" data in get folders", state.folderList);
    return tempFolders;
 }
 
@@ -75,18 +80,24 @@ export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
          accept: 'application/json' ,Authorization : "bearer "+state.token,
       } }).then(res=>{
       if (res.data.status_code === 200 ) {
+         dispatch({ type: 'FOLDER_LIST',
+          payload: { folderList:  Array.from( new Set(state.folderList).add(folderName)  ) } });
+          dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
       if( folderName !== "default")
-         notification.open({message:res.data.detail ,
+         notification.open({message:"Folder Exists, Upload a file to retain folder",
           icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
     } else if (res.data.status_code === 201) {
       if( folderName !== "default")
       notification.open({
-        message: `Successfully created`,
-        description: `Successfully created folder : ${folderName} `,
+        message: `Successfully created : ${folderName} `,
+        description: `Upload a file to retain folder `,
         icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
       });
       dispatch({ type: FOLDER_CREATED, payload: { folderCreated: folderName } });
-      GetFolders(state,dispatch,state.userId);
+      //GetFolders(state,dispatch,state.userId);
+      dispatch({ type: 'FOLDER_LIST',
+          payload: { folderList:  Array.from( new Set(state.folderList).add(folderName)  ) } });
+          dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
     } else {
       notification.open({message:'Unknown error occured in create Folder'});
     }});
@@ -171,8 +182,6 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
    }).then(res => {
-
-
       if( res.data === true){
        notification.open({message : " Update succesful"});
        console.log(  "update success" , res );

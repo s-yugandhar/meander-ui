@@ -138,7 +138,7 @@ const VideoCard = (props) => {
     dispatch({ type: PAGE, payload: { page: "edit-video" } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: null } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: obj } });
-    //dbGetObjByPath(state , dispatch , "bucket-"obj.itempath , false );
+    dbGetObjByPath(state , dispatch , obj.itempath , false );
   };
 
 
@@ -172,7 +172,7 @@ const VideoCard = (props) => {
         <>
           {props.videoTitle}
           <h6>
-            {new Date(props.fileObject.name.split(".")[0] * 1).toLocaleString()}
+            {new Date(props.fileObject.name.replace(state.userId,"").split(".")[0] * 1).toLocaleString()}
           </h6>
         </>
       }

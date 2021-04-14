@@ -58,7 +58,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [toggleEmbed, setToggleEmbed] = useState(false);
   const [embedCode, setEmbedCode] = useState(null);
   const [tableCols, setTableCols] = useState([]);
-
+  const [filterType,setFilterType] = useState("all");
   const { state, dispatch } = useContext(Context);
   const { Column } = Table;
 
@@ -147,8 +147,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   //   if(state.folderList.length === 0 ) CreateNewFolder(state,dispatch,state.userId ,"default");
   //}) ;
 
-
-
+useEffect(()=>{
+  if( filterType === "all" || filterType === "folder")
+  GetFolders(state, dispatch, state.userId);
+},[filterType]);
 
   useEffect(() => {
     setLoading(true);
@@ -192,7 +194,19 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
               </Button>
             </Row> */}
             </Col>
-            <Col span={6}>
+            <Col span={3}>
+              <Select
+                placeholder="Enter keyword..."
+                value={ filterType}
+                  onChange={(value) => setFilterType(value) }
+              >
+                <Option key="all" value="all"> Show All</Option>
+                <Option key="folder" value="folder"> Folders only</Option>
+                <Option key="video" value="video"> Videos only</Option>
+                <Option key="audio" value="audio"> Audio Only</Option>
+              </Select>
+            </Col>
+            <Col span={3}>
               <Search
                 placeholder="Enter keyword..."
                 allowClear
@@ -213,7 +227,9 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
             >
               {state.folderName === "" &&
                 state.folderList.map((folder, index) => {
-                    return <motion.div
+                    return (
+                    filterType === "all" || filterType === "folder"?
+                    <motion.div
                       key={"folder-" + index}
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                       variants={item}
@@ -226,13 +242,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                           innerFolder(folder)
                         }
                       />
-                    </motion.div>
+                    </motion.div> : null) 
                 })}
 
               {state.folderName === "" &&
                 state.videoList.map((obj, index) => {
-                  //&& folder._object_name.includes(state.userId) === false
+                  
                   return (
+                    filterType === "all" || obj.itemtype.includes(filterType) ?
                     <motion.div
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                       variants={item}
@@ -244,14 +261,16 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                         userId={state.userId}
                         embedClick={() => embedPopup(state, dispatch, obj)}
                       />
-                    </motion.div>
+                    </motion.div> : null
                   );
                 })}
 
               {
                 // Showing Files
                 state.folderName !== "" && state.videoList.length > 0
-                  ? state.videoList.map((file, index) => (
+                  ? state.videoList.map((file, index) => {
+                    return (
+                      filterType === "all" || file.itemtype.includes(filterType) ?
                       <motion.div
                         className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                         variants={item}
@@ -263,8 +282,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                           userId={state.userId}
                           embedClick={() => embedPopup(state, dispatch, file)}
                         />
-                      </motion.div>
-                    ))
+                      </motion.div> : null
+                  )})
                   : ""
               }
                   

@@ -155,6 +155,12 @@ useEffect(()=>{
 
 },[filterType]);
 
+useEffect(()=>{
+  setFilterType("all");
+},[state.folderName])
+
+
+
   useEffect(() => {
     setLoading(true);
     updateTab = addVideo;

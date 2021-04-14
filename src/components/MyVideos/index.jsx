@@ -148,8 +148,11 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   //}) ;
 
 useEffect(()=>{
-  if( filterType === "all" || filterType === "folder")
+  if( (filterType === "all" || filterType === "folder") && state.folderName === "")
   GetFolders(state, dispatch, state.userId);
+  if( filterType === "audio" || filterType === "video")
+      GetFiles(state,dispatch,state.userId,state.folderName);
+
 },[filterType]);
 
   useEffect(() => {
@@ -176,10 +179,24 @@ useEffect(()=>{
           }}
         >
           <Row align="middle">
+          <Col span={3}>
+              <Select
+                placeholder="Enter keyword..."
+                value={ filterType}
+                  onChange={(value) => setFilterType(value) }
+              >
+                <Option key="all" value="all"> Show All</Option>
+                <Option key="folder" value="folder"> Folders only</Option>
+                <Option key="video" value="video"> Videos only</Option>
+                <Option key="audio" value="audio"> Audio Only</Option>
+              </Select>
+            </Col>
+            
+            
             <Col span={12}>
               <h2 className="page-title">
-                Videos in current folder -{" "}
-                {state.videoList === undefined ? 0 : state.videoList.length}
+                { state.folderName === "" ?  "  All Items  "
+                :  `Objects in ${state.folderName} folder is ${state.videoList.length}`  }
               </h2>
             </Col>
 
@@ -194,18 +211,7 @@ useEffect(()=>{
               </Button>
             </Row> */}
             </Col>
-            <Col span={3}>
-              <Select
-                placeholder="Enter keyword..."
-                value={ filterType}
-                  onChange={(value) => setFilterType(value) }
-              >
-                <Option key="all" value="all"> Show All</Option>
-                <Option key="folder" value="folder"> Folders only</Option>
-                <Option key="video" value="video"> Videos only</Option>
-                <Option key="audio" value="audio"> Audio Only</Option>
-              </Select>
-            </Col>
+            
             <Col span={3}>
               <Search
                 placeholder="Enter keyword..."

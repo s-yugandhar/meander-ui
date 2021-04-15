@@ -74,16 +74,7 @@ const VideoCard = (props) => {
     if (type == "dash") return dash_url;
     if (type == "hls") return hls_url;
   }
-
-  const getPlayUrl = (state, dispatch, url, props) => {
-    let obj = props.fileObject;
-    let temppath = obj.itempath;
-    let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
-    if (dbobj !== undefined) {
-      return `${url}/${state.userId}/player/${dbobj.id}`;
-    } else return null;
-  };
-
+  
   const onSideNavFolderClick = (folderName) => {
     dispatch({ type: PAGE, payload: { page: "my-videos" } });
     dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
@@ -115,13 +106,23 @@ const VideoCard = (props) => {
     else alert("this is not a file to delete");
   }
 
+  const getPlayUrl = (state, dispatch, url, props) => {
+    let obj = props.fileObject;
+    let temppath = obj.itempath;
+    let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
+    if (dbobj !== undefined) {
+      return `${url}/watch/${state.userId}/${dbobj.id}`;
+    } else return null;
+  };
+
+
   const embedCodeFunc = (state, dispatch, obj) => {
     let temppath = obj.itempath;
     console.log(state.videoList);
     let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
     if(dbobj === undefined)
       return null;
-      let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='530'
+      let frame = `<iframe src='${url}/watch/${state.userId}/${dbobj.id}?embed=true' width='530'
     height='315' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture'
     allowfullscreen title='${dbobj.title}'></iframe>`;
       return frame ;

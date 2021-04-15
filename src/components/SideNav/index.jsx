@@ -105,7 +105,6 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             >
               All Items
             </Menu.Item>
-            ̉̉
             <Menu.Item
               disabled={true}
               className="createFolderMenuItem"

@@ -115,7 +115,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
     console.log(dbobj);
     if (dbobj !== undefined) {
-      let frame = `<iframe src='${url}/${state.userId}/player/${dbobj.id}' width='1920'
+      let frame = `<iframe src='${url}/watch/${state.userId}/${dbobj.id}?embed=true' width='1920'
     height='1080' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture'
     allowfullscreen title='${dbobj.title}'></iframe>`;
       setToggleEmbed(true);

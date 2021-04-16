@@ -41,7 +41,7 @@ export const GetFolders= async (state,dispatch ,userId)=>{
       console.log(res);
       return res.data;   })
    dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
-   dispatch({ type : VIDEO_LIST , payload : {videoList : tempFolders.dblist} })
+   dispatch({ type : VIDEO_LIST , payload : {videoList : tempFolders.dblist} });
    tempFolders.dblist.map(obj=>{
       setfolders.add( obj.itempath.split("/")[1]  );
    });

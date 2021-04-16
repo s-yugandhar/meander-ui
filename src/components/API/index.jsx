@@ -40,14 +40,16 @@ export const GetFolders= async (state,dispatch ,userId)=>{
    }).then(res => {
       console.log(res);
       return res.data;   })
-   dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
-   dispatch({ type : VIDEO_LIST , payload : {videoList : tempFolders.dblist} });
-   tempFolders.dblist.map(obj=>{
-      setfolders.add( obj.itempath.split("/")[1]  );
-   });
-   setfolders.add("default");
+      tempFolders.dblist.map(obj=>{
+         setfolders.add( obj.itempath.split("/")[1]  );
+      });
+      setfolders.add("default");
    dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
-   dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });
+   dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });   
+   dispatch({ type : VIDEO_LIST , payload : {videoList :tempFolders.dblist } });
+   dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
+   
+   
    console.log(" data in get folders", state.folderList);
    return tempFolders;
 }

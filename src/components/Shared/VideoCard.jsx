@@ -17,11 +17,12 @@ import {  dbGetObjByPath,  GetFolders,
 import { Context } from "../../context";
 import "../../assets/styles/videoCard.scss";
 import mp3img from "../../assets/mp3img.png";
+import { icons } from "antd/lib/image/PreviewGroup";
 
 const VideoCard = (props) => {
   const { state, dispatch } = useContext(Context); 
   const { Meta } = Card;
-  const  [visible,setVisible]=useState(false);
+  const [visible,setVisible] = useState(false);
 
 
   function getMp4Url(props, type) {
@@ -156,18 +157,20 @@ const VideoCard = (props) => {
     setVisible( flag );
   };
 
-  const menudropdown = (
+  const menuvideo = (
     <Menu onClick={handleMenuClick}>
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
-      {  props.fileObject.itemtype.includes("video") ?
-      <><Menu.Item key="mp4"> Mp4</Menu.Item>
+      <Menu.Item key="mp4"> Mp4</Menu.Item>
       <Menu.Item key="dash">Android</Menu.Item>
-      <Menu.Item key="hls"> Ios</Menu.Item> </> :
-      <Menu.Item key="mp3">Mp3</Menu.Item>}
-    </Menu>
-  );
+      <Menu.Item key="hls"> Ios</Menu.Item> </Menu>) ;
+const menuaudio =  (
+      <Menu onClick={handleMenuClick}>
+      <Menu.Item key="play"> Play</Menu.Item>
+      <Menu.Item key="embed">Embed</Menu.Item>
+      <Menu.Item key="iframe">Iframe</Menu.Item>
+      <Menu.Item key="mp3">Mp3</Menu.Item>    </Menu>);
     
   return (
     <Card
@@ -199,13 +202,14 @@ const VideoCard = (props) => {
           }
         />,
         <Dropdown
-        overlay={menudropdown}
+        overlay={  menuvideo}
         onVisibleChange={ handleVisibleChange}
         visible={ visible}
-      > <LinkOutlined key="link" title={"Copy links to video"} 
-        onClick={(e) => copyCode(state,dispatch,url,props)} />
-        </Dropdown>,
-
+        title={"Copy links to video"} 
+      >
+          <Button htmlType="a" key="link" onClick={(e) => copyCode(state,dispatch,url,props)} 
+         aria-hidden={true} style={{borderColor:"white"}}>V</Button>
+        </Dropdown>
       ]}
       className="cardVideo"
     >

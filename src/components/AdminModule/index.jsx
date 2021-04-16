@@ -14,8 +14,8 @@ import SideNav from "../SideNav";
 import MyVideos from "../MyVideos";
 import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
-import UploadVideoFloatingBtn from "../Shared/UploadVideoFloatingBtn";
 import Login from "../../Login";
+import Loading from "../Loading";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED,PAGE } from "../../reducer/types";
 import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  , url}  from '../API'
 import EditVideo from "../EditVideo";
@@ -34,17 +34,13 @@ const AdminModule = (props) => {
   const [selectedTab, setSelectedTab] = useState("my-videos");
   const [uploadVideo, setUploadVideo] = useState(false);
   const [logedIn, setLogedIn] = useState(false);
-
+  const [stateEdit, setStateEdit] = useState(false);
   const { state, dispatch } = useContext(Context);
 
   const localUserId = localStorage.getItem('userId');
 
   function updateFiles(id , folderName){
-
-    GetFiles(state,dispatch ,id , folderName).then(res => {
-      console.log('My Videos Files in sidenav - ', res);
-      dispatch({ type: FILE_LIST, payload: { fileList: res }});
-     });
+    GetFiles(state,dispatch ,id , folderName);
      if( state.folderName === "")
      dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );
      else
@@ -66,8 +62,6 @@ const AdminModule = (props) => {
         uppy.log(modifiedFile.name);
         return modifiedFile;
       }
-    }).use(ThumbnailGenerator,{ waitForThumbnailsBeforeUpload : false,
-      thumbnailWidth: 200,  thumbnailHeight: 200,  thumbnailType: 'image/jpeg',
     }).use(AwsS3Multipart, {
       limit: 1,
       companionUrl: url,
@@ -92,23 +86,32 @@ const AdminModule = (props) => {
             insertObj.push(builtObj);;
          }
       });
-       if (insertObj.length > 0) dbAddObj(state , dispatch , insertObj );
       dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   });
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   });
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   });
-      updateFiles(state.userId,state.folderName);
-      dispatch({ type: 'EDIT_VIDEO',  payload: { editVideo: null  }   });
-     dbGetObjByPath(state,dispatch, insertObj[0].itempath,false);
-      if (insertObj.length > 0) dispatch({ type: 'PAGE',  payload: { page : "edit-video"  }   });
-          closeUploadVideo();      
+                 
+      if (insertObj.length > 0){ closeUploadVideo(); 
+        dbAddObj(state , dispatch , insertObj );
+        updateFiles(state.userId,state.folderName); 
+        setStateEdit(insertObj[0].itempath);    }           
     })
   });
 
-  uppy.on('thumbnail:generated', (file, preview) => {
-    console.log( " thumbnail generated"  , file , preview);
-  });
+  useEffect(()=>{
+    if( stateEdit !== false){
+  // console.log("sleeping", stateEdit , state); 
+    let item = state.videoList.find((obj)=> obj.itempath === stateEdit );
+    console.log(item , stateEdit);
+    if ( item !== undefined){
+      setStateEdit(false); 
+    dispatch({ type: 'EDIT_VIDEO',  payload: { editVideo: item }  });
+    dispatch({ type: 'PAGE',  payload: { page : "edit-video"   }  });  }   
+  }
+  },[state.videoList])
 
 
+  
+  
   const closeUploadVideo = () => {
     uppy.reset();
     setUploadVideo(false);
@@ -168,8 +171,6 @@ const AdminModule = (props) => {
     "add-video": <AddVideo />,
     "my-profile": <MyProfile />,
   }; */
-
-
 
   return (
     <>
@@ -233,18 +234,20 @@ const AdminModule = (props) => {
                   style={{ width: "100%" }}
                   placeholder="search folder"
                   optionFilterProp="children"
-                  value={state.folderName === "" ? "default" : state.folderName}
+                  value={ state.folderName == "" ? "default" : state.folderName}
                   onChange={(value) =>
-                    dispatch({
+                   { dispatch({
                       type: FOLDER_NAME,
                       payload: { folderName: value },
-                    })
+                    }); if(state.folderName !== "") GetFiles(state,dispatch,state.userId,state.folderName); }
                   }
                 >
-                  { "length" in state.folderList
+                  { /*<Option key={"default"} value="default">{" "}
+                            {"default"}{" "}</Option> */}
+                  { state.folderList !== undefined && state.folderList !== null
                     ? state.folderList.map((obj, ind) => {
                         
-                          <Option
+                   return   <Option
                             key={obj}
                             value={obj}
                           >

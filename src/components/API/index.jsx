@@ -60,15 +60,10 @@ export async function GetFiles(state,dispatch,userId, folderName) {
       headers: {
          accept: 'application/json', //Authorization : "bearer "+state.token,
       }
-   }).then(res => {
-      res.data.miniolist.map(Ob => {
-         if (!Ob._object_name.includes('temp.dod')) {
-            tempFiles.push(Ob);
-         }
-      });
-      console.log('Get Files after filter - ', tempFiles);
+   }).then(res => {      
+      
       dispatch({type:VIDEO_LIST , payload : { videoList : res.data.dblist }});
-      return tempFiles;
+      return res.data.dblist;
    });
    return getFiles;
 }

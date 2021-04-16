@@ -1,76 +1,47 @@
-import React, { useContext } from "react";
-import { Card, Button , message } from "antd";
+import React, { useContext , useState } from "react";
+import { Menu ,Card, Button , message , Dropdown } from "antd";
 import {
-  SwapOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  LinkOutlined,
-  PlayCircleFilled,
-  VideoCameraOutlined,
-  AudioOutlined,
-  FileTextOutlined,
+  SwapOutlined,  EditOutlined,
+  DeleteOutlined,  LinkOutlined,
+  PlayCircleFilled,  VideoCameraOutlined,
+  AudioOutlined,  FileTextOutlined,
 } from "@ant-design/icons";
 import { deleteFile_Folder } from "../API";
 import {
-  PAGE,
-  FOLDER_CREATED,
-  FILE_UPLOADED,
-  FOLDER_NAME,
-  FILE_LIST,
-  FOLDER_LIST,
+  PAGE,  FOLDER_CREATED,  FILE_UPLOADED,
+  FOLDER_NAME,  FILE_LIST,  FOLDER_LIST,
 } from "../../reducer/types";
-import {
-  dbGetObjByPath,
-  GetFolders,
-  url,
-  GetFiles,
-  CreateNewFolder,
+import {  dbGetObjByPath,  GetFolders,
+  url,GetFiles,CreateNewFolder,
 } from "../API/index";
-
 import { Context } from "../../context";
-
 import "../../assets/styles/videoCard.scss";
 import mp3img from "../../assets/mp3img.png";
 
 const VideoCard = (props) => {
-  const { state, dispatch } = useContext(Context);
+  const { state, dispatch } = useContext(Context); 
   const { Meta } = Card;
+  const  [visible,setVisible]=useState(false);
+
+
   function getMp4Url(props, type) {
-    let base_url = "https://meander.ibee.ai/";
-    let dash_base_url = "https://meander.ibee.ai/dash/";
-    let hls_base_url = "https://meander.ibee.ai/hls/";
+    let tempdoc = ["img720","img480","img240"];
+    let ipath = props.fileObject.itempath;
+    let cdn_url = "https://meander.ibee.ai/" +  ipath.split(".")[0];
+    let dash_cdn = "https://meander.ibee.ai/dash/";
+    let hls_cdn = "https://meander.ibee.ai/hls/";
     let img1080 = "/thumbs/img1080/frame_0000.jpg";
-    let img720 = "/thumbs/img720/frame_0000.jpg";
-    let img480 = "/thumbs/img480/frame_0000.jpg";
-    let img240 = "/thumbs/img240/frame_0000.jpg";
-    let mp32 = "/audio2.mp3";
-    let mp33 = "/audio3.mp3";
     let mp34 = "/audio4.mp3";
-
-    let mp4 = {
-      "1080p": "/mp41080k.mp4",
-      "720p": "/mp4720k.mp4",
-      "480p": "/mp4480k.mp4",
-      "240p": "/mp4240k.mp4",
-    };
-
-    let bg_url = base_url + props.fileObject.itempath.split(".")[0] + img1080;
-    let mp4_url =
-      base_url + props.fileObject.itempath.split(".")[0] + mp4["1080p"];
-    let dash_url =
-      dash_base_url +
-      props.fileObject.itempath.split(".")[0] +
-      mp4["1080p"] +
-      "/manifest.mpd";
-    let hls_url =
-      hls_base_url +
-      props.fileObject.itempath.split(".")[0] +
-      mp4["1080p"] +
-      "/index.m3u8";
-    let mp3url = base_url + props.fileObject.itempath.split(".")[0] + mp34;
-    if (props.fileObject.itemtype.includes("audio")) return mp3url;
+    let mp4 = {"1080p": "/mp41080k.mp4","720p": "/mp4720k.mp4",
+      "480p": "/mp4480k.mp4","240p": "/mp4240k.mp4" };            
+    let dash_url = dash_cdn+ipath.split(".")[0]+"/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
+    let hls_url = hls_cdn+ipath.split(".")[0]+"/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
+    let mp4_url = cdn_url+mp4['1080p'];
+    let mp3_url = cdn_url+"/audio4.mp3";
+    let img_url = cdn_url+img1080;
+    if (type == "mp3" && props.fileObject.itemtype.includes("audio")) return mp3_url;
     if (type == "mp4") return mp4_url;
-    if (type == "img") return bg_url;
+    if (type == "img") return img_url;
     if (type == "dash") return dash_url;
     if (type == "hls") return hls_url;
   }
@@ -93,9 +64,7 @@ const VideoCard = (props) => {
     if (flag == false) return;
     if (!file.itempath.includes("temp.dod"))
       deleteFile_Folder(
-        state,
-        dispatch,
-        id,
+        state, dispatch,   id,
         file.itempath.split("/")[1] + "/" + file.itempath.split("/")[2],
         false
       ).then((res) => {
@@ -153,7 +122,6 @@ const VideoCard = (props) => {
     }
   };
 
-
   const copyEmbedCode = (state,dipatch,obj) => {
     let code =  embedCodeFunc(state,dispatch,obj);
     if (navigator.clipboard) {
@@ -164,7 +132,43 @@ const VideoCard = (props) => {
     }
   };
 
-  
+  const handleMenuClick = e => {
+    let code = null;
+    if(e.key === 'iframe') code = embedCodeFunc(state,dispatch,props.fileObject);
+    if(e.key === 'mp3') code = getMp4Url( props,"mp3");
+    if(e.key === 'hls') code = getMp4Url( props,"hls");
+    if(e.key === 'dash') code = getMp4Url( props,"dash");
+    if(e.key === 'mp4') code = getMp4Url( props,"mp4");
+    if(e.key === 'embed') 
+    {code = getPlayUrl(state,dispatch,url,props); code = code+"?embed=true"}
+    if(e.key === 'play') code = getPlayUrl(state,dispatch,url,props); 
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code);
+      message.success(`Code Copied is: ${code}`);
+    } else {
+      alert(`Sorry your browser does not support, please copy here: ${code}`);
+    }    
+    setVisible( false );
+    
+  };
+
+  const handleVisibleChange = flag => {
+    setVisible( flag );
+  };
+
+  const menudropdown = (
+    <Menu onClick={handleMenuClick}>
+      <Menu.Item key="play"> Play</Menu.Item>
+      <Menu.Item key="embed">Embed</Menu.Item>
+      <Menu.Item key="iframe">Iframe</Menu.Item>
+      {  props.fileObject.itemtype.includes("video") ?
+      <><Menu.Item key="mp4"> Mp4</Menu.Item>
+      <Menu.Item key="dash">Android</Menu.Item>
+      <Menu.Item key="hls"> Ios</Menu.Item> </> :
+      <Menu.Item key="mp3">Mp3</Menu.Item>}
+    </Menu>
+  );
+    
   return (
     <Card
       bordered={true}
@@ -194,8 +198,13 @@ const VideoCard = (props) => {
             editVideoFunc(state, dispatch, props, url , false)
           }
         />,
-        <SwapOutlined key="embed" title={"copy embed code"} onClick={(e)=>  copyEmbedCode(state,dispatch,props.fileObject)} />,
-        <LinkOutlined key="link" title={"Copy link to video"} onClick={(e) => copyCode(state,dispatch,url,props)} />,
+        <Dropdown
+        overlay={menudropdown}
+        onVisibleChange={ handleVisibleChange}
+        visible={ visible}
+      > <LinkOutlined key="link" title={"Copy links to video"} 
+        onClick={(e) => copyCode(state,dispatch,url,props)} />
+        </Dropdown>,
 
       ]}
       className="cardVideo"

@@ -134,14 +134,12 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                     >
                       <FolderOutlined /> {folder}
                     </Menu.Item>
-                  
                 })
               : null}
             <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
               Add Audio/Video
             </Menu.Item>
-           {/* <Menu.Item
-              key="manage-videos"
+           {/* <Menu.Item     key="manage-videos"
               onClick={() => loadPage('manage-videos')}
             >
               Manage Video

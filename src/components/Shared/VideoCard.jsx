@@ -202,7 +202,7 @@ const menuaudio =  (
           }
         />,
         <Dropdown
-        overlay={  menuvideo}
+        overlay={ props.fileObject.itemtype.includes("audio")?menuaudio: menuvideo}
         onVisibleChange={ handleVisibleChange}
         visible={ visible}
         title={"Copy links to video"} 

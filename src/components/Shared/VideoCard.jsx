@@ -1,18 +1,31 @@
-import React, { useContext , useState } from "react";
-import { Menu ,Card, Button , message , Dropdown } from "antd";
+import React, { useContext, useState } from "react";
+import { Menu, Card, Button, message, Dropdown, Tooltip } from "antd";
 import {
-  SwapOutlined,  EditOutlined,
-  DeleteOutlined,  LinkOutlined,
-  PlayCircleFilled,  VideoCameraOutlined,
-  AudioOutlined,  FileTextOutlined,
+  SwapOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  LinkOutlined,
+  PlayCircleFilled,
+  VideoCameraOutlined,
+  AudioOutlined,
+  FileTextOutlined,
+  EllipsisOutlined
 } from "@ant-design/icons";
 import { deleteFile_Folder } from "../API";
 import {
-  PAGE,  FOLDER_CREATED,  FILE_UPLOADED,
-  FOLDER_NAME,  FILE_LIST,  FOLDER_LIST,
+  PAGE,
+  FOLDER_CREATED,
+  FILE_UPLOADED,
+  FOLDER_NAME,
+  FILE_LIST,
+  FOLDER_LIST,
 } from "../../reducer/types";
-import {  dbGetObjByPath,  GetFolders,
-  url,GetFiles,CreateNewFolder,
+import {
+  dbGetObjByPath,
+  GetFolders,
+  url,
+  GetFiles,
+  CreateNewFolder,
 } from "../API/index";
 import { Context } from "../../context";
 import "../../assets/styles/videoCard.scss";
@@ -20,33 +33,43 @@ import mp3img from "../../assets/mp3img.png";
 import { icons } from "antd/lib/image/PreviewGroup";
 
 const VideoCard = (props) => {
-  const { state, dispatch } = useContext(Context); 
+  const { state, dispatch } = useContext(Context);
   const { Meta } = Card;
-  const [visible,setVisible] = useState(false);
-
+  const [visible, setVisible] = useState(false);
 
   function getMp4Url(props, type) {
-    let tempdoc = ["img720","img480","img240"];
+    let tempdoc = ["img720", "img480", "img240"];
     let ipath = props.fileObject.itempath;
-    let cdn_url = "https://meander.ibee.ai/" +  ipath.split(".")[0];
+    let cdn_url = "https://meander.ibee.ai/" + ipath.split(".")[0];
     let dash_cdn = "https://meander.ibee.ai/dash/";
     let hls_cdn = "https://meander.ibee.ai/hls/";
     let img1080 = "/thumbs/img1080/frame_0000.jpg";
     let mp34 = "/audio4.mp3";
-    let mp4 = {"1080p": "/mp41080k.mp4","720p": "/mp4720k.mp4",
-      "480p": "/mp4480k.mp4","240p": "/mp4240k.mp4" };            
-    let dash_url = dash_cdn+ipath.split(".")[0]+"/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
-    let hls_url = hls_cdn+ipath.split(".")[0]+"/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
-    let mp4_url = cdn_url+mp4['1080p'];
-    let mp3_url = cdn_url+"/audio4.mp3";
-    let img_url = cdn_url+img1080;
-    if (type == "mp3" && props.fileObject.itemtype.includes("audio")) return mp3_url;
+    let mp4 = {
+      "1080p": "/mp41080k.mp4",
+      "720p": "/mp4720k.mp4",
+      "480p": "/mp4480k.mp4",
+      "240p": "/mp4240k.mp4",
+    };
+    let dash_url =
+      dash_cdn +
+      ipath.split(".")[0] +
+      "/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
+    let hls_url =
+      hls_cdn +
+      ipath.split(".")[0] +
+      "/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
+    let mp4_url = cdn_url + mp4["1080p"];
+    let mp3_url = cdn_url + "/audio4.mp3";
+    let img_url = cdn_url + img1080;
+    if (type == "mp3" && props.fileObject.itemtype.includes("audio"))
+      return mp3_url;
     if (type == "mp4") return mp4_url;
     if (type == "img") return img_url;
     if (type == "dash") return dash_url;
     if (type == "hls") return hls_url;
   }
-  
+
   const onSideNavFolderClick = (folderName) => {
     dispatch({ type: PAGE, payload: { page: "my-videos" } });
     dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
@@ -65,7 +88,9 @@ const VideoCard = (props) => {
     if (flag == false) return;
     if (!file.itempath.includes("temp.dod"))
       deleteFile_Folder(
-        state, dispatch,   id,
+        state,
+        dispatch,
+        id,
         file.itempath.split("/")[1] + "/" + file.itempath.split("/")[2],
         false
       ).then((res) => {
@@ -85,36 +110,32 @@ const VideoCard = (props) => {
     } else return null;
   };
 
-
   const embedCodeFunc = (state, dispatch, obj) => {
     let temppath = obj.itempath;
     console.log(state.videoList);
     let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
-    if(dbobj === undefined)
-      return null;
-      let frame = `<iframe src='${url}/watch/${state.userId}/${dbobj.id}?embed=true' width='530'
+    if (dbobj === undefined) return null;
+    let frame = `<iframe src='${url}/watch/${state.userId}/${dbobj.id}?embed=true' width='530'
     height='315' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture'
     allowfullscreen title='${dbobj.title}'></iframe>`;
-      return frame ;
+    return frame;
   };
 
-
-  const editVideoFunc = (state, dispatch, props, url , play) => {
-   let playUrl = play ?  getPlayUrl(state,dispatch,url,props) : null;
-   let embedUrl = embedCodeFunc(state,dispatch , props.fileObject);
-   let userId = props.userId;
-   let obj = props.fileObject;
-    obj.playUrl = playUrl ;
-    obj.embedCode =  embedUrl;
+  const editVideoFunc = (state, dispatch, props, url, play) => {
+    let playUrl = play ? getPlayUrl(state, dispatch, url, props) : null;
+    let embedUrl = embedCodeFunc(state, dispatch, props.fileObject);
+    let userId = props.userId;
+    let obj = props.fileObject;
+    obj.playUrl = playUrl;
+    obj.embedCode = embedUrl;
     dispatch({ type: PAGE, payload: { page: "edit-video" } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: null } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: obj } });
-    dbGetObjByPath(state , dispatch , obj.itempath , false );
+    dbGetObjByPath(state, dispatch, obj.itempath, false);
   };
 
-
-  const copyCode = (state,dipatch,url,props) => {
-    let code =  getPlayUrl(state,dispatch,url,props);
+  const copyCode = (state, dipatch, url, props) => {
+    let code = getPlayUrl(state, dispatch, url, props);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code);
       message.success(`Code Copied is: ${code}`);
@@ -123,8 +144,8 @@ const VideoCard = (props) => {
     }
   };
 
-  const copyEmbedCode = (state,dipatch,obj) => {
-    let code =  embedCodeFunc(state,dispatch,obj);
+  const copyEmbedCode = (state, dipatch, obj) => {
+    let code = embedCodeFunc(state, dispatch, obj);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code);
       message.success(`Code Copied is: ${code}`);
@@ -133,28 +154,30 @@ const VideoCard = (props) => {
     }
   };
 
-  const handleMenuClick = e => {
+  const handleMenuClick = (e) => {
     let code = null;
-    if(e.key === 'iframe') code = embedCodeFunc(state,dispatch,props.fileObject);
-    if(e.key === 'mp3') code = getMp4Url( props,"mp3");
-    if(e.key === 'hls') code = getMp4Url( props,"hls");
-    if(e.key === 'dash') code = getMp4Url( props,"dash");
-    if(e.key === 'mp4') code = getMp4Url( props,"mp4");
-    if(e.key === 'embed') 
-    {code = getPlayUrl(state,dispatch,url,props); code = code+"?embed=true"}
-    if(e.key === 'play') code = getPlayUrl(state,dispatch,url,props); 
+    if (e.key === "iframe")
+      code = embedCodeFunc(state, dispatch, props.fileObject);
+    if (e.key === "mp3") code = getMp4Url(props, "mp3");
+    if (e.key === "hls") code = getMp4Url(props, "hls");
+    if (e.key === "dash") code = getMp4Url(props, "dash");
+    if (e.key === "mp4") code = getMp4Url(props, "mp4");
+    if (e.key === "embed") {
+      code = getPlayUrl(state, dispatch, url, props);
+      code = code + "?embed=true";
+    }
+    if (e.key === "play") code = getPlayUrl(state, dispatch, url, props);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code);
       message.success(`Code Copied is: ${code}`);
     } else {
       alert(`Sorry your browser does not support, please copy here: ${code}`);
-    }    
-    setVisible( false );
-    
+    }
+    setVisible(false);
   };
 
-  const handleVisibleChange = flag => {
-    setVisible( flag );
+  const handleVisibleChange = (flag) => {
+    setVisible(flag);
   };
 
   const menuvideo = (
@@ -164,14 +187,18 @@ const VideoCard = (props) => {
       <Menu.Item key="iframe">Iframe</Menu.Item>
       <Menu.Item key="mp4"> Mp4</Menu.Item>
       <Menu.Item key="dash">Android</Menu.Item>
-      <Menu.Item key="hls"> Ios</Menu.Item> </Menu>) ;
-const menuaudio =  (
-      <Menu onClick={handleMenuClick}>
+      <Menu.Item key="hls"> Ios</Menu.Item>{" "}
+    </Menu>
+  );
+  const menuaudio = (
+    <Menu onClick={handleMenuClick}>
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
-      <Menu.Item key="mp3">Mp3</Menu.Item>    </Menu>);
-    
+      <Menu.Item key="mp3">Mp3</Menu.Item>{" "}
+    </Menu>
+  );
+
   return (
     <Card
       bordered={true}
@@ -180,36 +207,52 @@ const menuaudio =  (
         <>
           {props.videoTitle}
           <h6>
-            {new Date(props.fileObject.name.replace(state.userId,"").split(".")[0] * 1).toLocaleString()}
+            {new Date(
+              props.fileObject.name.replace(state.userId, "").split(".")[0] * 1
+            ).toLocaleString()}
           </h6>
         </>
       }
       headStyle={{ height: "25%" }}
       bodyStyle={{ height: "55%" }}
       actions={[
-        <DeleteOutlined
-          key="delete"
-          title={"click to delete object"}
-          onClick={(e) =>
-            deleteFile(state, dispatch, props.userId, props.fileObject)
-          }
-        />,
-        <EditOutlined
-          key="edit"
-          title={"Click to edit metadata"}
-          onClick={(e) =>
-            editVideoFunc(state, dispatch, props, url , false)
-          }
-        />,
+        <Tooltip title="Delete">
+          <DeleteOutlined
+            key="delete"
+            title={"click to delete object"}
+            onClick={(e) =>
+              deleteFile(state, dispatch, props.userId, props.fileObject)
+            }
+          />
+        </Tooltip>,
+        <Tooltip title="Edit">
+          <EditOutlined
+            key="edit"
+            title={"Click to edit metadata"}
+            onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
+          />
+        </Tooltip>,
         <Dropdown
-        overlay={ props.fileObject.itemtype.includes("audio")?menuaudio: menuvideo}
-        onVisibleChange={ handleVisibleChange}
-        visible={ visible}
-        title={"Copy links to video"} 
-      >
-          <Button htmlType="a" key="link" onClick={(e) => copyCode(state,dispatch,url,props)} 
-         aria-hidden={true} style={{borderColor:"white"}}>V</Button>
-        </Dropdown>
+          overlay={
+            props.fileObject.itemtype.includes("audio") ? menuaudio : menuvideo
+          }
+          onVisibleChange={handleVisibleChange}
+          visible={visible}
+          title={"Copy links to video"}
+          trigger={["click"]}
+        >
+          <Button
+            htmlType="a"
+            key="link"
+            onClick={(e) => copyCode(state, dispatch, url, props)}
+            aria-hidden={true}
+            style={{ borderColor: "white", padding: 0 }}
+          >
+            <Tooltip title="Copy Code">
+              <EllipsisOutlined style={{ fontSize: "24px" }} />
+            </Tooltip>
+          </Button>
+        </Dropdown>,
       ]}
       className="cardVideo"
     >
@@ -218,11 +261,11 @@ const menuaudio =  (
         //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }}
         href={getPlayUrl(state, dispatch, url, props)}
         */}
-        <div className="videoBlock">        
+        <div className="videoBlock">
           <Button
             className="playBtn"
             type="button"
-            onClick={(e)=> editVideoFunc(state, dispatch, props, url , true)}
+            onClick={(e) => editVideoFunc(state, dispatch, props, url, true)}
           >
             <PlayCircleFilled width={40} height={40} />
           </Button>

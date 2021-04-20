@@ -148,15 +148,17 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   //}) ;
 
 useEffect(()=>{
+  let filterType = state.filterType;
   if( (filterType === "all" || filterType === "folder") && state.folderName === "")
   GetFolders(state, dispatch, state.userId);
   if( filterType === "audio" || filterType === "video")
       GetFiles(state,dispatch,state.userId,state.folderName);
 
-},[filterType]);
+},[state.filterType]);
 
 useEffect(()=>{
-  setFilterType("all");
+  //setFilterType("all");
+  dispatch({type:"FILTER_TYPE",payload : { filterType : "all" }});
 },[state.folderName])
 
 
@@ -189,7 +191,7 @@ useEffect(()=>{
               <Select
                 placeholder="Enter keyword..."
                 value={ filterType}
-                  onChange={(value) => setFilterType(value) }
+                  onChange={(value) => dispatch({type:"FILTER_TYPE",payload:{ filterType : value }}) }
               >
                 <Option key="all" value="all"> Show All</Option>
                 <Option key="folder" value="folder"> Folders only</Option>
@@ -240,7 +242,7 @@ useEffect(()=>{
               {state.folderName === "" &&
                 state.folderList.map((folder, index) => {
                     return (
-                    filterType === "all" || filterType === "folder"?
+                    state.filterType === "all" || state.filterType === "folder"?
                     <motion.div
                       key={"folder-" + index}
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
@@ -261,7 +263,7 @@ useEffect(()=>{
                 state.videoList.map((obj, index) => {
                   
                   return (
-                    filterType === "all" || obj.itemtype.includes(filterType) ?
+                    state.filterType === "all" || obj.itemtype.includes(state.filterType) ?
                     <motion.div
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                       variants={item}
@@ -282,7 +284,7 @@ useEffect(()=>{
                 state.folderName !== "" && state.videoList.length > 0
                   ? state.videoList.map((file, index) => {
                     return (
-                      filterType === "all" || file.itemtype.includes(filterType) ?
+                      state.filterType === "all" || file.itemtype.includes(state.filterType) ?
                       <motion.div
                         className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                         variants={item}

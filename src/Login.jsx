@@ -34,6 +34,7 @@ const Login = (props) => {
       username: values.signupName,
       email: values.signupEmail,
       password: values.signupPassword,
+      domain_name: window.location.hostname
     });
 
     const signupHeader = {
@@ -42,7 +43,6 @@ const Login = (props) => {
         Accept: "application/json"
       }
     }
-
 
     axios
       .post(url + "/signup", loginBody, signupHeader)
@@ -264,14 +264,16 @@ const Login = (props) => {
             </Card>
           </div>{" "}
           <Row align="middle" style={{ marginTop: "20px" }}>
-            <Col>
+            { window.location.hostname === "portal.meander.video"
+            || window.location.hostname.includes("localhost") ?
+              <Col>
               <Title level={5}>
                 Don't have an account{" "}
                 <Button type="link" onClick={() => setSignup(true)}>
                   Create Account Now
                 </Button>
               </Title>
-            </Col>
+            </Col> : null }
           </Row>
         </Content>
       </Layout>

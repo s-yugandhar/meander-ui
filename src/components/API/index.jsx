@@ -47,13 +47,10 @@ export const GetFolders= async (state,dispatch ,userId)=>{
    dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
    dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });   
    dispatch({ type : VIDEO_LIST , payload : {videoList :tempFolders.dblist } });
-   dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
-   
-   
+   dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });   
    console.log(" data in get folders", state.folderList);
    return tempFolders;
 }
-
 
 export async function GetFiles(state,dispatch,userId, folderName) {
    let tempFiles = [];
@@ -62,8 +59,7 @@ export async function GetFiles(state,dispatch,userId, folderName) {
       headers: {
          accept: 'application/json', //Authorization : "bearer "+state.token,
       }
-   }).then(res => {      
-      
+   }).then(res => {           
       dispatch({type:VIDEO_LIST , payload : { videoList : res.data.dblist }});
       return res.data.dblist;
    });

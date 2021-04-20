@@ -12,7 +12,8 @@ import {
    UPPY_BATCHID ,
    VIDEO_LIST ,
    EDIT_VIDEO,
-   USER_OBJ
+   USER_OBJ,
+   FILTER_TYPE
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -33,7 +34,8 @@ export const initialState = {
    uppyFailed : [],
    uppyBatchId : null ,
    videoList : [],
-   editVideo : null
+   editVideo : null ,
+   filterType : "all"
 }
 
 export const reducer = (state = initialState, action) => {
@@ -108,7 +110,10 @@ export const reducer = (state = initialState, action) => {
  
       case USER_OBJ :
          return { ...state , userObj : action.payload.userObj}
- 
+      
+      case FILTER_TYPE :
+         return { ...state , filterType : action.payload.filterType}
+
       default:
          return state;
    }

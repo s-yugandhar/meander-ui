@@ -98,17 +98,24 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}
           style={{ height: "100%", borderRight: 0 }}
         >
+          <Menu.Item
+              key="dashboard"
+              onClick={() => GetFolders(state, dispatch, state.userId)}
+            >
+              Dashboard
+            </Menu.Item>
+          
           <SubMenu key="my-videos-submenu" title="My Videos">
-            <Menu.Item
+            {/*<Menu.Item
               key="my-videos"
               onClick={() => GetFolders(state, dispatch, state.userId)}
             >
               All Items
-            </Menu.Item>
+            </Menu.Item>*/}
             <Menu.Item
               disabled={true}
               className="createFolderMenuItem"
-              key="cf"
+              key="cfv"
             >
               <Button
                 key={"xcvz"}
@@ -137,23 +144,80 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 })
               : null}
             <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
-              Add Audio/Video
+              Add Video
             </Menu.Item>
            {/* <Menu.Item     key="manage-videos"
               onClick={() => loadPage('manage-videos')}
-            >
-              Manage Video
-            </Menu.Item>
-            <Menu.Item
-              key="manage-users"
+            >            Manage Video            </Menu.Item>
+            <Menu.Item              key="manage-users"
               onClick={() => loadPage("manage-users")}
-            >
-              Manage Users
-              </Menu.Item>  */}
+            >              Manage Users     </Menu.Item>  */}
           </SubMenu>
+          {/*<SubMenu key="my-audios-submenu" title="My Audios">
+            <Menu.Item              key="my-audios"
+              onClick={() => GetFolders(state, dispatch, state.userId)}
+            >              All Items     </Menu.Item>
+            <Menu.Item
+              disabled={true}
+              className="createFolderMenuItem"
+              key="cfa"
+            >
+              <Button
+                key={"xcvz"}
+                type="primary"
+                shape="round"
+                icon={<FolderAddOutlined className="createFolderBtnIcon" />}
+                size="middle"
+                onClick={showCreateFolder}
+                className="createFolderBtn"
+              >
+                {" "}
+                Create Folder
+              </Button>
+            </Menu.Item>
+            { state.folderList !== undefined && state.folderList.length > 0
+              ? state.folderList.map((folder, index) => {
+                    return <Menu.Item
+                      key={"folder-" + index}
+                      onClick={() =>
+                        folderDetail(folder)
+                      }
+                      title={folder}
+                    >
+                      <FolderOutlined /> {folder}
+                    </Menu.Item>
+                })
+              : null}
+            <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
+              Add Audio
+            </Menu.Item>
+          </SubMenu>*/}
+          <SubMenu key="analytics" title="Analytics">
+                  <Menu.Item key="preport" title="Coming soon" >Performance by item</Menu.Item>
+                  <Menu.Item key="ureport" title="Coming soon">Usage Report</Menu.Item>
+          </SubMenu>
+          { state.userObj !== null && state.userObj !== undefined && 
+           ( state.userObj.roles === "reseller" 
+           || state.userObj.roles === "super_admin" )?
+          <><SubMenu key="settings" title="Settings">
+              {/*<SubMenu key="playlists" title="Playlists">
+                <Menu.Item key="listp" >List</Menu.Item>
+                <Menu.Item key="createp">Create</Menu.Item>
+              </SubMenu>
+              <SubMenu key="channels" title="Channels">
+                <Menu.Item key="listl" >List</Menu.Item>
+                <Menu.Item key="createl">Create</Menu.Item>
+              </SubMenu>*/}
+              <SubMenu key="users" title="Manage Users">
+                 <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>List</Menu.Item>
+              </SubMenu>
+          </SubMenu>
+          <SubMenu key="billing" title="Billing">
+                  <Menu.Item key="subdets" >Subscription Details</Menu.Item>
+                  <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item>
+          </SubMenu></>: null }
         </Menu>
       </Sider>
-
       <Modal
         title="Create New Folder"
         destroyOnClose={true}

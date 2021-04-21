@@ -15,6 +15,7 @@ const ManageUsers = () => {
   const { state, dispatch } = useContext(Context);
   const [listUsers , setListUsers] = useState([]); 
   const [editUser , setEditUser] = useState(null);
+  const [createUser,setCreateUser] = useState(null);
 
   const {Option} = Select;
   const {form} = Form.useForm();
@@ -27,9 +28,7 @@ const ManageUsers = () => {
           accept: 'application/json', Authorization : "bearer "+state.token,
              }
     }).then(res => {
-       console.log(res);
-       if ( res.status== 200)
-        setListUsers(res.data);
+       if ( res.status== 200)        setListUsers(res.data);
        return res.data;   })
     console.log(" userdata in get ", tempFolders);
     return tempFolders;
@@ -38,31 +37,51 @@ const ManageUsers = () => {
  const updateRecord= async (state,dispatch ,obj , switchValue)=>{
   if (state.userId === undefined || state.userId === null)
      return ;
-     if(switchValue === "toggle")
-    obj.is_active = !obj.is_active;
+     if(switchValue === "toggle")    obj.is_active = !obj.is_active;
   const tempFolders = await axios.post(url + `/users/${state.userId}/updateuser`, obj ,{
      headers: {
         accept: 'application/json', Authorization : "bearer "+state.token,
            }
   }).then(res => {
     message.success(`No of rows updated ${res.data}`);
-    setEditUser(null);
-     return res.data;   })
+    setEditUser(null);     return res.data;   })
   console.log(" userdata in get manageuser ", tempFolders);
   return tempFolders;
 }
 
 const setUpdateRecord=(values)=>{
-  let objinit = editUser;
-objinit.username=values.username;
-  objinit.phone=values.phone;
-  objinit.email =values.email;
-console.log(values,objinit);
+  let objinit = editUser;objinit.username=values.username;
+  objinit.phone=values.phone;  objinit.email =values.email;
   updateRecord(state,dispatch,objinit,"notoggle");
 }
 
+const writeRecord= async (state,dispatch ,obj )=>{
+  if (state.userId === undefined || state.userId === null)
+     return ;
+  const tempFolders = await axios.post(url + `/users/${state.userId}/createuser`, obj ,{
+     headers: {
+        accept: 'application/json', Authorization : "bearer "+state.token,
+           }
+  }).then(res => {
+    setEditUser(null);
+    message.success(`User with email ${res.data.email} created`);
+     return res.data;   })
+  console.log(" userdata in get manageuser ", tempFolders);
+  return tempFolders;
+}
+
+const initWriteRecord = ()=>{
+  let dummy = {'username' : '','email':'','password':'','domain_name':window.location.hostname};
+  setCreateUser(true);  setEditUser(dummy);
+}
 
 
+const setwriteRecord=(values)=>{
+  let writeobj = editUser;  writeobj.username = values.username;
+  writeobj.email = values.email;  writeobj.password = values.password;
+  console.log( values , writeobj);
+  writeRecord(state,dispatch,writeobj);
+}
 
 
  useEffect(()=>{
@@ -153,11 +172,17 @@ console.log(values,objinit);
         }}
       >
         <Row align="middle">
-        <ReloadOutlined  title={"refresh data"}  onClick={()=>{GetAllUserdetails(state,dispatch,state.userId);}}/>
-            <h2 className="page-title">
+        <Col span={4}>
+          <Button onClick={()=>{GetAllUserdetails(state,dispatch,state.userId);}}  
+          icon={<ReloadOutlined  title={"refresh data"} >   </ReloadOutlined>}>Refresh </Button>
+        </Col>
+        <Col span={16}><h2 className="page-title">
             {"   Manage Users -  "}
               { listUsers.length}
-            </h2>
+            </h2></Col>
+          <Col span={4}>
+      <Button onClick={()=>{ initWriteRecord()}} icon={<PlusOutlined title={"Create User"}  />}>
+        Create User</Button></Col>
         </Row>
         <Row align="middle" >
           <Col span={24}>
@@ -173,8 +198,8 @@ console.log(values,objinit);
           onCancel={()=>setEditUser(null)} closable={true} >
           <Form      name="basic"
               initialValues={{ username: editUser.username, email: editUser.email, 
-                phone : editUser.phone }}
-              onFinish={setUpdateRecord}
+                phone : editUser.phone, password : editUser.password }}
+              onFinish={ createUser == true ? setwriteRecord : setUpdateRecord}
               layout="vertical" form={form}
             >         
               <Form.Item
@@ -198,7 +223,22 @@ console.log(values,objinit);
               >
             <Input  type={"email"} key={editUser.id+"em"}  ></Input>
               </Form.Item>
-              <Form.Item
+              { createUser ?
+                <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: 'password is required',
+                  }, {
+                    pattern: /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+                    message: 'Please enter minimum 8 letter password, with at least a symbol, upper and lower case letters and a number ',
+                  }    ]}
+              >
+                <Input.Password name="password" id="password" />
+              </Form.Item>      :
+              <><Form.Item
                 label="Mobile"
                 name="phone"
                 rules={[
@@ -226,10 +266,10 @@ console.log(values,objinit);
               <Option key="admin" value="admin">admin</Option>
               <Option key="user" value="user">user</Option>
               <Option key="viewer" value="viewer">viewer</Option>                                    
-              </Select>   </Form.Item>
+              </Select>   </Form.Item> </> }
               <Form.Item>
                 <Button type="primary" htmlType="submit" size="large">
-                  Update
+                  {createUser ?"Create" : "Update"}
                 </Button>
               </Form.Item>
         </Form>

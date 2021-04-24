@@ -89,33 +89,33 @@ const AdminModule = (props) => {
       dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   });
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   });
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   });
-                 
-      if (insertObj.length > 0){ closeUploadVideo(); 
+
+      if (insertObj.length > 0){ closeUploadVideo();
         dbAddObj(state , dispatch , insertObj );
-        updateFiles(state.userId,state.folderName); 
-        setStateEdit(insertObj[0].itempath);    }           
+        updateFiles(state.userId,state.folderName);
+        setStateEdit(insertObj[0].itempath);    }
     })
   });
 
   useEffect(()=>{
     if( stateEdit !== false){
-  // console.log("sleeping", stateEdit , state); 
+  // console.log("sleeping", stateEdit , state);
     let item = state.videoList.find((obj)=> obj.itempath === stateEdit );
     console.log(item , stateEdit);
     if ( item !== undefined){
-      setStateEdit(false); 
+      setStateEdit(false);
     dispatch({ type: 'EDIT_VIDEO',  payload: { editVideo: item }  });
-    dispatch({ type: 'PAGE',  payload: { page : "edit-video"   }  });  }   
+    dispatch({ type: 'PAGE',  payload: { page : "edit-video"   }  });  }
   }
   },[state.videoList])
 
 
-  
-  
+
+
   const closeUploadVideo = () => {
     uppy.reset();
     setUploadVideo(false);
-    
+
   }
 
   const logout = () => {
@@ -246,7 +246,7 @@ const AdminModule = (props) => {
                             {"default"}{" "}</Option> */}
                   { state.folderList !== undefined && state.folderList !== null
                     ? state.folderList.map((obj, ind) => {
-                        
+
                    return   <Option
                             key={obj}
                             value={obj}
@@ -254,7 +254,7 @@ const AdminModule = (props) => {
                             {" "}
                             {obj}{" "}
                           </Option>
-                        
+
                       })
                     : null}
                 </Select>{" "}

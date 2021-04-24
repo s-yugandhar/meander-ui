@@ -199,11 +199,11 @@ useEffect(()=>{
                 <Option key="audio" value="audio"> Audio Only</Option>
               </Select>
             </Col>
-            
-            
+
+
             <Col span={12}>
               <h2 className="page-title">
-                { state.folderName === "" ?  "  All Items  "
+                { state.folderName === "" && state.videoList !== undefined ?  "  All Items  "
                 :  `Objects in ${state.folderName} folder is ${state.videoList.length}`  }
               </h2>
             </Col>
@@ -219,7 +219,7 @@ useEffect(()=>{
               </Button>
             </Row> */}
             </Col>
-            
+
             <Col span={3}>
               <Search
                 placeholder="Enter keyword..."
@@ -256,12 +256,12 @@ useEffect(()=>{
                           innerFolder(folder)
                         }
                       />
-                    </motion.div> : null) 
+                    </motion.div> : null)
                 })}
 
               {state.folderName === "" &&
                 state.videoList.map((obj, index) => {
-                  
+
                   return (
                     state.filterType === "all" || obj.itemtype.includes(state.filterType) ?
                     <motion.div
@@ -300,7 +300,7 @@ useEffect(()=>{
                   )})
                   : ""
               }
-                  
+
               {/*
             // build a board to provide to delete temporary files when upload fails
             <h2>{"Failed upload temporary files"}</h2>

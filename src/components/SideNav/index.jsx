@@ -81,8 +81,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
 
   const loadPage = (name) => {
     dispatch({ type: PAGE, payload: { page: name } });
-  }
-
+  };
 
   useEffect(() => {
     //getFolders();
@@ -93,25 +92,26 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
-          defaultOpenKeys={["my-videos-submenu"]}
+          defaultOpenKeys={["partners-submenu"]}
           selectedKeys={selectedKeys}
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}
           style={{ height: "100%", borderRight: 0 }}
         >
-          <Menu.Item
+          <SubMenu key="partners-submenu" title="Partners">
+            <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>
+              Users
+            </Menu.Item>
+            <Menu.Item key="reseller-settings">Settings</Menu.Item>
+            <Menu.Item key="reseller-reports">Reports</Menu.Item>
+          </SubMenu>
+
+          <SubMenu key="my-videos-submenu" title="Products">
+            <Menu.Item
               key="dashboard"
               onClick={() => GetFolders(state, dispatch, state.userId)}
             >
               Dashboard
             </Menu.Item>
-          
-          <SubMenu key="my-videos-submenu" title="My Videos">
-            {/*<Menu.Item
-              key="my-videos"
-              onClick={() => GetFolders(state, dispatch, state.userId)}
-            >
-              All Items
-            </Menu.Item>*/}
             <Menu.Item
               disabled={true}
               className="createFolderMenuItem"
@@ -130,23 +130,69 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 Create Folder
               </Button>
             </Menu.Item>
-            { state.folderList !== undefined && state.folderList.length > 0
+            {state.folderList !== undefined && state.folderList.length > 0
               ? state.folderList.map((folder, index) => {
-                    return <Menu.Item
+                  return (
+                    <Menu.Item
                       key={"folder-" + index}
-                      onClick={() =>
-                        folderDetail(folder)
-                      }
+                      onClick={() => folderDetail(folder)}
                       title={folder}
                     >
                       <FolderOutlined /> {folder}
                     </Menu.Item>
+                  );
                 })
               : null}
-            <Menu.Item key="add-videos" onClick={() => openUploadVideo(true)}>
-              Add Video
+            <Menu.Item
+              disabled={true}
+              className="createFolderMenuItem"
+              key="add-videos"
+            >
+              <Button
+                key={"xcvz"}
+                type="primary"
+                shape="round"
+                icon={<FolderAddOutlined className="createFolderBtnIcon" />}
+                size="middle"
+                onClick={() => openUploadVideo(true)}
+                className="createFolderBtn"
+              >
+                Add Video
+              </Button>
             </Menu.Item>
-           {/* <Menu.Item     key="manage-videos"
+            {/* <Menu.Item key="" onClick={() => openUploadVideo(true)}>
+              Add Video
+            </Menu.Item> */}
+            <Divider className="my-05" />
+            {/* <Menu.Item key="preport" title="Coming soon">
+              Performance by item
+            </Menu.Item> */}
+            <Menu.Item key="ureport" title="Coming soon">
+              Usage Report
+            </Menu.Item>
+            {state.userObj !== null &&
+            state.userObj !== undefined &&
+            (state.userObj.roles === "reseller" ||
+              state.userObj.roles === "super_admin") ? (
+              <>
+                <Divider className="my-05" />
+                <Menu.Item key="subdets">Subscription Details</Menu.Item>
+                {/* <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item> */}
+              </>
+            ) : null}
+
+            {/* {state.userObj !== null &&
+            state.userObj !== undefined &&
+            (state.userObj.roles === "reseller" ||
+              state.userObj.roles === "super_admin") ? (
+              <>
+                <Divider className="my-05" />
+                <Menu.Item key="subdets">Subscription Details</Menu.Item>
+                <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item>
+              </>
+            ) : null} */}
+
+            {/* <Menu.Item     key="manage-videos"
               onClick={() => loadPage('manage-videos')}
             >            Manage Video            </Menu.Item>
             <Menu.Item              key="manage-users"
@@ -192,15 +238,21 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               Add Audio
             </Menu.Item>
           </SubMenu>*/}
-          <SubMenu key="analytics" title="Analytics">
-                  <Menu.Item key="preport" title="Coming soon" >Performance by item</Menu.Item>
-                  <Menu.Item key="ureport" title="Coming soon">Usage Report</Menu.Item>
-          </SubMenu>
-          { state.userObj !== null && state.userObj !== undefined && 
-           ( state.userObj.roles === "reseller" 
-           || state.userObj.roles === "super_admin" )?
-          <><SubMenu key="settings" title="Settings">
-              {/*<SubMenu key="playlists" title="Playlists">
+          {/* <SubMenu key="analytics" title="Analytics">
+            <Menu.Item key="preport" title="Coming soon">
+              Performance by item
+            </Menu.Item>
+            <Menu.Item key="ureport" title="Coming soon">
+              Usage Report
+            </Menu.Item>
+          </SubMenu> */}
+          {/* {state.userObj !== null &&
+          state.userObj !== undefined &&
+          (state.userObj.roles === "reseller" ||
+            state.userObj.roles === "super_admin") ? (
+            <> */}
+          {/* <SubMenu key="settings" title="Settings"> */}
+          {/*<SubMenu key="playlists" title="Playlists">
                 <Menu.Item key="listp" >List</Menu.Item>
                 <Menu.Item key="createp">Create</Menu.Item>
               </SubMenu>
@@ -208,14 +260,21 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 <Menu.Item key="listl" >List</Menu.Item>
                 <Menu.Item key="createl">Create</Menu.Item>
               </SubMenu>*/}
-              <SubMenu key="users" title="Manage Users">
-                 <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>List</Menu.Item>
+          {/* <SubMenu key="users" title="Manage Users">
+                  <Menu.Item
+                    key="listu"
+                    onClick={() => loadPage("manage-users")}
+                  >
+                    List
+                  </Menu.Item>
+                </SubMenu> */}
+          {/* </SubMenu> */}
+          {/* <SubMenu key="billing" title="Billing">
+                <Menu.Item key="subdets">Subscription Details</Menu.Item>
+                <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item>
               </SubMenu>
-          </SubMenu>
-          <SubMenu key="billing" title="Billing">
-                  <Menu.Item key="subdets" >Subscription Details</Menu.Item>
-                  <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item>
-          </SubMenu></>: null }
+            </>
+          ) : null} */}
         </Menu>
       </Sider>
       <Modal

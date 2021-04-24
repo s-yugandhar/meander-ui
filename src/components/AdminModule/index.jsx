@@ -23,6 +23,7 @@ import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
 import Logo from "../../assets/images/Meander_Logo.svg";
 import Settings from '../Settings';
+import ResellerReports from '../Reseller-Reports'
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -151,6 +152,7 @@ const AdminModule = (props) => {
     "manage-videos": <ManageVideos />,
     "manage-users": <ManageUsers />,
     "reseller-settings": <Settings />,
+    "reseller-reports": <ResellerReports />,
   };
 
 

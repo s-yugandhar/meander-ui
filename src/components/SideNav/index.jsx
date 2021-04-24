@@ -110,7 +110,12 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             >
               Settings
             </Menu.Item>
-            <Menu.Item key="reseller-reports">Reports</Menu.Item>
+            <Menu.Item
+              key="reseller-reports"
+              onClick={() => loadPage("reseller-reports")}
+            >
+              Reports
+            </Menu.Item>
           </SubMenu>
 
           <SubMenu key="my-videos-submenu" title="Products">

@@ -68,8 +68,8 @@ const ResellerReports = () => {
                     {state.userObj && state.userObj.originsize ? (
                       <>
                         <div className="full-width storage-capacity-block">
-                          {(state.userObj.originsize / 4096).toFixed(0)}
-                          GB / 1000000GB
+                          {(Number(state.userObj.originsize) / (1024*1024)).toFixed(0)}
+                          MB / 1024MB per Year
                         </div>
                         <div className="full-width storage-current-block">
                           <Progress
@@ -77,7 +77,7 @@ const ResellerReports = () => {
                               from: "#43A047",
                               to: "#43A047",
                             }}
-                            percent={65}
+                            percent={( (Number(state.userObj.originsize) / (1024*1024))/1024).toFixed(2)}
                           />
                         </div>{" "}
                       </>
@@ -91,11 +91,11 @@ const ResellerReports = () => {
                     <strong>BandWidth</strong>
                   </h2>
                   <div className="full-width">
-                    {state.userObj && state.userObj.originserved ? (
+                    {state.userObj !== undefined && state.userObj !== null ? (
                       <>
                         <div className="full-width storage-capacity-block">
-                          {(state.userObj.originserved / 4096).toFixed(0)}
-                          GB / 1000000GB
+                          {(( Number(state.userObj.originserved) + Number(state.userObj.bridgeserved) )/ (1024*1024)).toFixed(2)}
+                          MB / 10240 MB per Month
                         </div>
                         <div className="full-width storage-current-block">
                           <Progress
@@ -103,7 +103,7 @@ const ResellerReports = () => {
                               from: "#43A047",
                               to: "#43A047",
                             }}
-                            percent={40}
+                            percent={((( Number(state.userObj.originserved) + Number(state.userObj.bridgeserved) )/ (1024*1024))/10240).toFixed(0)}
                           />
                         </div>
                       </>

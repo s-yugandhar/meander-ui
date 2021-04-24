@@ -100,13 +100,16 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu key="partners-submenu" title="Partners">
-            <Menu.Item key="customers">
-              Customers
-            </Menu.Item>
+            <Menu.Item key="customers">Customers</Menu.Item>
             <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>
               Users
             </Menu.Item>
-            <Menu.Item key="reseller-settings">Settings</Menu.Item>
+            <Menu.Item
+              key="reseller-settings"
+              onClick={() => loadPage("reseller-settings")}
+            >
+              Settings
+            </Menu.Item>
             <Menu.Item key="reseller-reports">Reports</Menu.Item>
           </SubMenu>
 

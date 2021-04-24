@@ -22,6 +22,7 @@ import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
 import Logo from "../../assets/images/Meander_Logo.svg";
+import Settings from '../Settings';
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -149,6 +150,7 @@ const AdminModule = (props) => {
     "edit-video": <EditVideo />,
     "manage-videos": <ManageVideos />,
     "manage-users": <ManageUsers />,
+    "reseller-settings": <Settings />,
   };
 
 

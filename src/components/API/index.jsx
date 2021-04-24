@@ -31,7 +31,7 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
 export const GetFolders= async (state,dispatch ,userId)=>{
    if (userId === undefined )
       return [];
-   let setfolders = new Set();    
+   let setfolders = new Set();
    //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
    const tempFolders = await axios.post(url + '/list_objects?id=' + userId + '&recursive=true', null, {
       headers: {
@@ -45,9 +45,9 @@ export const GetFolders= async (state,dispatch ,userId)=>{
       });
       setfolders.add("default");
    dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
-   dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });   
+   dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });
    dispatch({ type : VIDEO_LIST , payload : {videoList :tempFolders.dblist } });
-   dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });   
+   dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
    console.log(" data in get folders", state.folderList);
    return tempFolders;
 }
@@ -59,7 +59,7 @@ export async function GetFiles(state,dispatch,userId, folderName) {
       headers: {
          accept: 'application/json', //Authorization : "bearer "+state.token,
       }
-   }).then(res => {           
+   }).then(res => {
       dispatch({type:VIDEO_LIST , payload : { videoList : res.data.dblist }});
       return res.data.dblist;
    });
@@ -142,9 +142,10 @@ export const dbAddObj=async(state,dispatch, obj)=>{
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
    }).then(res => {
-      notification.open({ message : "Delete action succesful" });
+      notification.open({ message : "Uploaded successfully!" });
       console.log(  "delete success" , res );
-      return "";   });
+      return "";
+   });
    /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
    return getFiles;
 }

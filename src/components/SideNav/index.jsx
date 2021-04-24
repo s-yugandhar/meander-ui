@@ -14,6 +14,8 @@ import {
   FolderAddOutlined,
   CheckCircleOutlined,
   FolderOutlined,
+  CloudUploadOutlined,
+  VideoCameraAddOutlined,
 } from "@ant-design/icons";
 import {
   PAGE,
@@ -98,6 +100,9 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu key="partners-submenu" title="Partners">
+            <Menu.Item key="customers">
+              Customers
+            </Menu.Item>
             <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>
               Users
             </Menu.Item>
@@ -152,12 +157,14 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 key={"xcvz"}
                 type="primary"
                 shape="round"
-                icon={<FolderAddOutlined className="createFolderBtnIcon" />}
+                icon={
+                  <VideoCameraAddOutlined className="createFolderBtnIcon" />
+                }
                 size="middle"
                 onClick={() => openUploadVideo(true)}
                 className="createFolderBtn"
               >
-                Add Video
+                Upload Video
               </Button>
             </Menu.Item>
             {/* <Menu.Item key="" onClick={() => openUploadVideo(true)}>

@@ -100,11 +100,11 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           style={{ height: "100%", borderRight: 0 }}
         >
           <SubMenu key="partners-submenu" title="Partners">
-            <Menu.Item key="customers">Customers</Menu.Item>
+            {/*<Menu.Item key="customers">Customers</Menu.Item>*/}
             <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>
               Users
             </Menu.Item>
-            <Menu.Item
+            {/*<Menu.Item
               key="reseller-settings"
               onClick={() => loadPage("reseller-settings")}
             >
@@ -112,10 +112,10 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             </Menu.Item>
             <Menu.Item
               key="reseller-reports"
-              onClick={() => loadPage("reseller-reports")}
+            
             >
               Reports
-            </Menu.Item>
+            </Menu.Item>*/}
           </SubMenu>
 
           <SubMenu key="my-videos-submenu" title="Products">
@@ -182,7 +182,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             {/* <Menu.Item key="preport" title="Coming soon">
               Performance by item
             </Menu.Item> */}
-            <Menu.Item key="ureport" title="Coming soon">
+            <Menu.Item key="ureport" title="Coming soon"
+              onClick={() => loadPage("reseller-reports")}>
               Usage Report
             </Menu.Item>
             {state.userObj !== null &&

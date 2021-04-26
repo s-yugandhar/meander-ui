@@ -1,6 +1,6 @@
 import React , { useEffect,useContext , useState} from "react";
 import {  Layout,  Menu,  Row,  Col,  Divider,  Input,
-  Select,  Typography,  Empty,  Modal,  Form,
+  Select,  Typography,  Empty,  Modal,  Form, Collapse,
   Button,  message,  Switch,  Tooltip,  Upload} from "antd";
 
 import { PlayCircleOutlined ,ReloadOutlined,  DeleteOutlined,
@@ -16,41 +16,53 @@ import Logo from "../../assets/images/Meander_Logo.svg";
 const EditVideo = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
   const { Option } = Select;
+  const {Panel} = Collapse;
   const [form]= Form.useForm();
   const {state , dispatch} = useContext(Context);
   const [quality , setQuality] = useState("480p");
   const [ fileList, setFileList] = useState([]);
   const [ previewImage , setPreviewImage] = useState(null);
   const [seePreview , setSeePreview] = useState(false);
+  const [trans,setTrans] =  useState(false);
   let editV = { ...state.editVideo };
 
   let mp4 = {    "1080p": "/mp41080k.mp4",
       "720p": "/mp4720k.mp4",    "480p": "/mp4480k.mp4",
       "240p": "/mp4240k.mp4",  };
   
+      const isTranscodeDone=(imgurl)=>{
+        var image = new Image();
+        image.onload = function(){  if(this.width > 0){ setTrans(true);  }   }
+        image.onerror= function(){  setTrans(false); }
+        image.src = imgurl;
+      }
   
-  function getMp4Url(props , type ){
-    let base_url = "https://meander.ibee.ai/bucket-" + props.userId + "/";
-    let dash_base_url = "https://meander.ibee.ai/dash/bucket-" + props.userId + "/";
-    let hls_base_url = "https://meander.ibee.ai/hls/bucket-" + props.userId + "/";
-    let img1080 = "/thumbs/img1080/frame_0000.jpg";
-    let img720 = "/thumbs/img720/frame_0000.jpg";
-    let img480 = "/thumbs/img480/frame_0000.jpg";
-    let img240 = "/thumbs/img240/frame_0000.jpg";
-  
+      function getMp4Url( state, type) {
+        if( state.editVideo !== null && state.editVideo !== undefined){
+        let tempdoc = ["img720", "img480", "img240"];
+        let ipath = state.editVideo.itempath;
+        let cdn_url = "https://meander.ibee.ai/" + ipath.split(".")[0];
+        let dash_cdn = "https://meander.ibee.ai/dash/";
+        let hls_cdn = "https://meander.ibee.ai/hls/";
+        let img1080 = "/thumbs/img1080/frame_0000.jpg";
+        let mp34 = "/audio4.mp3";
+        let mp4 = {  "1080p": "/mp41080k.mp4",      "720p": "/mp4720k.mp4",
+          "480p": "/mp4480k.mp4",       "240p": "/mp4240k.mp4",       };
+        let dash_url =   dash_cdn +  ipath.split(".")[0] +
+          "/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
+        let hls_url =   hls_cdn +  ipath.split(".")[0] +
+          "/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
+        let mp4_url = cdn_url + mp4["1080p"];
+        let mp3_url = cdn_url + "/audio4.mp3";
+        let img_url = cdn_url + img1080;
+        if (type == "mp3" && state.editVideo.itemtype.includes("audio"))
+          return mp3_url;
+        if (type == "mp4") return mp4_url;
+        if (type == "img") return img_url;
+        if (type == "dash") return dash_url;
+        if (type == "hls") return hls_url; }
+      }
     
-    let bg_url = base_url + props.fileObject._object_name.split(".")[0] + img240;
-    let mp4_url =    base_url + props.fileObject._object_name.split(".")[0] + mp4["1080p"];
-    let dash_url =    dash_base_url +  props.fileObject._object_name.split(".")[0] +
-      mp4["1080p"] +    "/manifest.mpd";
-    let hls_url =    hls_base_url +  props.fileObject._object_name.split(".")[0] +
-      mp4["1080p"] +    "/index.m3u8";
-      if (type =="mp4") return mp4_url;
-      if(type == "img") return bg_url;
-      if(type == "dash") return dash_url;
-      if(type == "hls")  return  hls_url;
-    }
-
     const updateState=(values)=>{
       console.log(values);
       let obj = { ...state.editVideo};
@@ -126,8 +138,16 @@ const EditVideo = (props) => {
           ? null : state.editVideo.scope,
           'thumbnail' : state.editVideo ===  null || state.editVideo === undefined 
           ? null : state.editVideo.thumbnail,
+          'duration' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.duration,
+          'playlistid' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.playlistid,
+          'playlistindex' : state.editVideo ===  null || state.editVideo === undefined 
+          ? null : state.editVideo.playlistindex,
           });
-
+          if(state.editVideo !==  null && state.editVideo !== undefined && 
+            state.editVideo.transcode_state !== "complete")
+              isTranscodeDone( getMp4Url( state , "img" ) );
       },[state.editVideo])
 
       
@@ -150,74 +170,66 @@ const EditVideo = (props) => {
         }}
       >
         <Row align="stretch">
-          <Col span={10}>
             <div className="editVideoFormBlock full-width">
               <Form
                 name="basic"
                 form={form}
                 onFinish={(values)=> updateState(values)}
                 layout="vertical"
-              >
-                <h3>
-                <strong>General Info </strong>
-                </h3>
+              >    
+                <Collapse accordion>
+                <Panel header="General Info" key="1">
+                <Row><Col span={11}>
                 <Form.Item
-                  label="Video Title"
+                  label="Title"
                   name={'title'}
-                  className="editFormItem"
+                  className="editFormItem "
                 >
                   <Input  value={state.editVideo ===  null || state.editVideo === undefined 
                       ? null : state.editVideo.title}/>
-                </Form.Item>
+                </Form.Item>                  
                 <Form.Item
-                  label="Video Description"
+                  label="Duration in secs"
+                  name={'duration'}
+                  className="editFormItem"
+                >
+                  <Input   />
+                </Form.Item></Col>
+                <Col span={1}></Col>
+                <Col span={11}>
+                <Form.Item
+                  label="Description"
                   name={'description'}
                   className="editFormItem"
                 >
-                  <Input.TextArea rows="3"  />
-                </Form.Item>
+                  <Input.TextArea rows="5"  />
+                </Form.Item></Col></Row>
+                <Row >
+                <Col span={11}>  
                 <Form.Item
-                  label="Thumbnail"
-                  name={'thumbnail'}
+                  label="Playlist Name"
+                  name={'playlistid'}
                   className="editFormItem"
                 >
-                  <Input value={state.editVideo ===  null || state.editVideo === undefined 
-                      ? null : state.editVideo.thumbnail}/>
-                </Form.Item>
-                
+                  <Input   />
+                </Form.Item> </Col>
+                <Col span={1}></Col>
+                <Col span={11}>
                 <Form.Item
-                  label="Video Maturity"
-                  name={'maturity'}
+                  label="Playlist Position"
+                  name={'playlistindex'}
                   className="editFormItem"
                 >
-                  <Select
-                    placeholder="Select Maturity"
-                  >
-                    <Option value="U">U (Kids)</Option>
-                    <Option value="UA">UA (Teens)</Option>
-                    <Option value="A"> Adults</Option>
-                    <Option value="S"> Adults</Option>
-                    <Option value="13+"> 13+</Option>
-                    <Option value="16+"> 16+</Option>
-                    <Option value="18+"> 18+</Option>
-                  </Select>
-                </Form.Item>
-                <Divider />
-                {/*<h3>
-                  <strong>Privacy</strong>
-                  <Switch
-                    defaultChecked
-                    name="privacy"  
-                    style={{ marginLeft: "20px" }}
-                  />
-                </h3>*/}
+                  <Input   />
+                </Form.Item>  </Col> </Row>
+                <Col span={11}>
                 <Form.Item
                   label="Who can see?"
                   name={'scope'}
                   className="editFormItem"
                 >
                   <Select
-                    placeholder="Select Maturity"
+                    placeholder="Select Privacy"
                   >
                     <Option value="public">Public</Option>
                     <Option value="private"> Private</Option>
@@ -225,7 +237,50 @@ const EditVideo = (props) => {
                     <Option value="apponly"> App User</Option>
                     <Option value="inactive"> Inactive</Option>
                   </Select>
+                </Form.Item>   </Col> 
+                </Panel>       
+                {/*<h3>
+                  <strong>Privacy</strong>
+                  <Switch
+                    defaultChecked
+                    name="privacy"  
+                    style={{ marginLeft: "20px" }}
+                  />
+                </h3>*/
+                }
+                  <Panel header="Attach/View Thumbnail" key="2">
+                  <Row><Col span={11}>                
+                <Form.Item
+                  label=" Attach Thumbnail"
+                  name={'thumbnail'}
+                  className="editFormItem"
+                >
+                  <Input value={state.editVideo ===  null || state.editVideo === undefined 
+                      ? null : state.editVideo.thumbnail}/>
                 </Form.Item>
+                {"upload custom thumbnail or paste link"}
+                <Upload          listType="picture-card"
+                fileList={fileList}          onPreview={handlePreview}
+                onChange={handleUpload}
+                beforeUpload={() => false} // return false so that antd doesn't upload the picture right away
+                >  {uploadButton}  </Upload>
+                <Button onClick={handleSubmit} // this button click will trigger the manual upload
+                >          Submit    </Button></Col>
+                <Col span={1}></Col>
+                {trans ?
+                <Col span={11}>
+                  {"Auto generated Thumbnail"}
+                  <img  style={{height:"200px",width:"250px"}} src={getMp4Url(state,"img")} alt="Auto Generated Thumbnail"/>
+                </Col>: null}
+                </Row>
+                </Panel>
+                <Panel header={"Actions todo..."} key={3}>
+                  <Row>
+                    <Col span={11}></Col>
+                    <Col span={11}></Col>
+                  </Row>
+                </Panel>
+                </Collapse>
                 <Form.Item>
                   <div style={{ float: "right" }}>
                     <Button
@@ -234,7 +289,7 @@ const EditVideo = (props) => {
                       size="large"
                       disabled=""
                     >
-                      Update Information
+                      Save
                     </Button>
                   </div>
                   {/*<div style={{ float: "left", paddingTop: "5px" }}>
@@ -263,9 +318,10 @@ const EditVideo = (props) => {
                 </Form.Item>
 
                 <Form.Item></Form.Item>
+                
+                
               </Form>
             </div>
-          </Col>
           <Col span={1} />
           <Col span={13}>
             <div className="full-width edit-video-block">
@@ -273,21 +329,7 @@ const EditVideo = (props) => {
               <strong>Your Video Name : {  JSON.stringify(editV.name)}</strong>
               </h3>
               <div>
-        <Upload
-          listType="picture-card"
-          fileList={fileList}
-          onPreview={handlePreview}
-          onChange={handleUpload}
-          beforeUpload={() => false} // return false so that antd doesn't upload the picture right away
-        >
-          {uploadButton}
-        </Upload>
-
-        <Button onClick={handleSubmit} // this button click will trigger the manual upload
-        >
-            Submit
-        </Button>
-
+        
         <Modal
           visible={seePreview}
           footer={null}

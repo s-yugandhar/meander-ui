@@ -158,7 +158,7 @@ useEffect(()=>{
 
 useEffect(()=>{
   //setFilterType("all");
-  dispatch({type:"FILTER_TYPE",payload : { filterType : "all" }});
+  dispatch({type:"FILTER_TYPE",payload : { filterType : "video" }});
 },[state.folderName])
 
 
@@ -204,7 +204,8 @@ useEffect(()=>{
             <Col span={12}>
               <h2 className="page-title">
                 { state.folderName === "" && state.videoList !== undefined ?  "  All Items  "
-                :  `Objects in ${state.folderName} folder is ${state.videoList.length}`  }
+                :  `Objects in ${state.folderName} folder 
+                is ${state.videoList === undefined || state.videoList === null ? 0 : state.videoList.length}`  }
               </h2>
             </Col>
 

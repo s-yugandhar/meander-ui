@@ -43,10 +43,10 @@ const AdminModule = (props) => {
 
   function updateFiles(id , folderName){
     GetFiles(state,dispatch ,id , folderName);
-     if( state.folderName === "")
-     dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );
-     else
-     dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/"+state.folderName+"/" , true  );
+     //if( state.folderName === "")
+     //dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );
+     //else
+     //dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/"+state.folderName+"/" , true  );
   }
 
   const uppy = useUppy(() => {
@@ -163,12 +163,14 @@ const AdminModule = (props) => {
     console.log('Got user id - ', state.userId);
     localUserId ? setLogedIn(true) : setLogedIn(false);
     //Dashboard( { locale :{ strings : { dropHere : "hint"} }        } )
+    if( state.userId !== null ){
     uppy.setOptions( {  locale : {strings :
       {  'dropPaste' :state.folderName === ""?
       `Drop files here or paste or %{browse} to upload files to default` :
-       `Drop files here or paste or %{browse} to upload files to `+state.folderName      }} })
-      uppy.setMeta( { userId: state.userId, foldername: state.folderName === "" ? "default" : state.folderName })
-  }, [ state.folderName ]);
+       `Drop files here or paste or %{browse} to upload files to `+state.folderName      }} });
+      uppy.setMeta( { userId: state.userId, foldername: state.folderName === "" ? "default" : state.folderName });
+    }
+  }, [ state.folderName , state.userId ]);
 
   /* const content = {
     "my-videos": <MyVideos />,

@@ -94,15 +94,18 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
-          defaultOpenKeys={["partners-submenu"]}
+          defaultOpenKeys={["my-videos-submenu"]}
           selectedKeys={selectedKeys}
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}
           style={{ height: "100%", borderRight: 0 }}
         >
-          <SubMenu key="partners-submenu" title="Partners">
+          { state.userObj !== null &&
+            state.userObj !== undefined && 
+          (state.userObj.roles === "super_admin" || state.userObj.roles === "reseller") ? 
+          <SubMenu key="partners-submenu" title={ state.userObj.roles === "super_admin" ? "Super Admin Panel":"Partners"}>
             {/*<Menu.Item key="customers">Customers</Menu.Item>*/}
             <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>
-              Users
+              Accounts
             </Menu.Item>
             {/*<Menu.Item
               key="reseller-settings"
@@ -116,7 +119,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             >
               Reports
             </Menu.Item>*/}
-          </SubMenu>
+          </SubMenu> : "" }
 
           <SubMenu key="my-videos-submenu" title="Products">
             <Menu.Item
@@ -192,8 +195,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               state.userObj.roles === "super_admin") ? (
               <>
                 <Divider className="my-05" />
-                <Menu.Item key="subdets">Subscription Details</Menu.Item>
-                {/* <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item> */}
+                {/* <Menu.Item key="subdets">Subscription Details</Menu.Item>
+                 <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item> */}
               </>
             ) : null}
 
@@ -323,7 +326,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 message: "Please enter any name!",
               },
               {
-                pattern: /^[A-Za-z0-9 ]+$/,
+                pattern: /^[A-Za-z0-9]+$/,
                 message: "Special characters are not allowed",
               },
               { max: 35, message: "Maximum 35 characters" },

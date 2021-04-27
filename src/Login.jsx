@@ -86,6 +86,7 @@ const Login = (props) => {
             page: 'my-videos'
           }
         });
+        dispatch({type:"FOLDER_NAME",payload:{ folderName : "" }});
 
       })
       .catch((err) => {

@@ -7,9 +7,7 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
 export const url = "https://meander.video";
-
 //export const url = "http://127.0.0.1:8002";
-
 
 export const GetUserdetails= async (state,dispatch ,userId)=>{
    if (userId === undefined )
@@ -61,13 +59,17 @@ export async function GetFiles(state,dispatch,userId, folderName) {
       }
    }).then(res => {
       dispatch({type:VIDEO_LIST , payload : { videoList : res.data.dblist }});
-      return res.data.dblist;
-   });
-   return getFiles;
+      return true;
+   })
+   return getFiles ? true : false;
 }
 
 
 export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
+   if(folderName in state.folderList)
+      {  notification.open({message:"Folder Exists with files in it",
+      icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
+         return "";}
    const crtFolder = axios.post(url + '/create_folder?id=' + userId + '&foldername=' + folderName, null, {
       headers: {
          accept: 'application/json' ,Authorization : "bearer "+state.token,
@@ -76,6 +78,7 @@ export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
          dispatch({ type: 'FOLDER_LIST',
           payload: { folderList:  Array.from( new Set(state.folderList).add(folderName)  ) } });
           dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
+          dispatch({ type: FOLDER_CREATED, payload: { folderCreated: folderName } });
       if( folderName !== "default")
          notification.open({message:"Folder Exists, Upload a file to retain folder",
           icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
@@ -106,11 +109,11 @@ export const deleteAfterUpload = async (uploadId) => {
       }
    }).then(res => {
       console.log('delete after upload - ', res);
-      notification.open({message: "deleting temporary chunks after upload success"});
+      //notification.open({message: "deleting temporary chunks after upload success"});
       return "";
    }).catch(err => {
-      notification.open({message: `deleting temporary chunks after upload Failed ,
-       please delete objects with number names manually` });
+      //notification.open({message: `deleting temporary chunks after upload Failed ,
+       //please delete objects with number names manually` });
        return "";
    });
    return crtFolder;
@@ -143,11 +146,11 @@ export const dbAddObj=async(state,dispatch, obj)=>{
       }
    }).then(res => {
       notification.open({ message : "Uploaded successfully!" });
-      console.log(  "delete success" , res );
-      return "";
+      console.log(  "upload success" , res );
+      dispatch({type:'EDIT_VIDEO', payload : { editVideo : res.data[0]}  });
+      return true;
    });
-   /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
-   return getFiles;
+   return getFiles? true : false;
 }
 
 export const dbGetObjList=async(state,dispatch)=>{

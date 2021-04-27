@@ -141,11 +141,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     }
   };
 
-  // Go to Edit video page
-  //window.addEventListener('load',(e)=>
-  //{   GetFolders(state , dispatch,state.userId);
-  //   if(state.folderList.length === 0 ) CreateNewFolder(state,dispatch,state.userId ,"default");
-  //}) ;
 
 useEffect(()=>{
   let filterType = state.filterType;
@@ -162,7 +157,6 @@ useEffect(()=>{
 },[state.folderName])
 
 
-
   useEffect(() => {
     setLoading(true);
     updateTab = addVideo;
@@ -172,7 +166,6 @@ useEffect(()=>{
       //CreateNewFolder(state, dispatch, state.userId, "default");
       GetUserdetails(state,dispatch,state.userId);
     console.log('State - ', state.videoList);
-
  }, []);
 
   return (
@@ -190,17 +183,15 @@ useEffect(()=>{
           <Col span={3}>
               <Select
                 placeholder="Enter keyword..."
-                value={ filterType}
+                value={ state.filterType}
                   onChange={(value) => dispatch({type:"FILTER_TYPE",payload:{ filterType : value }}) }
               >
                 <Option key="all" value="all"> Show All</Option>
                 <Option key="folder" value="folder"> Folders only</Option>
                 <Option key="video" value="video"> Videos only</Option>
-                <Option key="audio" value="audio"> Audio Only</Option>
+                <Option key="audio" value="audio"> Audio only</Option>
               </Select>
             </Col>
-
-
             <Col span={12}>
               <h2 className="page-title">
                 { state.folderName === "" && state.videoList !== undefined ?  "  All Items  "
@@ -231,7 +222,6 @@ useEffect(()=>{
             </Col>
           </Row>
           <Divider orientation="left"></Divider>
-
           {(state.folderList !== undefined && state.folderList.length > 0) ||
           (state.fileList !== undefined && state.videoList.length > 0) ? (
             <motion.div

@@ -1,16 +1,18 @@
 import React , { useEffect,useContext , useState} from "react";
 import {  Layout,  Menu,  Row,  Col,  Divider,  Input,
   Select,  Typography,  Empty,  Modal,  Form, Collapse,
-  Button,  message,  Switch,  Tooltip,  Upload} from "antd";
+  Button,  message,  Switch,  Tooltip,  Upload, Radio,
+Dropdown} from "antd";
 
 import { PlayCircleOutlined ,ReloadOutlined,  DeleteOutlined,
-  DownloadOutlined } from "@ant-design/icons";
+  DownloadOutlined , ArrowRightOutlined } from "@ant-design/icons";
 import "./editVideo.scss";
 import axios from 'axios';
 import {dbUpdateObj , url} from '../API';
 import { Context } from '../../context';
 import PlayVideo from "../PlayVideo";
 import Logo from "../../assets/images/Meander_Logo.svg";
+import Loading from "../Loading";
 
 
 const EditVideo = (props) => {
@@ -24,6 +26,10 @@ const EditVideo = (props) => {
   const [ previewImage , setPreviewImage] = useState(null);
   const [seePreview , setSeePreview] = useState(false);
   const [trans,setTrans] =  useState(false);
+  const [seewhat,setSeeWhat] = useState(1);
+  const [copywhat,setCopyWhat] = useState("play");
+  const [showcode,setShowCode] = useState(null);
+  const [loading,setLoading] = useState(false);
   let editV = { ...state.editVideo };
 
   let mp4 = {    "1080p": "/mp41080k.mp4",
@@ -36,7 +42,7 @@ const EditVideo = (props) => {
         image.onerror= function(){  setTrans(false); }
         image.src = imgurl;
       }
-  
+
       function getMp4Url( state, type) {
         if( state.editVideo !== null && state.editVideo !== undefined){
         let tempdoc = ["img720", "img480", "img240"];
@@ -60,9 +66,71 @@ const EditVideo = (props) => {
         if (type == "mp4") return mp4_url;
         if (type == "img") return img_url;
         if (type == "dash") return dash_url;
-        if (type == "hls") return hls_url; }
+        if (type == "hls") return hls_url;        }
       }
     
+      const getPlayUrl = (state, dispatch) => {
+          return `${url}/watch/${state.userId}/${state.editVideo.id}`;
+      };
+
+      const embedCodeFunc = (state, dispatch, obj) => {
+        let dbobj = state.editVideo;
+        let frame = `<iframe src='${url}/watch/${state.userId}/${dbobj.id}?embed=true' width='530'
+        height='315' frameborder='0' allow=' autoplay; fullscreen; picture-in-picture'
+        allowfullscreen title='${dbobj.title}'></iframe>`;
+        return frame;
+      };
+    
+
+      const handleMenuClick = (e) => {
+        let code = null;
+        console.log(e);
+        e.key = e.target.value;
+        if (e.key === "iframe")
+          code = embedCodeFunc(state, dispatch, props.fileObject);
+        if (e.key === "mp3") code = getMp4Url(state, "mp3");
+        if (e.key === "hls") code = getMp4Url(state, "hls");
+        if (e.key === "dash") code = getMp4Url(state, "dash");
+        if (e.key === "mp4") code = getMp4Url(state, "mp4");
+        if (e.key === "embed") {
+          code = getPlayUrl(state, dispatch, url, props);
+          code = code + "?embed=true";
+        }
+        if (e.key === "play") code = getPlayUrl(state, dispatch, url, props);
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(code);
+          message.success(`Code Copied is: ${code}`);
+        } else {
+          alert(`Sorry your browser does not support, please copy here: ${code}`);
+        }
+        setShowCode(code);
+      };
+    
+      const menuvideo = (
+        <><Radio.Group onChange={(e)=>{ setCopyWhat(e.target.value); handleMenuClick(e) }}   value={copywhat}>
+          <Radio key="play" value="play"> Play</Radio>
+          <Radio key="embed" value="embed">Embed</Radio>
+          <Radio key="iframe" value="iframe">Iframe</Radio>
+          <Radio key="mp4" value="mp4"> Mp4</Radio>
+          <Radio key="dash" value="dash">Android</Radio>
+          <Radio key="hls" value="hls"> Ios</Radio>{" "}
+        </Radio.Group>
+        <br/><br/>
+        { showcode}
+        </>
+      );
+      const menuaudio = (
+        <><Radio.Group onChange={(e)=>{ setCopyWhat(e.target.value); handleMenuClick(e) }}   value={copywhat}>
+          <Radio key="play" value="play"> Play</Radio>
+          <Radio key="embed" value="embed">Embed</Radio>
+          <Radio key="iframe" value="iframe">Iframe</Radio>
+          <Radio key="mp3" value="mp3"> Mp3</Radio>
+        </Radio.Group>
+        <br/><br/>
+        { showcode}
+        </>
+      );
+      
     const updateState=(values)=>{
       console.log(values);
       let obj = { ...state.editVideo};
@@ -104,6 +172,7 @@ const EditVideo = (props) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setLoading(true);
     if ( state.editVideo === null || state.editVideo === undefined )
       return "";
     let formData = new FormData();
@@ -123,6 +192,7 @@ const EditVideo = (props) => {
         console.log("err", err);
         message.error("Error in Thumbnail updation");
       });
+      setLoading(false);
   };
 
       useEffect(()=>{
@@ -153,7 +223,7 @@ const EditVideo = (props) => {
       
   return (
     <Layout className="main">
-      
+      <Loading show={loading}/>
       {  state.editVideo !== null && state.editVideo !== undefined && state.editVideo.playUrl !== null 
           && state.editVideo.playUrl !== undefined   ?
       <Row>
@@ -239,14 +309,10 @@ const EditVideo = (props) => {
                   </Select>
                 </Form.Item>   </Col> 
                 </Panel>       
-                {/*<h3>
-                  <strong>Privacy</strong>
-                  <Switch
-                    defaultChecked
-                    name="privacy"  
-                    style={{ marginLeft: "20px" }}
-                  />
-                </h3>*/
+                {/*<h3>    <strong>Privacy</strong>
+                  <Switch     defaultChecked
+                    name="privacy"  style={{ marginLeft: "20px" }}
+                  />   </h3>*/
                 }
                   <Panel header="Attach/View Thumbnail" key="2">
                   <Row><Col span={11}>                
@@ -257,7 +323,7 @@ const EditVideo = (props) => {
                 >
                   <Input value={state.editVideo ===  null || state.editVideo === undefined 
                       ? null : state.editVideo.thumbnail}/>
-                </Form.Item>
+              </Form.Item>
                 {"upload custom thumbnail or paste link"}
                 <Upload          listType="picture-card"
                 fileList={fileList}          onPreview={handlePreview}
@@ -269,16 +335,86 @@ const EditVideo = (props) => {
                 <Col span={1}></Col>
                 {trans ?
                 <Col span={11}>
-                  {"Auto generated Thumbnail"}
-                  <img  style={{height:"200px",width:"250px"}} src={getMp4Url(state,"img")} alt="Auto Generated Thumbnail"/>
+                  <div >
+                  <Radio.Group onChange={(e)=> setSeeWhat(e.target.value)} value={seewhat} >
+                  <Radio defaultChecked value={1}>{"Thumbnail"}</Radio>
+                  <Radio  value={2}>{"Play "}</Radio>
+                  { state.editVideo !== null && state.editVideo !== undefined &&
+                  state.editVideo.thumbnail ?
+                   <Radio  value={3}>{"New Thumb"}</Radio> : null }
+                  </Radio.Group> 
+                  { seewhat === 1 ?
+                  <img  style={{height:"240px",width:"360px"}} src={getMp4Url(state,"img")} alt="Auto Generated Thumbnail"/>:null}
+                  { seewhat === 3 ?
+                  <img  style={{height:"240px",width:"360px"}} src={state.editVideo.thumbnail} alt="Auto Generated Thumbnail"/>:null}
+                  {seewhat === 2 ? 
+                      <>{editV !== null && editV.itempath !== undefined?
+                      <div className="video-container">              
+                        { editV.itemtype.includes("video") ?
+                        <video className="video" controls key={quality} 
+                        poster={getMp4Url(state,"img")?getMp4Url(state,"img"):Logo} 
+                        style={{height:'240px',width:'360px'}}>
+                       <source label={quality} id={quality} src={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]} 
+                          type="video/mp4"/>        </video> :
+                          <audio className="video" controls key={'keyaudio'} poster={Logo}>
+                            <source label={"a4"} id={"a4"} 
+                             src={"https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"} />
+                            </audio> }
+                        </div>
+                        : null}</>
+                  : null }</div>
                 </Col>: null}
                 </Row>
                 </Panel>
-                <Panel header={"Actions todo..."} key={3}>
+                <Panel header={"Copy Actions"} key={3}>
                   <Row>
-                    <Col span={11}></Col>
-                    <Col span={11}></Col>
-                  </Row>
+                    <Col span={18}> 
+                    {trans ? 
+                    state.editVideo.itemtype.includes("video")?menuvideo:menuaudio : null}
+                    </Col>
+                  </Row> 
+                  {/*<Row>
+                  <div className="edit-video-actions">
+                {editV.itemtype.includes("video") ?
+                <>
+                  <Select onChange={(value)=> setQuality(value) } value={quality}
+                style={{float : "right"}}  size="small" shape="round" > 
+                <Option value="1080p"> 1080p</Option>
+                <Option value="720p"> 720p</Option>
+                <Option value="480p"> 480p</Option>
+                <Option value="240p"> 240p</Option>
+                </Select>
+                
+                <Button
+                  type="primary"
+                  icon={<DownloadOutlined />}
+                  size="small"
+                  style={{ float: "right" }}
+                  shape="round"
+                  htmlType={"a"}
+                  href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]}
+                  target={"_blank"}
+                  download={ editV.name.split(".")[0] + mp4[quality] }
+                  //onClick={(e)=>{;}}
+                >
+                  { quality}
+                </Button> </>: 
+                <Button
+                type="primary"
+                icon={<DownloadOutlined />}
+                size="small"
+                style={{ float: "right" }}
+                shape="round"
+                htmlType={"a"}
+                href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"}
+                target={"_blank"}
+                download={ editV.name}
+                //onClick={(e)=>{;}}
+              >
+                {editV.name.split(".")[0]+".mp3 "}                
+                </Button>}
+              </div>
+                  </Row>*/}
                 </Panel>
                 </Collapse>
                 <Form.Item>
@@ -324,74 +460,12 @@ const EditVideo = (props) => {
             </div>
           <Col span={1} />
           <Col span={13}>
-            <div className="full-width edit-video-block">
-              <h3>
-              <strong>Your Video Name : {  JSON.stringify(editV.name)}</strong>
-              </h3>
               <div>
         
-        <Modal
-          visible={seePreview}
-          footer={null}
-          onCancel={handleCancel}
-        >
-          <img alt="example" style={{ width: "100%" }} src={previewImage} />
-        </Modal>
-      </div>
-
-              {editV !== null && editV.itempath !== undefined?
-              <><div className="video-container">              
-              { editV.itemtype.includes("video") ?
-              <video className="video" controls key={quality} poster={Logo}>
-                    <source label={quality} id={quality} src={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]} 
-                    type="video/mp4"/>
-                </video> :
-                <audio className="video" controls key={'keyaudio'} poster={Logo}>
-                  <source label={"a4"} id={"a4"} 
-                   src={"https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"} />
-                  </audio> }
-              </div>
-              <div className="edit-video-actions">
-                {editV.itemtype.includes("video") ?
-                <>
-                  <Select onChange={(value)=> setQuality(value) } value={quality}
-                style={{float : "right"}}  size="small" shape="round" > 
-                <Option value="1080p"> 1080p</Option>
-                <Option value="720p"> 720p</Option>
-                <Option value="480p"> 480p</Option>
-                <Option value="240p"> 240p</Option>
-                </Select>
-                
-                <Button
-                  type="primary"
-                  icon={<DownloadOutlined />}
-                  size="small"
-                  style={{ float: "right" }}
-                  shape="round"
-                  htmlType={"a"}
-                  href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]}
-                  //sssstarget={"_blank"}
-                  download={ editV.title+".mp4"}
-                  //onClick={(e)=>{;}}
-                >
-                  {editV.name.split(".")[0]+".mp4 "+ quality}
-                </Button> </>: 
-                <Button
-                type="primary"
-                icon={<DownloadOutlined />}
-                size="small"
-                style={{ float: "right" }}
-                shape="round"
-                htmlType={"a"}
-                href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"}
-                //sssstarget={"_blank"}
-                download={ editV.title+".mp3"}
-                //onClick={(e)=>{;}}
-              >
-                {editV.name.split(".")[0]+".mp3 "}                
-                </Button>}
-              </div> </>: null}
-            </div>
+        <Modal         visible={seePreview}
+          footer={null}          onCancel={handleCancel}
+        >      <img alt="example" style={{ width: "100%" }} src={previewImage} />
+        </Modal>      </div>
           </Col>
         </Row> 
               </Content> }

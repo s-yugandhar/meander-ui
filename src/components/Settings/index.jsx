@@ -1,25 +1,11 @@
 import React, { useContext, useState, useEffect } from "react";
 import {
-  Layout,
-  Row,
-  Divider,
-  Table,
-  Switch,
-  Button,
-  Form,
-  Col,
-  Upload,
-  message,
-  Input,
-  Select,
-} from "antd";
+  Layout,  Row,  Divider,  Table,  Switch,
+  Button,  Form,  Col,  Upload,  message,
+  Input,  Select,} from "antd";
 import {
-  EditOutlined,
-  DeleteOutlined,
-  LinkOutlined,
-  PlusOutlined,
-  ReloadOutlined,
-  FileImageOutlined,
+  EditOutlined,  DeleteOutlined,  LinkOutlined,
+  PlusOutlined,  ReloadOutlined,  FileImageOutlined,
 } from "@ant-design/icons";
 // custom imports
 import { Context } from "../../context";

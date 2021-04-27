@@ -207,9 +207,8 @@ const VideoCard = (props) => {
         <>
           {props.videoTitle}
           <h6>
-            {new Date(
-              props.fileObject.name.replace(state.userId, "").split(".")[0] * 1
-            ).toLocaleString()}
+            {  new Date( props.fileObject.updatetime === "-1" || props.fileObject.updatetime === -1?
+              null : props.fileObject.updatetime * 1  ).toLocaleString() }
           </h6>
         </>
       }
@@ -239,15 +238,13 @@ const VideoCard = (props) => {
           onVisibleChange={handleVisibleChange}
           visible={visible}
           title={"Copy links to video"}
-          trigger={["click"]}
-        >
+          trigger={["click"]}   >
           <Button
             htmlType="a"
             key="link"
             onClick={(e) => copyCode(state, dispatch, url, props)}
             aria-hidden={true}
-            style={{ borderColor: "white", padding: 0 }}
-          >
+            style={{ borderColor: "white", padding: 0 }}  >
             <Tooltip title="Copy Code">
               <EllipsisOutlined style={{ fontSize: "24px" }} />
             </Tooltip>

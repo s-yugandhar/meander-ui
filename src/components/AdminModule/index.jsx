@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import {  Layout, Menu,  Dropdown, Avatar,   Row,  Col, Input,  Select, Typography,  Drawer, Button,} from "antd";
+import {  Layout, Menu,  Dropdown, Avatar,   Row,  Col, Input,  Select, Typography,  Drawer, Button, message, notification,} from "antd";
 import {  UserOutlined,  DownOutlined} from "@ant-design/icons";
 import Uppy from '@uppy/core';
 import 'uppy/dist/uppy.min.css';
@@ -37,12 +37,13 @@ const AdminModule = (props) => {
   const [uploadVideo, setUploadVideo] = useState(false);
   const [logedIn, setLogedIn] = useState(false);
   const [stateEdit, setStateEdit] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { state, dispatch } = useContext(Context);
 
   const localUserId = localStorage.getItem('userId');
 
   function updateFiles(id , folderName){
-    GetFiles(state,dispatch ,id , folderName);
+      ;
      //if( state.folderName === "")
      //dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );
      //else
@@ -52,76 +53,59 @@ const AdminModule = (props) => {
   const uppy = useUppy(() => {
     return new Uppy({allowMultipleUploads  : false
       ,autoProceed : false,debug:true,restrictions:{ allowedFileTypes : [ videomime , audiomime ]},
-      onBeforeFileAdded: (currentFile, files) => {
-        let time = Date.now();
-        let uuid = state.userId+String(time);
-        const modifiedFile = {
-          ...currentFile,
-          name:  uuid+ '.' + currentFile.name.split(".")[1],
-          meta : {title: currentFile.name ,
-          description : currentFile.name , time : time , uuidname : uuid }
-        }
-        uppy.log(modifiedFile.name);
-        return modifiedFile;
-      }
     }).use(AwsS3Multipart, {
-      limit: 1,
-      companionUrl: url,
+      limit: 1,      companionUrl: url,
       getChunkSize(file) {
         var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
         return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
       }
     }).on('complete', result => {
       console.log(result , "inside uppy complete event")
-      let succes = result.successful;
-      let failed = result.failed;
-      let batchId = result.uploadID;
-      let insertObj = [];
+      let succes = result.successful;      let failed = result.failed;
+      let batchId = result.uploadID;      let insertObj = [];
       succes.map((obj,ind)=>{
          if( obj.progress.uploadComplete=== true){
           let idt = obj.s3Multipart.uploadId;
             dispatch({ type: FILE_UPLOADED,  payload: { fileName:  obj.name }   });
-            deleteAfterUpload(idt);
+            //deleteAfterUpload(idt);
             let path = "bucket-"+idt.split("-")[0]+"/"+idt.split("-")[1]+"/"+idt.split("-")[2] ;
             let builtObj= { "name":obj.name  ,"title" : obj.meta.title , "description" : obj.meta.description , "itempath" : path ,
-          "itemtype": obj.type , "itemsize" : obj.size ,"upload_state":"complete" ,"scope":"private"  };
-            insertObj.push(builtObj);;
+            "itemtype": obj.type , "itemsize" : obj.size ,"upload_state":"complete" ,"scope":"private" ,"updatetime":obj.meta.time };
+            insertObj.push(builtObj);
          }
       });
       dispatch({ type: UPPY_SUCCESS,  payload: { uppySuccess: succes  }   });
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   });
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   });
-
-      if (insertObj.length > 0){ closeUploadVideo();
+      if (insertObj.length > 0){ 
+        closeUploadVideo(); 
+        setLoading(true);
         dbAddObj(state , dispatch , insertObj );
-        updateFiles(state.userId,state.folderName);
-        setStateEdit(insertObj[0].itempath);    }
+        setStateEdit(insertObj[0].itempath);         
+      }
     })
   });
-
+  
   useEffect(()=>{
     if( stateEdit !== false){
-  // console.log("sleeping", stateEdit , state);
-    let item = state.videoList.find((obj)=> obj.itempath === stateEdit );
-    console.log(item , stateEdit);
-    if ( item !== undefined){
       setStateEdit(false);
-    dispatch({ type: 'EDIT_VIDEO',  payload: { editVideo: item }  });
+      setLoading(false);
     dispatch({ type: 'PAGE',  payload: { page : "edit-video"   }  });  }
-  }
-  },[state.videoList])
+  },[state.editVideo])
 
-
+  useEffect(()=>{
+    if( state.folderCreated !== null && state.folderCreated !== ""){
+        setUploadVideo(true);
+    }
+  },[state.folderCreated])
 
 
   const closeUploadVideo = () => {
-    uppy.reset();
-    setUploadVideo(false);
-
+    uppy.reset();    setUploadVideo(false);
   }
 
   const logout = () => {
-     localStorage.removeItem('token');
+    localStorage.removeItem('token');
     localStorage.removeItem('userId');
     dispatch({  type: 'FOLDER_LIST', payload:{ folderList : []} });
     dispatch({  type: 'FILE_LIST', payload:{ fileList : []} });
@@ -163,14 +147,20 @@ const AdminModule = (props) => {
     console.log('Got user id - ', state.userId);
     localUserId ? setLogedIn(true) : setLogedIn(false);
     //Dashboard( { locale :{ strings : { dropHere : "hint"} }        } )
-    if( state.userId !== null ){
-    uppy.setOptions( {  locale : {strings :
-      {  'dropPaste' :state.folderName === ""?
+    uppy.setOptions( { 
+      onBeforeFileAdded: (currentFile, files) => {
+      let time = Date.now();      let uuid = state.userId+String(time);
+      const modifiedFile = {   ...currentFile,
+        name:  uuid+ '.' + currentFile.name.split(".")[1],
+        meta : {title: currentFile.name ,  description : currentFile.name ,
+       time : time , uuidname : uuid }
+      };    return modifiedFile;
+    } ,
+    locale : {strings : { 'dropPaste' :state.folderName === ""?
       `Drop files here or paste or %{browse} to upload files to default` :
-       `Drop files here or paste or %{browse} to upload files to `+state.folderName      }} });
+       `Drop files here or paste or %{browse} to upload files to `+state.folderName  }} });
       uppy.setMeta( { userId: state.userId, foldername: state.folderName === "" ? "default" : state.folderName });
-    }
-  }, [ state.folderName , state.userId ]);
+  }, [ state.folderName ,localUserId ]);
 
   /* const content = {
     "my-videos": <MyVideos />,
@@ -180,6 +170,7 @@ const AdminModule = (props) => {
 
   return (
     <>
+        { loading ?<Loading  show={loading}/>:null}
       {localUserId ? (
         <Layout>
           <Header className="header">
@@ -219,11 +210,10 @@ const AdminModule = (props) => {
           <Layout>
             <SideNav
               updateTab={(tab) => setSelectedTab(tab)}
-              openUploadVideo={() => setUploadVideo(true)}
+              openUploadVideo={() => { setUploadVideo(true)}}
             />
             {page[state.page] ||
               "You do not have permissions to view this module"}
-
             <Drawer
               title="Upload Videos"
               placement="right"
@@ -266,6 +256,7 @@ const AdminModule = (props) => {
                 </Select>{" "}
               </div>
               <div className="uploadFileUppyBlock" style={{ height: "80vh" }}>
+                
                 <Dashboard
                   uppy={uppy}
                   showProgressDetails={true}

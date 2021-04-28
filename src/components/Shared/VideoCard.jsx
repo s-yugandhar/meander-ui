@@ -40,9 +40,9 @@ const VideoCard = (props) => {
   function getMp4Url(props, type) {
     let tempdoc = ["img720", "img480", "img240"];
     let ipath = props.fileObject.itempath;
-    let cdn_url = "https://meander.ibee.ai/" + ipath.split(".")[0];
-    let dash_cdn = "https://meander.ibee.ai/dash/";
-    let hls_cdn = "https://meander.ibee.ai/hls/";
+    let cdn_url = "https://cdn.meander.video/" + ipath.split(".")[0];
+    let dash_cdn = "https://cdn.meander.video/dash/";
+    let hls_cdn = "https://cdn.meander.video/hls/";
     let img1080 = "/thumbs/img1080/frame_0000.jpg";
     let mp34 = "/audio4.mp3";
     let mp4 = {
@@ -131,7 +131,7 @@ const VideoCard = (props) => {
     dispatch({ type: PAGE, payload: { page: "edit-video" } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: null } });
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: obj } });
-    dbGetObjByPath(state, dispatch, obj.itempath, false);
+    //dbGetObjByPath(state, dispatch, obj.itempath, false);
   };
 
   const copyCode = (state, dipatch, url, props) => {
@@ -242,7 +242,7 @@ const VideoCard = (props) => {
           <Button
             htmlType="a"
             key="link"
-            onClick={(e) => copyCode(state, dispatch, url, props)}
+            onClick={(e) => {}}
             aria-hidden={true}
             style={{ borderColor: "white", padding: 0 }}  >
             <Tooltip title="Copy Code">

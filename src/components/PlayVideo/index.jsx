@@ -17,7 +17,7 @@ const PlayVideo = (props) => {
           <div className="video-player-block full-width">
             <div className="full-width video-player">              
               <iframe
-                src = { props.obj.playUrl}
+                src = { props.obj.playUrl+"?embed=true"}
                 //src="https://meander.video/3d79252ccf874d4c88353ab1ea03f4f7/player/c1a6f70900f2496bb587a5303b8c7702"
                 width="100%"
                 height="400"
@@ -31,7 +31,8 @@ const PlayVideo = (props) => {
             <div className="full-width">
               <h2 className="ant-text-gray">
                   <strong> { props.obj.title } </strong>
-              </h2><h5> { new Date(props.obj.name.split(".")[0] * 1).toLocaleString() }</h5>
+              </h2><h5> { new Date(props.obj.updatetime === "-1" || props.obj.updatetime === -1?
+              null : props.obj.updatetime).toLocaleString() }</h5>
             </div>
               <p>
                 {props.obj.description}

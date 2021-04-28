@@ -144,7 +144,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
 useEffect(()=>{
   let filterType = state.filterType;
-  if( (filterType === "all" || filterType === "folder") && state.folderName === "")
+  if( (filterType === "all" || filterType === "folder") )
   GetFolders(state, dispatch, state.userId);
   if( filterType === "audio" || filterType === "video")
       GetFiles(state,dispatch,state.userId,state.folderName);

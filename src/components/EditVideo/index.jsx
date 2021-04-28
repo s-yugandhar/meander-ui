@@ -37,19 +37,20 @@ const EditVideo = (props) => {
       "240p": "/mp4240k.mp4",  };
   
       const isTranscodeDone=(imgurl)=>{
+        if( trans === false){ 
         var image = new Image();
         image.onload = function(){  if(this.width > 0){ setTrans(true);  }   }
         image.onerror= function(){  setTrans(false); }
-        image.src = imgurl;
+        image.src = imgurl;}
       }
 
       function getMp4Url( state, type) {
         if( state.editVideo !== null && state.editVideo !== undefined){
         let tempdoc = ["img720", "img480", "img240"];
         let ipath = state.editVideo.itempath;
-        let cdn_url = "https://meander.ibee.ai/" + ipath.split(".")[0];
-        let dash_cdn = "https://meander.ibee.ai/dash/";
-        let hls_cdn = "https://meander.ibee.ai/hls/";
+        let cdn_url = "https://cdn.meander.video/" + ipath.split(".")[0];
+        let dash_cdn = "https://cdn.meander.video/dash/";
+        let hls_cdn = "https://cdn.meander.video/hls/";
         let img1080 = "/thumbs/img1080/frame_0000.jpg";
         let mp34 = "/audio4.mp3";
         let mp4 = {  "1080p": "/mp41080k.mp4",      "720p": "/mp4720k.mp4",
@@ -215,23 +216,18 @@ const EditVideo = (props) => {
           'playlistindex' : state.editVideo ===  null || state.editVideo === undefined 
           ? null : state.editVideo.playlistindex,
           });
-          if(state.editVideo !==  null && state.editVideo !== undefined && 
-            state.editVideo.transcode_state !== "complete")
-              isTranscodeDone( getMp4Url( state , "img" ) );
+          let loopid = null;
+          if(state.editVideo !==  null && state.editVideo !== undefined ){
+            isTranscodeDone( getMp4Url( state , "img" ) );
+              loopid = setInterval(()=>  isTranscodeDone( getMp4Url( state , "img" ) ) , 2000 );}
+
+          return () => { if(loopid !== null)clearInterval(loopid);}
       },[state.editVideo])
 
       
   return (
     <Layout className="main">
-      <Loading show={loading}/>
-      {  state.editVideo !== null && state.editVideo !== undefined && state.editVideo.playUrl !== null 
-          && state.editVideo.playUrl !== undefined   ?
-      <Row>
-            <Col span={18}>
-              <PlayVideo   obj={state.editVideo}  />
-            </Col>
-          </Row> 
-      :<Content
+      <Content
         className="site-layout-background"
         style={{
           padding: 24,
@@ -247,7 +243,14 @@ const EditVideo = (props) => {
                 onFinish={(values)=> updateState(values)}
                 layout="vertical"
               >    
-                <Collapse accordion>
+                <Collapse accordion defaultActiveKey={ state.editVideo.playUrl !== null 
+                  && state.editVideo.playUrl !== undefined ?["4"]:["1"]} bordered={false}>
+                { state.editVideo.playUrl !== null 
+                  && state.editVideo.playUrl !== undefined ?
+                <Panel header="Play Video" key="4">
+                  <Row>  <Col span={18}>                   
+                     <PlayVideo   obj={state.editVideo}  /> 
+                </Col>    </Row> </Panel> : null }
                 <Panel header="General Info" key="1">
                 <Row><Col span={11}>
                 <Form.Item
@@ -259,12 +262,26 @@ const EditVideo = (props) => {
                       ? null : state.editVideo.title}/>
                 </Form.Item>                  
                 <Form.Item
+                  label="Who can see?"
+                  name={'scope'}
+                  className="editFormItem"
+                >
+                  <Select
+                    placeholder="Select Privacy"
+                  >
+                    <Option value="public">Public</Option>
+                    <Option value="private"> Private</Option>
+                    <Option value="teamonly"> Team</Option>
+                    <Option value="apponly"> App User</Option>
+                    <Option value="inactive"> Inactive</Option>
+                  </Select>
+                </Form.Item> 
+                {/*<Form.Item
                   label="Duration in secs"
                   name={'duration'}
                   className="editFormItem"
-                >
-                  <Input   />
-                </Form.Item></Col>
+                >    <Input   />
+                </Form.Item> */}</Col>
                 <Col span={1}></Col>
                 <Col span={11}>
                 <Form.Item
@@ -285,29 +302,14 @@ const EditVideo = (props) => {
                 </Form.Item> </Col>
                 <Col span={1}></Col>
                 <Col span={11}>
-                <Form.Item
+                {/*<Form.Item
                   label="Playlist Position"
                   name={'playlistindex'}
                   className="editFormItem"
                 >
                   <Input   />
-                </Form.Item>  </Col> </Row>
-                <Col span={11}>
-                <Form.Item
-                  label="Who can see?"
-                  name={'scope'}
-                  className="editFormItem"
-                >
-                  <Select
-                    placeholder="Select Privacy"
-                  >
-                    <Option value="public">Public</Option>
-                    <Option value="private"> Private</Option>
-                    <Option value="teamonly"> Team</Option>
-                    <Option value="apponly"> App User</Option>
-                    <Option value="inactive"> Inactive</Option>
-                  </Select>
-                </Form.Item>   </Col> 
+                </Form.Item>  */}</Col> </Row>
+                <Col span={11}>    </Col> 
                 </Panel>       
                 {/*<h3>    <strong>Privacy</strong>
                   <Switch     defaultChecked
@@ -363,7 +365,8 @@ const EditVideo = (props) => {
                         </div>
                         : null}</>
                   : null }</div>
-                </Col>: null}
+                </Col>: `Video you uploaded is in processsing , 
+                a autogenerated thumbnail will load hear as soon as processing is completed`}
                 </Row>
                 </Panel>
                 <Panel header={"Copy Actions"} key={3}>
@@ -418,6 +421,9 @@ const EditVideo = (props) => {
                 </Panel>
                 </Collapse>
                 <Form.Item>
+                  <><div style={{float:"left"}}>
+
+                  </div>
                   <div style={{ float: "right" }}>
                     <Button
                       type="primary"
@@ -450,7 +456,7 @@ const EditVideo = (props) => {
                     >
                       Replace Video <ReloadOutlined />
                     </Button>
-              </div>*/}
+              </div>*/}</>
                 </Form.Item>
 
                 <Form.Item></Form.Item>

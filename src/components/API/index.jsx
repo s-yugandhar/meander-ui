@@ -9,6 +9,9 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
 export const url = "https://meander.video";
 //export const url = "http://127.0.0.1:8002";
 
+
+export const cdn_url = "https://cdns.meander.video/";
+
 export const GetUserdetails= async (state,dispatch ,userId)=>{
    if (userId === undefined )
       return [];
@@ -128,7 +131,7 @@ export const deleteFile_Folder = async (state,dispatch, userId,objectName , recu
          accept: 'application/json',
       }
    }).then(res => {
-      notification.open({ message : "Delete action succesful" });
+      notification.open({ message : "Delete file in  cdn" });
       console.log(  "delete success" , res , objectName , recursive , userId);
       return "";   });
    /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
@@ -221,7 +224,7 @@ export const dbRemoveObj=async( state , dispatch ,path , recursive )=>{
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
    }).then(res => {
-      notification.open({ message : "objects removal from db succesful" });
+      notification.open({ message : "Removed metadata f" });
       //if(res.status === 200){
          console.log(  "delete video obj " , res );
      // dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});

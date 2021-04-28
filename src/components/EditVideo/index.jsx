@@ -8,7 +8,7 @@ import { PlayCircleOutlined ,ReloadOutlined,  DeleteOutlined,
   DownloadOutlined , ArrowRightOutlined } from "@ant-design/icons";
 import "./editVideo.scss";
 import axios from 'axios';
-import {dbUpdateObj , url} from '../API';
+import {dbUpdateObj , url , cdn_url } from '../API';
 import { Context } from '../../context';
 import PlayVideo from "../PlayVideo";
 import Logo from "../../assets/images/Meander_Logo.svg";
@@ -48,9 +48,9 @@ const EditVideo = (props) => {
         if( state.editVideo !== null && state.editVideo !== undefined){
         let tempdoc = ["img720", "img480", "img240"];
         let ipath = state.editVideo.itempath;
-        let cdn_url = "https://cdn.meander.video/" + ipath.split(".")[0];
-        let dash_cdn = "https://cdn.meander.video/dash/";
-        let hls_cdn = "https://cdn.meander.video/hls/";
+        let tempcdn_url = cdn_url + ipath.split(".")[0];
+        let dash_cdn = cdn_url+"dash/";
+        let hls_cdn = cdn_url+"hls/";
         let img1080 = "/thumbs/img1080/frame_0000.jpg";
         let mp34 = "/audio4.mp3";
         let mp4 = {  "1080p": "/mp41080k.mp4",      "720p": "/mp4720k.mp4",
@@ -59,9 +59,9 @@ const EditVideo = (props) => {
           "/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
         let hls_url =   hls_cdn +  ipath.split(".")[0] +
           "/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
-        let mp4_url = cdn_url + mp4["1080p"];
-        let mp3_url = cdn_url + "/audio4.mp3";
-        let img_url = cdn_url + img1080;
+        let mp4_url = tempcdn_url + mp4["1080p"];
+        let mp3_url = tempcdn_url + "/audio4.mp3";
+        let img_url = tempcdn_url + img1080;
         if (type == "mp3" && state.editVideo.itemtype.includes("audio"))
           return mp3_url;
         if (type == "mp4") return mp4_url;
@@ -100,7 +100,7 @@ const EditVideo = (props) => {
         if (e.key === "play") code = getPlayUrl(state, dispatch, url, props);
         if (navigator.clipboard) {
           navigator.clipboard.writeText(code);
-          message.success(`Code Copied is: ${code}`);
+          message.success(`Code Copied `);
         } else {
           alert(`Sorry your browser does not support, please copy here: ${code}`);
         }
@@ -356,11 +356,11 @@ const EditVideo = (props) => {
                         <video className="video" controls key={quality} 
                         poster={getMp4Url(state,"img")?getMp4Url(state,"img"):Logo} 
                         style={{height:'240px',width:'360px'}}>
-                       <source label={quality} id={quality} src={ "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]} 
+                       <source label={quality} id={quality} src={ cdn_url +editV.itempath.split(".")[0] +mp4[quality]} 
                           type="video/mp4"/>        </video> :
                           <audio className="video" controls key={'keyaudio'} poster={Logo}>
                             <source label={"a4"} id={"a4"} 
-                             src={"https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"} />
+                             src={cdn_url +editV.itempath.split(".")[0] +"/audio4.mp3"} />
                             </audio> }
                         </div>
                         : null}</>
@@ -395,7 +395,7 @@ const EditVideo = (props) => {
                   style={{ float: "right" }}
                   shape="round"
                   htmlType={"a"}
-                  href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +mp4[quality]}
+                  href={  cdn_url+editV.itempath.split(".")[0] +mp4[quality]}
                   target={"_blank"}
                   download={ editV.name.split(".")[0] + mp4[quality] }
                   //onClick={(e)=>{;}}
@@ -409,7 +409,7 @@ const EditVideo = (props) => {
                 style={{ float: "right" }}
                 shape="round"
                 htmlType={"a"}
-                href={  "https://meander.ibee.ai/"+editV.itempath.split(".")[0] +"/audio4.mp3"}
+                href={  cdn_url+editV.itempath.split(".")[0] +"/audio4.mp3"}
                 target={"_blank"}
                 download={ editV.name}
                 //onClick={(e)=>{;}}

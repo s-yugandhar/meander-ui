@@ -51,11 +51,11 @@ const FolderCard = (props) => {
                </div>
             </Button>
          </div>
-         <Dropdown overlay={menu} trigger={['click']}>
+         {/*<Dropdown overlay={menu} trigger={['click']}>
             <Button type="link" className="ant-dropdown-link floatingFolderOptions" onClick={e => e.preventDefault()}>
                <EllipsisOutlined className="folderDropDownIcon" />
             </Button>
-         </Dropdown>
+         </Dropdown>*/}
          {/* <Button type="link" className="floatingFolderOptions"><EllipsisOutlined className="folderDropDownIcon" /></Button> */}
 
       </Card>

@@ -23,7 +23,7 @@ import {
 import {
   dbGetObjByPath,
   GetFolders,
-  url,
+  url,cdn_url,
   GetFiles,
   CreateNewFolder,
 } from "../API/index";
@@ -40,9 +40,9 @@ const VideoCard = (props) => {
   function getMp4Url(props, type) {
     let tempdoc = ["img720", "img480", "img240"];
     let ipath = props.fileObject.itempath;
-    let cdn_url = "https://cdn.meander.video/" + ipath.split(".")[0];
-    let dash_cdn = "https://cdn.meander.video/dash/";
-    let hls_cdn = "https://cdn.meander.video/hls/";
+    let tempcdn_url = cdn_url + ipath.split(".")[0];
+    let dash_cdn = cdn_url+"dash/";
+    let hls_cdn = cdn_url +"hls/";
     let img1080 = "/thumbs/img1080/frame_0000.jpg";
     let mp34 = "/audio4.mp3";
     let mp4 = {
@@ -51,17 +51,13 @@ const VideoCard = (props) => {
       "480p": "/mp4480k.mp4",
       "240p": "/mp4240k.mp4",
     };
-    let dash_url =
-      dash_cdn +
-      ipath.split(".")[0] +
+    let dash_url =      dash_cdn + ipath.split(".")[0] +
       "/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
-    let hls_url =
-      hls_cdn +
-      ipath.split(".")[0] +
+    let hls_url =   hls_cdn +   ipath.split(".")[0] +
       "/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
-    let mp4_url = cdn_url + mp4["1080p"];
-    let mp3_url = cdn_url + "/audio4.mp3";
-    let img_url = cdn_url + img1080;
+    let mp4_url = tempcdn_url + mp4["1080p"];
+    let mp3_url = tempcdn_url + "/audio4.mp3";
+    let img_url = tempcdn_url + img1080;
     if (type == "mp3" && props.fileObject.itemtype.includes("audio"))
       return mp3_url;
     if (type == "mp4") return mp4_url;
@@ -138,22 +134,12 @@ const VideoCard = (props) => {
     let code = getPlayUrl(state, dispatch, url, props);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code);
-      message.success(`Code Copied is: ${code}`);
+      message.success(`Code Copied `);
     } else {
       alert(`Sorry your browser does not support, please copy here: ${code}`);
     }
   };
-
-  const copyEmbedCode = (state, dipatch, obj) => {
-    let code = embedCodeFunc(state, dispatch, obj);
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(code);
-      message.success(`Code Copied is: ${code}`);
-    } else {
-      alert(`Sorry your browser does not support, please copy here: ${code}`);
-    }
-  };
-
+  
   const handleMenuClick = (e) => {
     let code = null;
     if (e.key === "iframe")
@@ -169,7 +155,7 @@ const VideoCard = (props) => {
     if (e.key === "play") code = getPlayUrl(state, dispatch, url, props);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code);
-      message.success(`Code Copied is: ${code}`);
+      message.success(`Code Copied `);
     } else {
       alert(`Sorry your browser does not support, please copy here: ${code}`);
     }

@@ -9,12 +9,10 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
 export const url = "https://meander.video";
 //export const url = "http://127.0.0.1:8002";
 
-
 export const cdn_url = "https://cdns.meander.video/";
 
 export const GetUserdetails= async (state,dispatch ,userId)=>{
-   if (userId === undefined )
-      return [];
+   if (userId === undefined )   return [];
        //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
    const tempFolders = await axios.get(url + `/users/${userId}`, {
       headers: {
@@ -28,10 +26,8 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
    return tempFolders;
 }
 
-
 export const GetFolders= async (state,dispatch ,userId)=>{
-   if (userId === undefined )
-      return [];
+   if (userId === undefined )   return [];
    let setfolders = new Set();
    //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
    const tempFolders = await axios.post(url + '/list_objects?id=' + userId + '&recursive=true', null, {

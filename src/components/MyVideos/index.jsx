@@ -28,6 +28,7 @@ import {
   DeleteOutlined,
   LinkOutlined,
   PlusOutlined,
+  SortAscendingOutlined,SortDescendingOutlined
 } from "@ant-design/icons";
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
@@ -60,6 +61,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [tableCols, setTableCols] = useState([]);
   const [filterType,setFilterType] = useState("all");
   const { state, dispatch } = useContext(Context);
+  const [sortState, setSortState] =  useState(null);
   const { Column } = Table;
 
   let initialAnimate;
@@ -168,6 +170,26 @@ useEffect(()=>{
     console.log('State - ', state.videoList);
  }, []);
 
+
+ const sortvideoList=()=>{
+  console.log(sortState);
+  if(sortState === null ) return;
+  let temp = []
+  if( sortState === "asc")
+  temp = state.videoList.sort((a,b)=> Number(a.updatetime) - Number(b.updatetime) );
+  if( sortState === "desc")
+  temp = state.videoList.sort((a,b)=> Number(b.updatetime) - Number(a.updatetime) );
+  dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
+ }
+
+const triggerSearch=(value)=>{
+  let key = value.target.value;
+let temp= [];
+temp = state.videoList.sort((a,b)=> {return a.title.includes( key)?-1 : b.title.includes(key) ? 1 : 0 });
+dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
+
+};
+
   return (
     <>
       <Layout className="main">
@@ -200,7 +222,7 @@ useEffect(()=>{
               </h2>
             </Col>
 
-            <Col span={6} style={{ paddingRight: "15px" }}>
+            <Col span={3} style={{ paddingRight: "15px" }}>
               {/* <Row justify="end">
               <Button
                 type="primary"
@@ -210,14 +232,23 @@ useEffect(()=>{
                 Add New
               </Button>
             </Row> */}
+            <Row justify="end">
+              <Button
+                type="primary"
+                icon={sortState === "asc"? <SortAscendingOutlined /> :sortState === "desc"? <SortDescendingOutlined /> : null}
+                //onClick={() => updateTab("add-video")}
+                onClick={()=> {setSortState( sortState === null? "asc":sortState === "asc"? "desc" : "asc" );sortvideoList()}}
+              > sort
+              </Button>
+            </Row>
             </Col>
 
-            <Col span={3}>
-              <Search
-                placeholder="Enter keyword..."
+            <Col span={6}>
+              <Input
+                placeholder="Search Title..."
                 allowClear
-                onSearch=""
-                enterButton
+                onChange={(e)=>triggerSearch(e)}
+                //enterButton
               />
             </Col>
           </Row>

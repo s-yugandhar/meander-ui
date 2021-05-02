@@ -21,6 +21,7 @@ import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  , url}  from '../
 import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
+import ShareAccess from "../ShareAccess";
 import Logo from "../../assets/images/Meander_Logo.svg";
 import Settings from '../Settings';
 import ResellerReports from '../Reseller-Reports'
@@ -135,6 +136,7 @@ const AdminModule = (props) => {
     "edit-video": <EditVideo />,
     "manage-videos": <ManageVideos />,
     "manage-users": <ManageUsers />,
+    "share-access" : <ShareAccess/>,
     "reseller-settings": <Settings />,
     "reseller-reports": <ResellerReports />,
   };

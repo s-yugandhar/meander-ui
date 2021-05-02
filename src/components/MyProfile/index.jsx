@@ -5,8 +5,8 @@ import {
 import {Context} from '../../context';
 import {USER_OBJ} from '../../reducer/types';
 import { GetUserdetails } from '../API/index';
-import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
+import Friends from "../Friends";
 
 
 const MyProfile = () => {
@@ -45,6 +45,7 @@ const MyProfile = () => {
         {/*<Row> {JSON.stringify(state.userObj)}</Row>
         <ManageVideos></ManageVideos>
          <ManageUsers></ManageUsers>*/}
+         <Friends/>
        </Content>
      </Layout>
    );

@@ -13,3 +13,5 @@ export const VIDEO_LIST = "VIDEO_LIST";
 export const EDIT_VIDEO = "EDIT_VIDEO" ;
 export const USER_OBJ = "USER_OBJ";
 export const FILTER_TYPE = "FILTER_TYPE";
+export const ACCESS_IN = "ACCESS_IN";
+export const ACCESS_OUT = "ACCESS_OUT";

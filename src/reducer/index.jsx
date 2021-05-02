@@ -13,7 +13,9 @@ import {
    VIDEO_LIST ,
    EDIT_VIDEO,
    USER_OBJ,
-   FILTER_TYPE
+   FILTER_TYPE,
+   ACCESS_IN,
+   ACCESS_OUT
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -35,7 +37,9 @@ export const initialState = {
    uppyBatchId : null ,
    videoList : [],
    editVideo : null ,
-   filterType : "all"
+   filterType : "all",
+   accessIn : [] ,
+   accessOut : []
 }
 
 export const reducer = (state = initialState, action) => {
@@ -113,6 +117,12 @@ export const reducer = (state = initialState, action) => {
       
       case FILTER_TYPE :
          return { ...state , filterType : action.payload.filterType}
+      
+      case ACCESS_IN :
+         return { ...state , accessIn : action.payload.accessIn }
+      
+      case ACCESS_OUT :
+         return { ...state , accessOut : action.payload.accessOut }
 
       default:
          return state;

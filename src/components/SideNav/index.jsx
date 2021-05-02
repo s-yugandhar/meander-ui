@@ -120,7 +120,6 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               Reports
             </Menu.Item>*/}
           </SubMenu> : "" }
-
           <SubMenu key="my-videos-submenu" title="Products">
             <Menu.Item
               key="dashboard"
@@ -146,7 +145,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 Create Folder
               </Button>
             </Menu.Item>
-            {state.folderList !== undefined && state.folderList.length > 0
+              {state.folderList !== undefined && state.folderList.length > 0
               ? state.folderList.map((folder, index) => {
                   return (
                     <Menu.Item
@@ -159,6 +158,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                   );
                 })
               : null}
+      
             <Menu.Item
               disabled={true}
               className="createFolderMenuItem"
@@ -174,8 +174,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 size="middle"
                 onClick={() => openUploadVideo(true)}
                 className="createFolderBtn"
-              >
-                Upload Video
+              >       Upload Video
               </Button>
             </Menu.Item>
             {/* <Menu.Item key="" onClick={() => openUploadVideo(true)}>
@@ -192,14 +191,17 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             {state.userObj !== null &&
             state.userObj !== undefined &&
             (state.userObj.roles === "reseller" ||
-              state.userObj.roles === "super_admin") ? (
+              state.userObj.roles === "super_admin" || state.userObj.roles === "admin") ? (
               <>
                 <Divider className="my-05" />
-                {/* <Menu.Item key="subdets">Subscription Details</Menu.Item>
+                {<Menu.Item key="listu" onClick={() => loadPage("share-access")}>
+                    Invite Users
+                 </Menu.Item>
+                
+                /* <Menu.Item key="subdets">Subscription Details</Menu.Item>
                  <Menu.Item key="updowmgrade">Upgrade / Downgrade</Menu.Item> */}
               </>
             ) : null}
-
             {/* {state.userObj !== null &&
             state.userObj !== undefined &&
             (state.userObj.roles === "reseller" ||

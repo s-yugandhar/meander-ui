@@ -17,7 +17,8 @@ import MyProfile from "../MyProfile";
 import Login from "../../Login";
 import Loading from "../Loading";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED,PAGE } from "../../reducer/types";
-import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  , url}  from '../API'
+import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  ,
+ GetUserdetails , url}  from '../API'
 import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
@@ -42,6 +43,8 @@ const AdminModule = (props) => {
   const { state, dispatch } = useContext(Context);
 
   const localUserId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+  
 
   function updateFiles(id , folderName){
       ;
@@ -60,8 +63,10 @@ const AdminModule = (props) => {
         var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
         return file.size < 5 * 1024 * 1024 ? 5 * 1024 * 1024 : Math.ceil(file.size / (chunks - 1));
       }
-    }).on('complete', result => {
-      console.log(result , "inside uppy complete event")
+    }) });
+
+    const  completeEvent = (result) =>{
+      console.log(result , "inside uppy complete event");
       let succes = result.successful;      let failed = result.failed;
       let batchId = result.uploadID;      let insertObj = [];
       succes.map((obj,ind)=>{
@@ -79,18 +84,23 @@ const AdminModule = (props) => {
       dispatch({ type: UPPY_FAILED,  payload: { uppyFailed: failed  }   });
       dispatch({ type: UPPY_BATCHID,  payload: { uppyBatchId: batchId  }   });
       if (insertObj.length > 0){ 
-        closeUploadVideo(); 
         setLoading(true);
-        dbAddObj(state , dispatch , insertObj );
-        setStateEdit(insertObj[0].itempath);         
+        if(stateEdit === false){
+        dbAddObj(state , dispatch ,insertObj );
+        setStateEdit(insertObj[0].itempath);  }
       }
-    })
-  });
-  
+    };
+
+  useEffect(()=>{
+    uppy.on('complete', result => { completeEvent(result) });
+    return () =>  uppy.off('complete');
+  },[uppy])
+    
   useEffect(()=>{
     if( stateEdit !== false){
       setStateEdit(false);
       setLoading(false);
+      closeUploadVideo(); 
     dispatch({ type: 'PAGE',  payload: { page : "edit-video"   }  });  }
   },[state.editVideo])
 
@@ -119,10 +129,14 @@ const AdminModule = (props) => {
 
   const userMenu = (
     <Menu>
+      {state.archiveAccount !== null ?
+        <Menu.Item onClick={()=> switchToSelf(state,dispatch)}>
+        Switch To Own Account
+      </Menu.Item> :
       <Menu.Item onClick={() => { setSelectedTab('my-profile') ;
       dispatch({ type: PAGE, payload: { page: 'my-profile' } }); }}>
         My Profile
-      </Menu.Item>
+      </Menu.Item>}
       <Menu.Item onClick={(e)=>logout()}>
         Logout
       </Menu.Item>
@@ -164,11 +178,16 @@ const AdminModule = (props) => {
       uppy.setMeta( { userId: state.userId, foldername: state.folderName === "" ? "default" : state.folderName });
   }, [ state.folderName ,localUserId ]);
 
-  /* const content = {
-    "my-videos": <MyVideos />,
-    "add-video": <AddVideo />,
-    "my-profile": <MyProfile />,
-  }; */
+  const switchToSelf = (state,dispatch)=>{
+    if(state.archiveAccount !== null){
+      localStorage.setItem("userId",state.archiveAccount.userId);
+      localStorage.setItem("token",state.archiveAccount.token);
+      localStorage.setItem("archive",null);
+      dispatch({type:"ARCHIVE_ACCOUNT", payload : {archiveAccount :null }});
+      dispatch({type:"LOGIN_SUCCESS", payload:{  token:state.archiveAccount.token,userId : state.archiveAccount.userId,page:"my-videos" } });
+      GetUserdetails(state,dispatch, state.userId);
+    }
+  }
 
   return (
     <>
@@ -198,7 +217,9 @@ const AdminModule = (props) => {
                           icon={<UserOutlined />}
                           style={{ marginRight: "5px" }}
                         />{" "}
-                        {state.userObj !== undefined && state.userObj !== null
+                        {
+                        state.archiveAccount !== null ? "Shared Account":
+                        state.userObj !== undefined && state.userObj !== null
                           ? state.userObj.username
                           : "My Account"}
                         <DownOutlined />

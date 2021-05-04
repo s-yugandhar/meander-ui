@@ -15,14 +15,17 @@ import {
    USER_OBJ,
    FILTER_TYPE,
    ACCESS_IN,
-   ACCESS_OUT
+   ACCESS_OUT,
+   ARCHIVE_ACCOUNT
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
 const localToken = localStorage.getItem('token');
 const localUserName = localStorage.getItem('userName');
+const archive = JSON.parse(localStorage.getItem('archive'));
 
 export const initialState = {
+   archiveAccount : archive,
    token: localToken ? localToken : null,
    userId: localUserId ? localUserId : null,
    userName: localUserName ? localUserName : null,
@@ -123,6 +126,9 @@ export const reducer = (state = initialState, action) => {
       
       case ACCESS_OUT :
          return { ...state , accessOut : action.payload.accessOut }
+
+      case ARCHIVE_ACCOUNT : 
+      return { ...state , archiveAccount : action.payload.archiveAccount }
 
       default:
          return state;

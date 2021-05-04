@@ -159,7 +159,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 })
               : null}
       
-            <Menu.Item
+            {state.userId !== null ?<Menu.Item
               disabled={true}
               className="createFolderMenuItem"
               key="add-videos"
@@ -176,7 +176,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 className="createFolderBtn"
               >       Upload Video
               </Button>
-            </Menu.Item>
+            </Menu.Item> : null }
             {/* <Menu.Item key="" onClick={() => openUploadVideo(true)}>
               Add Video
             </Menu.Item> */}

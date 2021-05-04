@@ -65,7 +65,7 @@ const Login = (props) => {
       });
   };
 
-  const loginNow = (values) => {
+  const loginNow = async (values) => {
 
     console.log('Login Values - ', values);
 
@@ -73,21 +73,11 @@ const Login = (props) => {
       email: values.loginEmail,
       password: values.loginPassword,
     });
-    axios
-      .post(url + "/token", loginBody, loginHeaders)
+    let  resp = await axios.post(url + "/token", loginBody, loginHeaders)
       .then((loginRes) => {
         console.log('Login Res - ', loginRes);
         // props.onSubmit({ token: loginRes.data.access_token, userId: loginRes.data.id });
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: {
-            token: loginRes.data.access_token ? loginRes.data.access_token : null,
-            userId: loginRes.data.id ? loginRes.data.id : null,
-            page: 'my-videos'
-          }
-        });
-        dispatch({type:"FOLDER_NAME",payload:{ folderName : "" }});
-
+        return loginRes;
       })
       .catch((err) => {
         console.log("Login Error - ", err);
@@ -97,6 +87,18 @@ const Login = (props) => {
           setCommonError("");
         }, 5000);
       });
+
+      if(resp.status === 200){
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: {
+            token: resp.data.access_token ? resp.data.access_token : null,
+            userId: resp.data.id ? resp.data.id : null,
+            page: 'my-videos'
+          }
+        });
+        dispatch({type:"FOLDER_NAME",payload:{ folderName : "" }});
+      }
   }
 
   useEffect(() => {

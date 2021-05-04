@@ -6,8 +6,8 @@ import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
 import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
-export const url = "https://meander.video";
-//export const url = "http://127.0.0.1:8002";
+//export const url = "https://meander.video";
+export const url = "http://127.0.0.1:8002";
 
 export const cdn_url = "https://cdns.meander.video/";
 
@@ -54,7 +54,7 @@ export async function GetFiles(state,dispatch,userId, folderName) {
    if (folderName === '') return [];
    const getFiles = await axios.post(url + '/list_objects?id=' + userId + '&recursive=false&foldername=' + folderName, null, {
       headers: {
-         accept: 'application/json', //Authorization : "bearer "+state.token,
+         accept: 'application/json', Authorization : "bearer "+state.token,
       }
    }).then(res => {
       dispatch({type:VIDEO_LIST , payload : { videoList : res.data.dblist }});

@@ -1,3 +1,4 @@
+export const ARCHIVE_ACCOUNT = "ARCHIVE_ACCOUNT";
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
 export const PAGE = "PAGE";

@@ -166,20 +166,12 @@ const setwriteRecord=(values)=>{
   ];
 
   return (
-    <Layout className="main">
-      <Content
-        className="site-layout-background"
-        style={{
-          padding: 12,
-          margin: 0,
-          minHeight: "100vh",
-        }}
-      >
+      <>
         <Row align="middle">
-        <Col span={12}><h2 className="page-title">
-            {" Following poeple can see your videos -  "}
+        <Col span={12}><h4 >
+            {" Following people can see your videos -  "}
               { state.accessOut.length}
-            </h2></Col>
+            </h4></Col>
 
             <Col span={6}>
             <Input type="search"  value={srch} 
@@ -301,8 +293,7 @@ const setwriteRecord=(values)=>{
         </Form>
           </Modal>  : null }
         </Row>
-      </Content>
-    </Layout>
+      </>
   );
 };
 

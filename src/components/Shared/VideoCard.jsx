@@ -1,11 +1,11 @@
-import React, { useContext, useState } from "react";
-import { Menu, Card, Button, message, Dropdown, Tooltip } from "antd";
+import React, { useContext, useState ,lazy ,Suspense} from "react";
+import { Menu, Card, Button, message, Dropdown, Tooltip,Image } from "antd";
 import {
   SwapOutlined,
   EditOutlined,
   DeleteOutlined,
   LinkOutlined,
-  PlayCircleFilled,
+  PlayCircleOutlined,
   VideoCameraOutlined,
   AudioOutlined,
   FileTextOutlined,
@@ -30,6 +30,7 @@ import {
 import { Context } from "../../context";
 import "../../assets/styles/videoCard.scss";
 import mp3img from "../../assets/mp3img.png";
+import logo from "../../assets/images/meander-1920x1080.png"
 import { icons } from "antd/lib/image/PreviewGroup";
 
 const VideoCard = (props) => {
@@ -185,6 +186,7 @@ const VideoCard = (props) => {
     </Menu>
   );
 
+  
   return (
     <Card
       bordered={true}
@@ -201,7 +203,9 @@ const VideoCard = (props) => {
       headStyle={{ height: "25%" }}
       bodyStyle={{ height: "55%" }}
       actions={[
-        <Tooltip title="Delete">
+        state.userObj !== undefined && state.userObj !== null && 
+        state.userObj.roles !== "user" &&   state.userObj.roles !== "viewer"
+          ?  <Tooltip title="Delete">
           <DeleteOutlined
             key="delete"
             title={"click to delete object"}
@@ -209,14 +213,16 @@ const VideoCard = (props) => {
               deleteFile(state, dispatch, props.userId, props.fileObject)
             }
           />
-        </Tooltip>,
-        <Tooltip title="Edit">
+        </Tooltip> : null,
+         state.userObj !== undefined &&
+         state.userObj !== null && state.userObj.roles !== "viewer"
+          ?<Tooltip title="Edit">
           <EditOutlined
             key="edit"
             title={"Click to edit metadata"}
             onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
           />
-        </Tooltip>,
+        </Tooltip> : null,
         <Dropdown
           overlay={
             props.fileObject.itemtype.includes("audio") ? menuaudio : menuvideo
@@ -239,37 +245,29 @@ const VideoCard = (props) => {
       ]}
       className="cardVideo"
     >
-      <div className="videoCardBlock">
+      <div className="videoCardBlock" id={props.fileObject.id}>
         {/*<div className="videoDuration">10:00</div>
         //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }}
         href={getPlayUrl(state, dispatch, url, props)}
         */}
         <div className="videoBlock">
+          
+          {/*<VideoCameraOutlined className="videoIconLoading" />*/}
+          { document.getElementById(props.fileObject.id)  ?
+          <img alt="Thumbnail" 
+           src={   
+            props.fileObject.itemtype.includes("audio")
+            ? mp3img  : getMp4Url(props, "img")
+           }
+             /> : <img src={logo} alt=""/>}
           <Button
             className="playBtn"
             type="button"
             onClick={(e) => editVideoFunc(state, dispatch, props, url, true)}
           >
-            <PlayCircleFilled width={40} height={40} />
+            <PlayCircleOutlined  />
           </Button>
 
-          <VideoCameraOutlined className="videoIconLoading" />
-          {/* <FileTextOutlined className="videoIconLoading" /> */}
-          <img
-            alt="Thumbnail"
-            src={
-              props.fileObject.itemtype.includes("audio")
-                ? mp3img
-                : getMp4Url(props, "img")
-            }
-          />
-
-          {/*  <video
-              id = {props.fileObject.itempath}
-              src={getMp4Url(props,"mp4")}
-              controls
-              className="videoInfoImageBlock"
-            ></video>*/}
         </div>
         {/*<div className="videoCardInfoBlock" style={{  }}>ss
           <div className="videoTitle">{ props.videoTitle}</div>

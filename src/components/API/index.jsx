@@ -6,10 +6,33 @@ import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
 import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 
-export const url = "https://meander.video";
-//export const url = "http://127.0.0.1:8002";
+//export const url = "https://meander.video";
+export const url = "http://127.0.0.1:8002";
 
 export const cdn_url = "https://cdns.meander.video/";
+
+const getParentAssingnedRole = async (child_id) => {
+   const arcAcc = JSON.parse(localStorage.getItem("archive"));
+   if (arcAcc === null)  return "viewer";
+   const token = arcAcc === null ? null : arcAcc.token ;
+   const userId = arcAcc === null ? null : arcAcc.userId ;
+   const tempFolders = await axios.get(url + `/users/${userId}`, {
+      headers: {
+         accept: 'application/json', Authorization : "bearer "+token,
+            }
+   }).then(res => {
+      console.log(res);
+      return res.data;   });
+   if(  tempFolders !== undefined && tempFolders !== null && 
+      tempFolders.access !== undefined && tempFolders.access !== null   ){
+         if( tempFolders.access.admin.includes(child_id))
+            return "admin";
+         if( tempFolders.access.user.includes(child_id))
+            return "user";
+         if( ["reseller","super_admin"].includes(tempFolders.roles))
+            return "admin";
+      }   return "viewer";
+}
 
 export const GetUserdetails= async (state,dispatch ,userId)=>{
    if (userId === undefined )   return [];
@@ -20,9 +43,13 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
             }
    }).then(res => {
       console.log(res);
-      return res.data;   })
+      return res.data;   });
    console.log(" userdata in get ", tempFolders);
-   dispatch({  type : USER_OBJ , payload : { userObj : tempFolders}});
+   if(state.archiveAccount !== null){
+      let shroles  = await getParentAssingnedRole(tempFolders.id);
+      tempFolders.roles = shroles;
+   }
+      dispatch({type:"USER_OBJ",payload:{userObj : tempFolders}});
    return tempFolders;
 }
 

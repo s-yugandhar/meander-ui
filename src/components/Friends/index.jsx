@@ -144,10 +144,8 @@ const switchToSelf = (state,dispatch)=>{
         key: "id",
         render :(e,record)=>(
            state.archiveAccount === null ?
-          <Button  onClick={e => toggleToUser(state,dispatch,record)}>Switch to profile</Button> : 
-          state.archiveAccount !== null && state.archiveAccount.userId === record.id?
-          <Button  onClick={e => switchToSelf(state,dispatch) }>Show My Account</Button>:
-          <Button  onClick={e => toggleToUser(state,dispatch,record)}>Switch to profile</Button>
+          <Button  onClick={e => toggleToUser(state,dispatch,record)}>Switch to profile</Button> : null
+          
         )
      }
   ];

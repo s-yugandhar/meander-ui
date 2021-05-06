@@ -8,6 +8,7 @@ import { GetUserdetails } from '../API/index';
 import ManageUsers from "../ManageUsers";
 import Friends from "../Friends";
 import Settings from  "../Settings";
+import ShareAccess from "../ShareAccess";
 
 
 const MyProfile = () => {
@@ -25,12 +26,13 @@ const MyProfile = () => {
 
     if( state.userId !== null && state.userId !== undefined)
     GetUserdetails(state,dispatch,state.userId);
-   },[state.userId]);
+   },[]);
 
    const tabListNoTitle = [
-    {    key: 'general',   tab: 'general',  },
-    {    key: 'friends',   tab: 'friends',  },
-    {     key: 'settings',    tab: 'settings',   },
+    {    key: 'general',   tab: 'General',  },
+    {    key: 'friends',   tab: 'Shared Profiles',  },
+    {    key: 'inviteusers',   tab: 'Share Profile',  },
+    {     key: 'settings',    tab: 'Settings',   },
     {    key: 'project',   tab: 'project'  },
   ];
 
@@ -40,6 +42,7 @@ const MyProfile = () => {
  <Row> Welcome {state.userObj.username} - your Role is {state.userObj.roles}</Row> : null }</>,
     friends:  <Friends/>,
     settings: <Settings/> ,
+    inviteusers : <ShareAccess/>,
     project: <p>To Do</p>,
   };
 

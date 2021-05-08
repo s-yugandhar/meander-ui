@@ -41,13 +41,16 @@ const Friends = () => {
  
 useEffect(()=>{
   let sh = [];  let ob = state.userObj;
+  if( ob !== null && ob !== undefined && ob.access !== null){
     let prems = [ ...ob.access.viewer , ...ob.access.user , ...ob.access.admin ];
     prems.map( (ob )=>{
         let dex =  state.accessIn.find( e=> e.id == ob);
         if(dex !== undefined) sh.push(dex)
     }); 
-    dispatch({type:"ACCESS_IN",payload:{ accessIn : sh }});
     GetSharedUsersdetails(state,dispatch,state.userId);
+  }
+    dispatch({type:"ACCESS_IN",payload:{ accessIn : sh }});
+    
 },[state.userObj])
 
 const toggleToUser = async( state , dispatch , record)=>{
@@ -91,7 +94,8 @@ const switchToSelf = (state,dispatch)=>{
 
  let tableData = [];
 
-  if ( state.accessIn !== undefined &&  state.accessIn.length > 0) {
+  if ( state.accessIn !== null && state.accessIn !== undefined &&  
+    state.accessIn.length > 0) {
     state.accessIn.map((itm, ind) => {
       tableData.push({
         key: ind,    pos : ind+1,    id: itm.id,

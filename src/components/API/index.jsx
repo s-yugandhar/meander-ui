@@ -8,7 +8,6 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
 
 export const url = "https://meander.video";
 //export const url = "http://127.0.0.1:8002";
-
 export const cdn_url = "https://cdns.meander.video/";
 
 const getParentAssingnedRole = async (child_id) => {

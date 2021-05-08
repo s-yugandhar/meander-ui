@@ -2,28 +2,17 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import {
-  Layout,
-  Menu,
-  Row,
-  Col,
-  Divider,
-  Input,
-  Select,
-  Typography,
-  Empty,
-  Modal,
-  Form,
-  Button,
-  message,
-  Card,
-  notification,
-  Table,
-  Tag,
-  Space,
-  Switch,
+  Layout, Menu,  Row,
+  Col,  Divider,  Input,
+  Select,  Typography,  Empty,
+  Modal,  Form,  Button,
+  message,  Card,  notification,
+  Table,  Tag,  Space,  Switch,Tooltip
 } from "antd";
 
 import {
+  InfoCircleOutlined,
+  FolderOutlined,
   EditOutlined,
   DeleteOutlined,
   LinkOutlined,
@@ -38,8 +27,8 @@ import {
   FOLDER_NAME,
 } from "../../reducer/types";
 import {
-  url, GetFolders,
-  GetFiles,  GetUserdetails,
+  url, GetFolders,dbGetObjByPath,
+  GetFiles,  GetUserdetails,CreateNewFolder
 } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
@@ -60,6 +49,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [embedCode, setEmbedCode] = useState(null);
   const [tableCols, setTableCols] = useState([]);
   const [filterType,setFilterType] = useState("all");
+  const [folderSubmitBtn, setFolderSubmitBtn] = useState(false);
+  const [cModal, setCModal] = useState(false);
   const { state, dispatch } = useContext(Context);
   const [sortState, setSortState] =  useState(null);
   const { Column } = Table;
@@ -97,6 +88,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const innerFolder = (folderName) => {
     setLoading(true);
+    if (folderName === "All"){
+      GetFolders(state, dispatch, state.userId);
+    return ;   }
+    if (folderName === "") folderName ="default" ;
     GetFiles(state, dispatch, state.userId, folderName)
       .then((res) => {
         console.log("My Videos Files res - ", res);
@@ -143,6 +138,21 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     }
   };
 
+  const showCreateFolder = () => {
+    setCModal(true);
+  };
+
+  const createFolderModalClose = () => {
+    setCModal(false);
+  };
+
+  const callCreateFolder = (values) => {
+    console.log(state);
+    CreateNewFolder(state, dispatch, state.userId, values.folderName);
+    createFolderModalClose();
+  };
+
+
 
 useEffect(()=>{
   let filterType = state.filterType;
@@ -187,8 +197,20 @@ const triggerSearch=(value)=>{
 let temp= [];
 temp = state.videoList.sort((a,b)=> {return a.title.includes( key)?-1 : b.title.includes(key) ? 1 : 0 });
 dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
-
 };
+
+const folderDetail = (folderName) => {
+  dispatch({ type: 'PAGE', payload: { page: "my-videos" } });
+  dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
+  dbGetObjByPath(
+    state,    dispatch,    "bucket-" + state.userId + "/" + folderName,   true
+  );
+  GetFiles(state, dispatch, state.userId, folderName).then((res) => {
+    console.log("My Videos Files in sidenav - ", res);
+    dispatch({ type: FILE_LIST, payload: { fileList: res } });
+  });
+};
+
 
   return (
     <>
@@ -202,39 +224,67 @@ dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
           }}
         >
           <Row align="middle">
-          <Col span={3}>
+          <Col span={4}>
+            <Tooltip title={"Select folder to see folder wise Videos"}>
               <Select
-                placeholder="Enter keyword..."
-                value={ state.filterType}
-                  onChange={(value) => dispatch({type:"FILTER_TYPE",payload:{ filterType : value }}) }
-              >
-                <Option key="all" value="all"> Show All</Option>
-                <Option key="folder" value="folder"> Folders only</Option>
-                <Option key="video" value="video"> Videos only</Option>
-                <Option key="audio" value="audio"> Audio only</Option>
-              </Select>
+                  size="medium"
+                  style={{ width: "100%" }}
+                  placeholder="search folder"
+                  optionFilterProp="children"
+                  value={ state.folderName === "" ? "default" : state.folderName}
+                  onChange={(value) =>
+                   { dispatch({   type: FOLDER_NAME,
+                      payload: { folderName: value },
+                    }); innerFolder(value); }
+                  }
+                >
+                  { state.folderList !== undefined && state.folderList !== null
+                    ? state.folderList.map((obj, ind) => {
+                   return   <Option   key={obj}  value={obj}
+                          >  {" "}   {obj}{" "}    </Option>
+                      })
+                    : null}
+                </Select></Tooltip>
             </Col>
-            <Col span={12}>
-              <h2 className="page-title">
-                { state.folderName === "" && state.videoList !== undefined ?  "  All Items  "
-                :  `Objects in ${state.folderName} folder 
-                is ${state.videoList === undefined || state.videoList === null ? 0 : state.videoList.length}`  }
-              </h2>
+            <Col span={2}>
+              <h4 >
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    {  state.videoList === undefined || state.videoList === null ? 0 : state.videoList.length  }
+              </h4>
             </Col>
-
-            <Col span={3} style={{ paddingRight: "15px" }}>
-              {/* <Row justify="end">
-              <Button
+            <Col span={8}></Col>
+            <Col span={2}>
+            <Tooltip title={"Create new folder to upload video"}><Button
+                key={"xcvz"}
                 type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => updateTab("add-video")}
+                //icon={<FolderAddOutlined className="createFolderBtnIcon" />}
+                shape="round"
+                size="medium"
+                onClick={showCreateFolder}
+                className="createFolderBtn"
               >
-                Add New
-              </Button>
-            </Row> */}
+                {" + "}
+                 Folder
+              </Button></Tooltip>
+            </Col>
+            <Col span={2}>
+            <Tooltip title={"Click to upload video"}>
+            <Button
+                key={"xcvz"}
+                type="primary"
+                //icon={<VideoCameraAddOutlined className="createFolderBtnIcon" /> }
+                shape="round"
+                size="medium"
+                onClick={() => openUploadVideo(true)}
+                className="createFolderBtn"
+              >Upload</Button></Tooltip>
+            </Col>
+            <Col span={2} style={{ paddingRight: "15px" }}>
             <Row justify="end">
               <Button
                 type="primary"
+                shape="round"
+                size="medium"
                 icon={sortState === "asc"? <SortAscendingOutlined /> :sortState === "desc"? <SortDescendingOutlined /> : null}
                 //onClick={() => updateTab("add-video")}
                 onClick={()=> {setSortState( sortState === null? "asc":sortState === "asc"? "desc" : "asc" );sortvideoList()}}
@@ -242,8 +292,7 @@ dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
               </Button>
             </Row>
             </Col>
-
-            <Col span={6}>
+            <Col span={4}>
               <Input
                 placeholder="Search Title..."
                 allowClear
@@ -387,6 +436,57 @@ dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
             </div>
           ) : null}
         </div>
+      </Modal>
+      <Modal
+        title="Create New Folder"
+        destroyOnClose={true}
+        visible={cModal}
+        onOk=""
+        onCancel={createFolderModalClose}
+        footer={null}
+      >
+        <Form
+          name="basic"
+          initialValues={{}}
+          onFinish={callCreateFolder}
+          layout="vertical"
+        >
+          {/*errMsg ? (
+            <Alert   message={errMsg}
+              closable type="error"
+              onClose={() => setErrMsg(null)}
+              style={{ marginBottom: "20px" }}
+            />
+          ) : null */}
+          <Form.Item
+            label="Folder Name"
+            name="folderName"
+            rules={[
+              {
+                required: true,
+                message: "Please enter any name!",
+              },
+              {
+                pattern: /^[A-Za-z0-9]+$/,
+                message: "Special characters are not allowed",
+              },
+              { max: 35, message: "Maximum 35 characters" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              disabled={folderSubmitBtn}
+            >
+              Create Folder
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );

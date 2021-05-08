@@ -30,9 +30,9 @@ const MyProfile = () => {
 
    const tabListNoTitle = [
     {    key: 'general',   tab: 'General',  },
-    {    key: 'friends',   tab: 'Shared Profiles',  },
-    {    key: 'inviteusers',   tab: 'Share Profile',  },
-    {     key: 'settings',    tab: 'Settings',   },
+    {     key: 'settings',    tab: 'Profile',   },
+    {    key: 'inviteusers',   tab: 'My Team',  },
+    {    key: 'friends',   tab: 'Member of',  },
     {    key: 'project',   tab: 'project'  },
   ];
 

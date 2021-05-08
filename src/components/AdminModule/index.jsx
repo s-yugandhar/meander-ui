@@ -132,11 +132,11 @@ const AdminModule = (props) => {
       {state.archiveAccount !== null ?
         <Menu.Item onClick={()=> switchToSelf(state,dispatch)}>
         Switch To Own Account
-      </Menu.Item> :
-      <Menu.Item onClick={() => { setSelectedTab('my-profile') ;
+      </Menu.Item> : null
+      /*<Menu.Item onClick={() => { setSelectedTab('my-profile') ;
       dispatch({ type: PAGE, payload: { page: 'my-profile' } }); }}>
         My Profile
-      </Menu.Item>}
+      </Menu.Item>*/}
       <Menu.Item onClick={(e)=>logout()}>
         Logout
       </Menu.Item>
@@ -144,7 +144,7 @@ const AdminModule = (props) => {
   );
 
   const page = {
-    "my-videos": <MyVideos />,
+    "my-videos": <MyVideos openUploadVideo={() => { setUploadVideo(true)}} />,
     "add-video": <AddVideo />,
     "my-profile": <MyProfile />,
     "edit-video": <EditVideo />,
@@ -255,9 +255,7 @@ const AdminModule = (props) => {
                   optionFilterProp="children"
                   value={ state.folderName == "" ? "default" : state.folderName}
                   onChange={(value) =>
-                   { dispatch({
-                      type: FOLDER_NAME,
-                      payload: { folderName: value },
+                   { dispatch({   type: FOLDER_NAME,    payload: { folderName: value },
                     }); if(state.folderName !== "") GetFiles(state,dispatch,state.userId,state.folderName); }
                   }
                 >

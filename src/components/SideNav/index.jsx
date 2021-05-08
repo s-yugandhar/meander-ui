@@ -41,47 +41,11 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
   const [selectedKeys, setSelectedKeys] = useState(["my-videos"]);
   const [errMsg, setErrMsg] = useState(null);
   /* const [api, contextHolder] = notification.useNotification(); */
-  const [folderSubmitBtn, setFolderSubmitBtn] = useState(false);
   const [fsrch, setFsrch] = useState("");
-  const [cModal, setCModal] = useState(false);
   const { Sider } = Layout;
   const { SubMenu } = Menu;
 
   const { state, dispatch } = useContext(Context);
-
-  const showCreateFolder = () => {
-    setCModal(true);
-  };
-
-  const createFolderModalClose = () => {
-    setCModal(false);
-    setErrMsg(null);
-  };
-
-  const folderDetail = (folderName) => {
-    dispatch({ type: PAGE, payload: { page: "my-videos" } });
-    dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
-    dbGetObjByPath(
-      state,
-      dispatch,
-      "bucket-" + state.userId + "/" + folderName,
-      true
-    );
-    GetFiles(state, dispatch, state.userId, folderName).then((res) => {
-      console.log("My Videos Files in sidenav - ", res);
-      dispatch({ type: FILE_LIST, payload: { fileList: res } });
-    });
-  };
-
-  const showAllvideos = () => {
-    GetFolders(state.userId);
-  };
-
-  const callCreateFolder = (values) => {
-    console.log(state);
-    CreateNewFolder(state, dispatch, state.userId, values.folderName);
-    createFolderModalClose();
-  };
 
   const loadPage = (name) => {
     dispatch({ type: PAGE, payload: { page: name } });
@@ -127,9 +91,9 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               key="dashboard"
               onClick={() => GetFolders(state, dispatch, state.userId)}
             >
-              Dashboard
+              All Videos
             </Menu.Item>
-            <Menu.Item
+            {/*<Menu.Item
               disabled={true}
               className="createFolderMenuItem"
               key="cfv"
@@ -146,8 +110,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 {" "}
                 Create Folder
               </Button>
-            </Menu.Item>
-            <Menu.Item>
+            </Menu.Item>*/}
+            {/*<Menu.Item>
             <><SearchOutlined/>
             <Input  placeholder="folder, 3 letters" value={fsrch}
              onChange={(e)=>{ setFsrch(e.target.value);   }}  />
@@ -167,7 +131,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                   ): null;
                 })
               : null}
-              <SubMenu key="foldersearch" 
+              // search in menu above , do not delete 
+              <Menu key="foldersearch" 
              title={ state.folderList !== undefined && state.folderList.length > 0
              ? "Folders "+state.folderList.length : "Folders "+0 }> 
               {state.folderList !== undefined && state.folderList.length > 0
@@ -178,30 +143,12 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                       onClick={() => folderDetail(folder)}
                       title={folder}
                     >
-                      <FolderOutlined /> {folder}
+                       {folder}
                     </Menu.Item>
                   );
                 })
               : null}
-            </SubMenu>
-            {state.userId !== null ?<Menu.Item
-              disabled={true}
-              className="createFolderMenuItem"
-              key="add-videos"
-            >
-              <Button
-                key={"xcvz"}
-                type="primary"
-                shape="round"
-                icon={
-                  <VideoCameraAddOutlined className="createFolderBtnIcon" />
-                }
-                size="middle"
-                onClick={() => openUploadVideo(true)}
-                className="createFolderBtn"
-              >       Upload Video
-              </Button>
-            </Menu.Item> : null }
+            </Menu>*/}
             </SubMenu>
             {/* <Menu.Item key="" onClick={() => openUploadVideo(true)}>
               Add Video
@@ -219,58 +166,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               Usage Report
             </Menu.Item>          
         </Menu>
-      </Sider>
-      <Modal
-        title="Create New Folder"
-        destroyOnClose={true}
-        visible={cModal}
-        onOk=""
-        onCancel={createFolderModalClose}
-        footer={null}
-      >
-        <Form
-          name="basic"
-          initialValues={{}}
-          onFinish={callCreateFolder}
-          layout="vertical"
-        >
-          {/*errMsg ? (
-            <Alert   message={errMsg}
-              closable type="error"
-              onClose={() => setErrMsg(null)}
-              style={{ marginBottom: "20px" }}
-            />
-          ) : null */}
-          <Form.Item
-            label="Folder Name"
-            name="folderName"
-            rules={[
-              {
-                required: true,
-                message: "Please enter any name!",
-              },
-              {
-                pattern: /^[A-Za-z0-9]+$/,
-                message: "Special characters are not allowed",
-              },
-              { max: 35, message: "Maximum 35 characters" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              disabled={folderSubmitBtn}
-            >
-              Create Folder
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+      </Sider>      
     </>
   );
 };

@@ -223,14 +223,15 @@ const folderDetail = (folderName) => {
             minHeight: "100vh",
           }}
         >
-          <Row align="middle">
-          <Col span={4}>
+          <Row align="middle" type="flex">
+          <Col span={8}>
             <Tooltip title={"Select folder to see folder wise Videos"}>
               <Select
                   size="medium"
-                  style={{ width: "100%" }}
+                  style={{ width: "60%" }}
                   placeholder="search folder"
                   optionFilterProp="children"
+                  showSearch={true}
                   value={ state.folderName === "" ? "default" : state.folderName}
                   onChange={(value) =>
                    { dispatch({   type: FOLDER_NAME,
@@ -240,20 +241,14 @@ const folderDetail = (folderName) => {
                 >
                   { state.folderList !== undefined && state.folderList !== null
                     ? state.folderList.map((obj, ind) => {
-                   return   <Option   key={obj}  value={obj}
-                          >  {" "}   {obj}{" "}    </Option>
+                   return  <> <Option   key={obj}  value={obj}
+                          >  {" "}   {obj}{"      "}  </Option> </>
                       })
                     : null}
-                </Select></Tooltip>
+                </Select>&nbsp;&nbsp;&nbsp;&nbsp;{"-"}&nbsp;&nbsp;&nbsp;
+                 {  state.videoList === undefined || state.videoList === null ? 0 : state.videoList.length  } </Tooltip>
             </Col>
-            <Col span={2}>
-              <h4 >
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    {  state.videoList === undefined || state.videoList === null ? 0 : state.videoList.length  }
-              </h4>
-            </Col>
-            <Col span={8}></Col>
-            <Col span={2}>
+            <Col span={8}>
             <Tooltip title={"Create new folder to upload video"}><Button
                 key={"xcvz"}
                 type="primary"
@@ -266,8 +261,6 @@ const folderDetail = (folderName) => {
                 {" + "}
                  Folder
               </Button></Tooltip>
-            </Col>
-            <Col span={2}>
             <Tooltip title={"Click to upload video"}>
             <Button
                 key={"xcvz"}
@@ -278,9 +271,6 @@ const folderDetail = (folderName) => {
                 onClick={() => openUploadVideo(true)}
                 className="createFolderBtn"
               >Upload</Button></Tooltip>
-            </Col>
-            <Col span={2} style={{ paddingRight: "15px" }}>
-            <Row justify="end">
               <Button
                 type="primary"
                 shape="round"
@@ -290,7 +280,6 @@ const folderDetail = (folderName) => {
                 onClick={()=> {setSortState( sortState === null? "asc":sortState === "asc"? "desc" : "asc" );sortvideoList()}}
               > sort
               </Button>
-            </Row>
             </Col>
             <Col span={4}>
               <Input

@@ -1,13 +1,13 @@
 import React, { useContext, useState , useEffect } from "react";
 import { Layout, Row, Divider, Table, Switch, Button,
-  Form,Col,message, Input,Select } from "antd";
-import {  EditOutlined,  DeleteOutlined,
+  Form,Col,message, Input,Select, Tooltip, Tag } from "antd";
+import { InfoCircleOutlined, EditOutlined,  DeleteOutlined,
   LinkOutlined,  PlusOutlined, ReloadOutlined
 } from "@ant-design/icons";
 // custom imports
 import { Context } from "../../context";
 import axios from 'axios';
-import {url} from '../API/index';
+import {url , GetUserdetails} from '../API/index';
 import Modal from "antd/lib/modal/Modal";
 
 const ManageUsers = () => {
@@ -83,6 +83,34 @@ const setwriteRecord=(values)=>{
   writeRecord(state,dispatch,writeobj);
 }
 
+const toggleToUser = async( state , dispatch , record)=>{
+  const tempFolders = await axios.get(url + `/sharedtoken/${state.userId}/${record.id}`, {
+    headers: {
+       accept: 'application/json', Authorization : "bearer "+state.token,
+          }
+ }).then(res => {
+   //message.success(`No of rows updated ${res.data}`);
+   let flag = window.confirm("Do you really want to switch profile");
+   if (flag !== false){
+        switchToProfile(state,dispatch, res.data.id , res.data.access_token);
+   }     
+   return res.data;   })
+ console.log(" userdata in get manageuser ", tempFolders);
+ return tempFolders;
+}
+
+const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
+    let previd = localStorage.getItem("userId");
+    let prevtoken = localStorage.getItem("token");
+    localStorage.setItem("userId",sharedid);
+    localStorage.setItem("token",sharedtoken);
+    localStorage.setItem("archive",JSON.stringify({"userId":previd , "token" : prevtoken  } ));
+    dispatch({type:"ARCHIVE_ACCOUNT", payload:{ archiveAccount : { token : prevtoken , userId :previd } }});
+    dispatch({type:"LOGIN_SUCCESS", payload:{  token : sharedtoken , userId : sharedid,page:"my-videos" } });
+    GetUserdetails(state,dispatch, state.userId);
+}
+
+
 
  useEffect(()=>{
   GetAllUserdetails(state,dispatch,state.userId);
@@ -93,53 +121,56 @@ const setwriteRecord=(values)=>{
     {
       title: "#",
       dataIndex: "pos",
-      key: "pos"
+      key: "pos",
+      responsive : ["md","lg"]
     },
     {
       title: "User Name",
       dataIndex: "username",
       key: "username",
+      responsive : ["lg"]
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      render:(e,record)=>( e   )
+      // /<Col xl={3} xxl={3} lg={3}  md={2} sm={2} xs={1} >
     },
     {
       title: "Mobile",
       dataIndex: "phone",
       key: "phone",
+      responsive : ["md","lg"]
     },
     {
       title: state.userObj.roles === "super_admin"?"domain" : "",
       dataIndex: "domain_name",
       key: "domain_name",
       render:(e,record)=>(state.userObj.roles === "super_admin"? e : ""),
+      responsive : ["md","lg"]
     },
     {
       title: "roles",
       dataIndex: "roles",
       key: "roles",
+      responsive : ["md","lg"]
     },
     {
-      title: "Active",
+      title: <Tooltip title="Make user Inactive, Edit user, Browse as User">
+        <InfoCircleOutlined/>Actions</Tooltip>,
       dataIndex : "is_active",
       key: "is_active",
-      render:(e,record)=>(<><Switch size={"small"}
+      render:(e,record)=>(<>
+      { state.archiveAccount === null && state.userObj.id !== record.id?
+      <><Switch size={"small"}
       defaultChecked={e} onChange={()=>updateRecord(state,dispatch,record ,"toggle") }></Switch>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-        <Button icon={<EditOutlined />} onClick={(value)=>{ setEditUser({...record})}} />
-        {/*<Button icon={<DeleteOutlined />} onClick="" /> */}
-      </>),
+      &nbsp;
+        <Button size={"small"} icon={<EditOutlined />} onClick={(value)=>{ setEditUser({...record})}} />
+        &nbsp;<Tooltip title={`Browse as user ${record.email}`}>
+       <Button size={"small"} onClick={e => toggleToUser(state,dispatch,record)}>Use as</Button></Tooltip> 
+      </> : null }</>),
     },
-    {/*
-      title: "Actions",  key: "actions",
-      render: (e,record) => (
-        <>
-        <Button icon={<EditOutlined />} onClick={(value)=>{ setEditUser({...record})}} />
-        <Button icon={<DeleteOutlined />} onClick="" />   </>
-      ),
-      */},
   ];
 
   let tableData = [];
@@ -159,7 +190,8 @@ const setwriteRecord=(values)=>{
         items : itm.items,
         originsize: itm.originsize,
         originserved: itm.originserved,
-        bridgeserved: itm.bridgeserved
+        bridgeserved: itm.bridgeserved,
+        access : itm.access
       });
     });
   }
@@ -180,7 +212,7 @@ const setwriteRecord=(values)=>{
           icon={<ReloadOutlined  title={"refresh data"} >   </ReloadOutlined>}>Refresh </Button>
         </Col>
         <Col span={16}><h2 className="page-title">
-            {"   Manage Users -  "}
+            {"  Users -  "}
               { listUsers.length}
             </h2></Col>
           <Col span={4}>
@@ -192,13 +224,25 @@ const setwriteRecord=(values)=>{
             <Table
             dataSource={tableData} columns={tableColmnsTitle}
             pagination={{ defaultPageSize: 50  }}
+            expandable={{
+              expandedRowRender: record => <>
+                   <Tag>{"Videos : "+record.items.length}  </Tag>
+                   <Tag>{"Storage : "+ Number(record.originsize/(1024*1024)).toFixed(2) } </Tag>
+                   <Tag>{"Bandwidth : "+ Number((Number(record.originserved) +Number(record.bridgeserved))/(1024*1024)).toFixed(2) }</Tag>
+                   <Tooltip title={`${record.email}'s as part of other accounts` }><Tag>{"Other roles : "}{record.access !== null ?<Tag> {"View- "+record.access.viewer.length} </Tag>: null} 
+                   {record.access !== null ?<Tag> {"Edit- "+record.access.user.length} </Tag>: null} 
+                   {record.access !== null ?<Tag> {"Admin- "+record.access.admin.length} </Tag>: null} </Tag></Tooltip>
+                </>
+              ,
+              rowExpandable : record => true
+            }}
             ></Table>
           </Col>
         </Row>
         <Row align="middle" >
           { editUser !== null ?
-          <Modal title={"Edit User "}  visible={ editUser !== null }  centered={true}
-          onCancel={()=>setEditUser(null)} closable={true} >
+          <Modal title={createUser ?"Create User":"Edit User "}  visible={ editUser !== null }  centered={true}
+          onCancel={()=>{ setEditUser(null);setCreateUser(null); }} closable={true} footer={null}>
           <Form      name="basic"
               initialValues={{ username: editUser.username, email: editUser.email,
                 phone : editUser.phone, password : editUser.password }}

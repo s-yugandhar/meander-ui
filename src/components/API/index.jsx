@@ -22,14 +22,16 @@ const getParentAssingnedRole = async (child_id) => {
    }).then(res => {
       console.log(res);
       return res.data;   });
+      if( tempFolders !== undefined && tempFolders !== null && 
+          tempFolders.roles === "reseller" || tempFolders.roles === "super_admin")
+            return "self";
    if(  tempFolders !== undefined && tempFolders !== null && 
       tempFolders.access !== undefined && tempFolders.access !== null   ){
          if( tempFolders.access.admin.includes(child_id))
             return "admin";
          if( tempFolders.access.user.includes(child_id))
             return "user";
-         if( ["reseller","super_admin"].includes(tempFolders.roles))
-            return "admin";
+         
       }   return "viewer";
 }
 
@@ -46,7 +48,7 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
    console.log(" userdata in get ", tempFolders);
    if(state.archiveAccount !== null){
       let shroles  = await getParentAssingnedRole(tempFolders.id);
-      tempFolders.roles = shroles;
+      if( shroles !== "self")  tempFolders.roles = shroles;
    }
       dispatch({type:"USER_OBJ",payload:{userObj : tempFolders}});
    return tempFolders;

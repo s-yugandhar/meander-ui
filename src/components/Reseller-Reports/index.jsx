@@ -88,7 +88,7 @@ const ResellerReports = () => {
               <Col span={24} md={12}>
                 <div className="each-report-block full-width">
                   <h2 className="each-report-title full-width">
-                    <strong>BandWidth</strong>
+                    <strong>Bandwidth</strong>
                   </h2>
                   <div className="full-width">
                     {state.userObj !== undefined && state.userObj !== null ? (
@@ -103,7 +103,7 @@ const ResellerReports = () => {
                               from: "#43A047",
                               to: "#43A047",
                             }}
-                            percent={((( Number(state.userObj.originserved) + Number(state.userObj.bridgeserved) )/ (1024*1024))/10240).toFixed(0)}
+                            percent={((( Number(state.userObj.originserved) + Number(state.userObj.bridgeserved) )/ (1024*1024))/10240).toFixed(2)}
                           />
                         </div>
                       </>

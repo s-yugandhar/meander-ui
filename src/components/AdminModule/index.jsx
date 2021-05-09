@@ -231,10 +231,13 @@ const AdminModule = (props) => {
             </Row>
           </Header>
           <Layout>
+          <Sider   collapsedWidth={0} breakpoint="md"   style={{backgroundColor:"whitesmoke"}} 
+          trigger={true} >
             <SideNav
               updateTab={(tab) => setSelectedTab(tab)}
               openUploadVideo={() => { setUploadVideo(true)}}
             />
+          </Sider>
             {page[state.page] ||
               "You do not have permissions to view this module"}
             <Drawer

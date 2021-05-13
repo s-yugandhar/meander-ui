@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import {  Layout, Menu,  Dropdown, Avatar,   Row,  Col, Input,  Select, Typography,  Drawer, Button, message, notification,} from "antd";
+import {  Layout, Menu,  Dropdown, Avatar,   Row,  Col, Input,  Select, Typography,  Drawer, Button, message, notification, Divider,} from "antd";
 import {  UserOutlined,  DownOutlined} from "@ant-design/icons";
 import Uppy from '@uppy/core';
 import 'uppy/dist/uppy.min.css';
@@ -23,9 +23,33 @@ import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
 import ShareAccess from "../ShareAccess";
-import Logo from "../../assets/images/Meander_Logo.svg";
+import impLogo from "../../assets/images/Meander_Logo.svg";
 import Settings from '../Settings';
 import ResellerReports from '../Reseller-Reports'
+import axios from 'axios';
+
+let Logo = impLogo;
+let HeaderBG = "black";
+const getLogoBG = async(window)=>{
+  let domain = window.location.hostname;
+  const tempFolders = await axios.get(url + `/getlogo?domain=${domain}`, {
+    headers: {
+       accept: 'application/json',
+          }
+ }).then(res => {
+   let sett = JSON.parse(res.data.settings);
+   let comp = JSON.parse(res.data.company);
+   Logo = sett.logo;
+   HeaderBG = sett.headerbgcolor;
+   //console.log(res.data.settings.logo , res.data.settings, res.data);
+  return { settings : sett , company: comp} ;
+});
+return tempFolders;
+}
+
+if(window.location.hostname !== "portal.meander.video")
+  getLogoBG(window);        
+
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -95,7 +119,8 @@ const AdminModule = (props) => {
     uppy.on('complete', result => { completeEvent(result) });
     return () =>  uppy.off('complete');
   },[uppy])
-    
+
+      
   useEffect(()=>{
     if( stateEdit !== false){
       setStateEdit(false);
@@ -196,12 +221,17 @@ const AdminModule = (props) => {
         { loading ?<Loading  show={loading}/>:null}
       {localUserId ? (
         <Layout>
-          <Header className="header">
+        <Header className="header" style={{"backgroundColor":HeaderBG ,borderBottom: "1px solid #ddd"}}>
             <Row>
               <Col span={6}>
+                { window.location.hostname === "portal.meander.video"?
                 <div style={{ color: "white" }} className="brandingLogoBlock">
                   <img src={Logo} alt=""  className="brandingLogo" />
+                </div>:
+                  <div style={{ color: HeaderBG }} className="brandingLogoBlock">
+                  <img src={Logo} alt=""  className="brandingLogo" />
                 </div>
+                    }
               </Col>
               <Col span={18}>
                 <Row justify="end">
@@ -212,7 +242,7 @@ const AdminModule = (props) => {
                         type="link"
                         className="ant-dropdown-link"
                         onClick={(e) => e.preventDefault()}
-                        style={{ color: "white" }}
+                        style={{ color: HeaderBG === "black" ? "white" : "black" }}
                       >
                         <Avatar
                           size={30}

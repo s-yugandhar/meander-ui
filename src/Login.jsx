@@ -88,7 +88,7 @@ const Login = (props) => {
         }, 5000);
       });
 
-      if(resp.status === 200){
+      if(resp!== undefined && resp.status === 200){
         dispatch({
           type: 'LOGIN_SUCCESS',
           payload: {

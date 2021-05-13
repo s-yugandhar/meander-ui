@@ -6,6 +6,7 @@ import {
    FILE_UPLOADED,
    FOLDER_NAME ,
    FOLDER_LIST ,
+   DBFOLDER_LIST,
    FILE_LIST,
    UPPY_SUCCESS,
    UPPY_FAILED,
@@ -34,6 +35,7 @@ export const initialState = {
    fileUploaded: null,
    folderName: '' ,
    folderList : [],
+   dbfolderList : [],
    fileList : [],
    uppySuccess : [],
    uppyFailed : [],
@@ -97,6 +99,9 @@ export const reducer = (state = initialState, action) => {
       case FOLDER_LIST:
          return {   ...state,  folderList : action.payload.folderList}
       
+      case DBFOLDER_LIST:
+            return {   ...state,  dbfolderList : action.payload.dbfolderList}
+
       case FILE_LIST:
          return {   ...state,  fileList : action.payload.fileList}
       

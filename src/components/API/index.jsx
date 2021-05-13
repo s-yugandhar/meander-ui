@@ -1,10 +1,11 @@
 
 import axios from 'axios';
-import {notification } from 'antd';
+import {message, notification } from 'antd';
 import {  PAGE,FOLDER_CREATED,  FILE_UPLOADED,  FOLDER_NAME ,FILE_LIST,
     EDIT_VIDEO,VIDEO_LIST,FOLDER_LIST,USER_OBJ }  from '../../reducer/types';
 import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
+import { Content } from 'antd/lib/layout/layout';
 
 export const url = "https://meander.video";
 //export const url = "http://127.0.0.1:8002";
@@ -257,5 +258,46 @@ export const dbRemoveObj=async( state , dispatch ,path , recursive )=>{
       //   console.log("Error in getting objects from db");
       // }
    });
+   return getFiles;
+}
+
+
+export const listPlaylist=async (state,dispatch)=>{ 
+   const getFiles = await axios.get(url + `/listplaylist?user_id=${state.userId}` , {
+      headers: {
+         accept: 'application/json',  Authorization : "bearer "+state.token,
+      }
+   }).then(res => {
+      
+         console.log(  "playlist list" , res );
+      dispatch({ type : "DBFOLDER_LIST" , payload :{ dbfolderList : res.data   }});
+      return res.data;
+   });
+   return getFiles;
+}
+
+export const createPlaylist=async (state,dispatch,name,ftype)=>{
+   const getFiles = await axios.get(url + `/createplaylist?user_id=${state.userId}&name=${name}&ftype=${ftype}` , {
+      headers: {
+         accept: 'application/json',  Authorization : "bearer "+state.token,
+      }
+   }).then(res => {
+         console.log(  "createFolder/playlist" , res );
+      return res.data;
+   }).then(err=>{ return null; } );
+   return getFiles;
+}
+
+export const updatePlaylist= async (state,dispatch,ftype,pid,vid,pos)=>{
+   if (pos === null || pos === undefined) pos=-1;
+   if (ftype === null) return;
+   const getFiles = await axios.get(url + `/addtoplaylist?user_id=${state.userId}&pid=${pid}&ftype=
+   ${ftype}&vid=${vid}&pos=${pos}` , {
+      headers: {
+         accept: 'application/json',  Authorization : "bearer "+state.token,
+      }
+   }).then(res => {
+         notification.open({message:   res.data +"playlist update operation"});
+   }).then(err=>{ return null; } );
    return getFiles;
 }

@@ -28,7 +28,8 @@ import {
 } from "../../reducer/types";
 import {
   url, GetFolders,dbGetObjByPath,
-  GetFiles,  GetUserdetails,CreateNewFolder
+  GetFiles,  GetUserdetails,CreateNewFolder,
+  listPlaylist,createPlaylist
 } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
@@ -53,6 +54,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [cModal, setCModal] = useState(false);
   const { state, dispatch } = useContext(Context);
   const [sortState, setSortState] =  useState(null);
+  const [nfApi, setNFApi] =  useState(false);
   const { Column } = Table;
 
   let initialAnimate;
@@ -149,12 +151,20 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const callCreateFolder = (values) => {
     console.log(state);
     CreateNewFolder(state, dispatch, state.userId, values.folderName);
+    
+    createPlaylist(state,dispatch,values.folderName,'folder').then(res=>{
+      //notification.open({message:"Folder Created succesfully"});
+      listPlaylist(state,dispatch);
+    }).catch((err)=> {}
+      //notification.open({message:"Cannot create duplicate folder"});
+      )
     createFolderModalClose();
   };
 
 
 
 useEffect(()=>{
+  
   let filterType = state.filterType;
   if( (filterType === "all" || filterType === "folder") )
   GetFolders(state, dispatch, state.userId);
@@ -171,6 +181,7 @@ useEffect(()=>{
 
   useEffect(() => {
     setLoading(true);
+    listPlaylist(state,dispatch);
     updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
@@ -224,9 +235,13 @@ const folderDetail = (folderName) => {
           }}
         >
           <Row align="middle" type="flex">
-          <Col span={8}>
+          <Col span={2}>
+          <Switch size={"small"}
+          defaultChecked={nfApi} onChange={()=> setNFApi(!nfApi) }></Switch>
+          </Col>
+          <Col span={6}>
             <Tooltip title={"Select folder to see folder wise Videos"}>
-              <Select
+              {nfApi === true ?<Select
                   size="medium"
                   style={{ width: "60%" }}
                   placeholder="search folder"
@@ -245,9 +260,31 @@ const folderDetail = (folderName) => {
                           >  {" "}   {obj}{"      "}  </Option> </>
                       })
                     : null}
-                </Select>&nbsp;&nbsp;&nbsp;&nbsp;{"-"}&nbsp;&nbsp;&nbsp;
+                </Select>:
+                <Select
+                size="medium"
+                style={{ width: "60%" }}
+                placeholder="search folder"
+                optionFilterProp="children"
+                showSearch={true}
+                value={ state.folderName === "" ? "default" : state.folderName}
+                onChange={(value) =>
+                 { dispatch({   type: FOLDER_NAME,
+                    payload: { folderName: value },
+                  }); innerFolder(value); }
+                }
+              >
+                { state.dbfolderList.length > 0
+                  ? state.dbfolderList.map((obj, ind) => {
+                 return  obj.foldertype==="folder"?
+                 <> <Option   key={obj.id}  value={obj.id}
+                        >  {" "}   {obj.foldername}{"      "}  </Option> </> : null
+                    })
+                  : null}
+              </Select>                
+                }&nbsp;&nbsp;&nbsp;&nbsp;{"-"}&nbsp;&nbsp;&nbsp;
                  {  state.videoList === undefined || state.videoList === null ? 0 : state.videoList.length  } </Tooltip>
-            </Col>
+                </Col>
             <Col span={8}>
             <Tooltip title={"Create new folder to upload video"}><Button
                 key={"xcvz"}
@@ -454,10 +491,6 @@ const folderDetail = (folderName) => {
               {
                 required: true,
                 message: "Please enter any name!",
-              },
-              {
-                pattern: /^[A-Za-z0-9]+$/,
-                message: "Special characters are not allowed",
               },
               { max: 35, message: "Maximum 35 characters" },
             ]}

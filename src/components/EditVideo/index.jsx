@@ -1,14 +1,15 @@
 import React , { useEffect,useContext , useState} from "react";
 import {  Layout,  Menu,  Row,  Col,  Divider,  Input,
   Select,    Modal,  Form, Collapse,
-  Button,  message,   Upload, Radio,Card
-} from "antd";
+  Button,  message,   Upload, Radio,Card,
+  Tooltip,
+  notification} from "antd";
 
 import { PlayCircleOutlined ,ReloadOutlined,  DeleteOutlined, 
-  LoadingOutlined , DownloadOutlined , ArrowRightOutlined } from "@ant-design/icons";
+  LoadingOutlined , PlusSquareOutlined } from "@ant-design/icons";
 import "./editVideo.scss";
 import axios from 'axios';
-import {dbUpdateObj , url , cdn_url } from '../API';
+import {dbUpdateObj , url , cdn_url , listPlaylist, createPlaylist } from '../API';
 import { Context } from '../../context';
 import PlayVideo from "../PlayVideo";
 import Logo from "../../assets/images/Meander_Logo.svg";
@@ -35,12 +36,14 @@ const EditVideo = (props) => {
   const [copywhat,setCopyWhat] = useState("play");
   const [showcode,setShowCode] = useState(null);
   const [loading,setLoading] = useState(false);
+  const [plist,setPlist] = useState([]);
+  const [flag,setFlag] = useState(false);
   let editV = { ...state.editVideo };
 
   let mp4 = {    "1080p": "/mp41080k.mp4",
       "720p": "/mp4720k.mp4",    "480p": "/mp4480k.mp4",
       "240p": "/mp4240k.mp4",  };
-  
+      
       const isTranscodeDone=(imgurl)=>{
         if( trans === false){ 
         var image = new Image();
@@ -206,6 +209,8 @@ const EditVideo = (props) => {
 
       useEffect(()=>{
 
+        listPlaylist(state,dispatch);
+
         form.setFieldsValue({ 
           'title' : state.editVideo ===  null || state.editVideo === undefined 
           ? null : state.editVideo.title,
@@ -302,12 +307,29 @@ const EditVideo = (props) => {
                 <Row >
                 <Col span={11}>  
                 <Form.Item
-                  label="Playlist Name"
+                  label={<Tooltip title={"Click plus to create New Name"}>
+                  Playlist Name
+                  &nbsp;&nbsp;&nbsp;&nbsp;
+                  &nbsp;&nbsp;&nbsp;&nbsp; <PlusSquareOutlined 
+                  onClick={(e)=>setFlag(true)}>
+                </PlusSquareOutlined>
+                                      </Tooltip>}
                   name={'playlistid'}
                   className="editFormItem"
                 >
-                  <Input   />
-                </Form.Item> </Col>
+                  <Select
+                    placeholder="Search"
+                    showSearch={true}
+                  >
+                    {state.dbfolderList.length > 0?
+                        state.dbfolderList.map((obj)=>{
+                          return obj.foldertype === "playlist" ?
+                        <Option key={obj.id} value={obj.id}>{obj.foldername}</Option>:null
+                        })
+                    : null}
+                  </Select>
+                </Form.Item> 
+                  </Col>
                 <Col span={1}></Col>
                 <Col span={11}>
                 {/*<Form.Item
@@ -489,6 +511,46 @@ const EditVideo = (props) => {
           </Col>
         </Row> 
               </Content> 
+              <Modal        title="Create New Playlist"
+        destroyOnClose={true}        visible={flag}
+        onOk=""        onCancel={()=>setFlag(false)}        footer={null}
+      >
+        <Form
+          name="basic"
+          initialValues={{}}
+          onFinish={ val => {
+            createPlaylist(state,dispatch,val.folderName,'playlist').then(res=>{
+              notification.open({message:"Playlist Created succesfully"});
+              listPlaylist(state,dispatch);
+            }).catch(err=> notification.open({message:"Cannot create duplicate playlist"})) }} 
+          layout="vertical"
+        >
+          
+          <Form.Item
+            label="Playlist Name"
+            name="folderName"
+            rules={[
+              {
+                required: true,
+                message: "Please enter any name!",
+              },
+              { max: 64, message: "Maximum 64 characters" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+            >
+              Create Playlist
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   );
 };

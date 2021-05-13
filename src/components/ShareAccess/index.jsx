@@ -216,7 +216,7 @@ const setwriteRecord=(values)=>{
         <Row align="middle" >
           { editUser !== null ?
           <Modal title={"Edit User "}  visible={ editUser !== null }  centered={true}
-          onCancel={()=>setEditUser(null)} closable={true} >
+          onCancel={()=>setEditUser(null)} closable={true} footer={null}>
           <Form      name="basic"
               initialValues={{ username: editUser.username, email: editUser.email,
                 phone : editUser.phone, password : editUser.password }}

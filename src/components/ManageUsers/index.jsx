@@ -168,7 +168,7 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
       &nbsp;
         <Button size={"small"} icon={<EditOutlined />} onClick={(value)=>{ setEditUser({...record})}} />
         &nbsp;<Tooltip title={`Browse as user ${record.email}`}>
-       <Button size={"small"} onClick={e => toggleToUser(state,dispatch,record)}>Use as</Button></Tooltip> 
+       <Button size={"small"} onClick={e => toggleToUser(state,dispatch,record)}>Switch</Button></Tooltip> 
       </> : null }</>),
     },
   ];

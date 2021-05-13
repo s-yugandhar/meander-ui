@@ -163,6 +163,8 @@ const AdminModule = (props) => {
     console.log('Got user id - ', state.userId);
     localUserId ? setLogedIn(true) : setLogedIn(false);
     //Dashboard( { locale :{ strings : { dropHere : "hint"} }        } )
+
+    const dispName = state.dbfolderList.find(ob=>  ob.id === state.folderName);
     uppy.setOptions( { 
       onBeforeFileAdded: (currentFile, files) => {
       let time = Date.now();      let uuid = state.userId+String(time);
@@ -172,9 +174,9 @@ const AdminModule = (props) => {
        time : time , uuidname : uuid }
       };    return modifiedFile;
     } ,
-    locale : {strings : { 'dropPaste' :state.folderName === ""?
-      `Drop files here or paste or %{browse} to upload files to default` :
-       `Drop files here or paste or %{browse} to upload files to `+state.folderName  }} });
+    locale : {strings : { 'dropPaste' :dispName === undefined || dispName === null?
+      `Drop files here or paste or %{browse} to upload files ` :
+       `Drop files here or paste or %{browse} to upload files to : `+dispName.foldername  }} });
       uppy.setMeta( { userId: state.userId, foldername: state.folderName === "" ? "default" : state.folderName });
   }, [ state.folderName ,localUserId ]);
 
@@ -251,7 +253,27 @@ const AdminModule = (props) => {
               className="uploadVideoDrawer"
             >
               <div className="uploadSelectfolderBlock">
-                <Select
+              <Select
+                size="medium"
+                style={{ width: "60%" }}
+                placeholder="search folder"
+                optionFilterProp="children"
+                showSearch={true}
+                value={ state.folderName === "" ? "default" : state.folderName}
+                onChange={(value) =>
+                  { dispatch({   type: FOLDER_NAME,    payload: { folderName: value },
+                   }); if(state.folderName !== "") GetFiles(state,dispatch,state.userId,state.folderName); }
+                 }
+              >
+                { state.dbfolderList.length > 0
+                  ? state.dbfolderList.map((obj, ind) => {
+                 return  obj.foldertype==="folder"?
+                 <> <Option   key={obj.id}  value={obj.id}
+                        >  {" "}   {obj.foldername}{"      "}  </Option> </> : null
+                    })
+                  : null}
+              </Select>
+              {/*  <Select
                   size="large"
                   style={{ width: "100%" }}
                   placeholder="search folder"
@@ -262,8 +284,6 @@ const AdminModule = (props) => {
                     }); if(state.folderName !== "") GetFiles(state,dispatch,state.userId,state.folderName); }
                   }
                 >
-                  { /*<Option key={"default"} value="default">{" "}
-                            {"default"}{" "}</Option> */}
                   { state.folderList !== undefined && state.folderList !== null
                     ? state.folderList.map((obj, ind) => {
 
@@ -277,7 +297,7 @@ const AdminModule = (props) => {
 
                       })
                     : null}
-                </Select>{" "}
+                    </Select>*/}{" "}
               </div>
               <div className="uploadFileUppyBlock" style={{ height: "80vh" }}>
                 

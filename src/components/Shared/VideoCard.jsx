@@ -1,5 +1,5 @@
 import React, { useContext, useState ,lazy ,Suspense} from "react";
-import { Menu, Card, Button, message, Dropdown, Tooltip,Image } from "antd";
+import { Menu, Card, Button, message,Row,Col ,Dropdown, Modal,Tooltip,Image, Popover } from "antd";
 import {
   SwapOutlined,
   EditOutlined,
@@ -37,6 +37,8 @@ const VideoCard = (props) => {
   const { state, dispatch } = useContext(Context);
   const { Meta } = Card;
   const [visible, setVisible] = useState(false);
+  const [codesModal,setCodesModal] = useState(false);
+  const [code , setCode] = useState("<---- Click on any button to copy the code");
 
   function getMp4Url(props, type) {
     let tempdoc = ["img720", "img480", "img240"];
@@ -153,13 +155,15 @@ const VideoCard = (props) => {
       code = getPlayUrl(state, dispatch, url, props);
       code = code + "?embed=true";
     }
-    if (e.key === "play") code = getPlayUrl(state, dispatch, url, props);
+    if (e.key === "play" || e.key === "playnotinmenu") 
+      code = getPlayUrl(state, dispatch, url, props);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code);
       message.success(`Code Copied `);
     } else {
       alert(`Sorry your browser does not support, please copy here: ${code}`);
     }
+    setCode(code);
     setVisible(false);
   };
 
@@ -168,7 +172,7 @@ const VideoCard = (props) => {
   };
 
   const menuvideo = (
-    <Menu onClick={handleMenuClick}>
+    <Menu onClick={handleMenuClick} key="dbahdlca" title="Click below names to copy code">
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
@@ -178,7 +182,7 @@ const VideoCard = (props) => {
     </Menu>
   );
   const menuaudio = (
-    <Menu onClick={handleMenuClick}>
+    <Menu onClick={handleMenuClick} key="sbdsldl" title="Click below names to copy code">
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
@@ -205,7 +209,7 @@ const VideoCard = (props) => {
       actions={[
         state.userObj !== undefined && state.userObj !== null && 
         state.userObj.roles !== "user" &&   state.userObj.roles !== "viewer"
-          ?  <Tooltip title="Delete">
+          ?  <Tooltip title="Click to delete video">
           <DeleteOutlined
             key="delete"
             title={"click to delete object"}
@@ -216,32 +220,34 @@ const VideoCard = (props) => {
         </Tooltip> : null,
          state.userObj !== undefined &&
          state.userObj !== null && state.userObj.roles !== "viewer"
-          ?<Tooltip title="Edit">
+          ?<Tooltip title="Click to edit Metadata">
           <EditOutlined
             key="edit"
-            title={"Click to edit metadata"}
             onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
           />
         </Tooltip> : null,
-        <Dropdown
-          overlay={
-            props.fileObject.itemtype.includes("audio") ? menuaudio : menuvideo
-          }
-          onVisibleChange={handleVisibleChange}
-          visible={visible}
-          title={"Copy links to video"}
-          trigger={["click"]}   >
+        state.userObj !== undefined &&
+        state.userObj !== null && state.userObj.roles !== "viewer"
+         ?<Tooltip title="copy player link">
+         <LinkOutlined
+           key="playnotinmenu"
+           onClick={(e) => handleMenuClick(e)}
+         />
+       </Tooltip> : null,
+        <Popover  content={props.fileObject.itemtype.includes("audio") ? null : null
+           }
+        title={null}>
           <Button
             htmlType="a"
             key="link"
-            onClick={(e) => {}}
+            onClick={(e) => {setCodesModal(true)}}
             aria-hidden={true}
             style={{ borderColor: "white", padding: 0 }}  >
-            <Tooltip title="Copy Code">
-              <EllipsisOutlined style={{ fontSize: "24px" }} />
-            </Tooltip>
+              <Tooltip title="Copy links to video">
+              <EllipsisOutlined style={{ fontSize: "24px" }} /></Tooltip>
           </Button>
-        </Dropdown>,
+          </Popover>
+        ,
       ]}
       className="cardVideo"
     >
@@ -267,13 +273,27 @@ const VideoCard = (props) => {
           >
             <PlayCircleOutlined  />
           </Button>
-
         </div>
         {/*<div className="videoCardInfoBlock" style={{  }}>ss
           <div className="videoTitle">{ props.videoTitle}</div>
           <div className="publishedDate">{props.postedOn}</div>
         </div> */}
       </div>
+      <Modal title={null}  visible={ codesModal  }  centered={true}
+          onCancel={()=> {setCode("<---- Click on any button to copy the code");
+          setCodesModal(false);}} closable={true} footer={null}  
+          >
+            <Row >
+              <Col span={6}>
+            {props.fileObject.itemtype.includes("audio") ? menuaudio : menuvideo}
+              </Col>
+              <Col span={2}></Col>
+              <Col span={12}>
+                {code}
+              </Col>
+            </Row>
+          
+          </Modal>
     </Card>
   );
 };

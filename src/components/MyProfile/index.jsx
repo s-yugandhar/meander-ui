@@ -14,7 +14,7 @@ import ShareAccess from "../ShareAccess";
 const MyProfile = () => {
    const [requiredMark, setRequiredMarkType] = useState("optional");
    const { Header, Footer, Sider, Content } = Layout;
-    const [tabnow,setTabNow] = useState("friends");
+    const [tabnow,setTabNow] = useState("settings");
 
     const {state,dispatch} = useContext(Context);
 
@@ -29,11 +29,11 @@ const MyProfile = () => {
    },[]);
 
    const tabListNoTitle = [
-    {    key: 'general',   tab: 'General',  },
+    //{    key: 'general',   tab: 'General',  },
     {     key: 'settings',    tab: 'Profile',   },
-    {    key: 'inviteusers',   tab: 'My Team',  },
-    {    key: 'friends',   tab: 'Member of',  },
-    {    key: 'project',   tab: 'project'  },
+    {    key: 'inviteusers',   tab: 'Team',  },
+    //{    key: 'friends',   tab: 'Member of',  },
+    //{    key: 'project',   tab: 'project'  },
   ];
 
   const contentListNoTitle = {

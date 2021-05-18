@@ -18,7 +18,7 @@ import Login from "../../Login";
 import Loading from "../Loading";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED,PAGE } from "../../reducer/types";
 import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  ,
- GetUserdetails , url}  from '../API'
+ GetUserdetails , url , getPublicItems}  from '../API'
 import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
@@ -27,6 +27,7 @@ import impLogo from "../../assets/images/Meander_Logo.svg";
 import Settings from '../Settings';
 import ResellerReports from '../Reseller-Reports'
 import axios from 'axios';
+import { PlayerPage } from "../Player";
 
 let Logo = impLogo;
 let HeaderBG = "black";
@@ -180,6 +181,8 @@ const AdminModule = (props) => {
     "share-access" : <ShareAccess/>,
     "reseller-settings": <Settings />,
     "usage": <ResellerReports />,
+    "player" : <PlayerPage/>,
+    "login" : <Login/>,
     "forbidden" : <><div> <p> You have no permission to view this page</p></div></>
   };
 
@@ -222,7 +225,6 @@ const AdminModule = (props) => {
   return (
     <>
         { loading ?<Loading  show={loading}/>:null}
-      {localUserId ? (
         <Layout>
         <Header className="header" style={{"backgroundColor":HeaderBG ,borderBottom: "1px solid #ddd"}}>
             <Row>
@@ -236,10 +238,16 @@ const AdminModule = (props) => {
                 </div>
                     }
               </Col>
-              <Col span={18}>
+              <Col span={12}>
+              <Input.Search onChange={(e)=>getPublicItems(state,dispatch,e.target.value)}
+                placeholder={"Search Public videos by title or description & click to play"} 
+                style={{ marginTop:"15px" }}>
+                </Input.Search>
+              </Col>
+              <Col span={6}>
                 <Row justify="end">
-                  <Col>
-                    <Dropdown overlay={userMenu} trigger={["click"]}>
+                 <Col>
+                 {localUserId?      <Dropdown overlay={userMenu} trigger={["click"]}>
                       <Button
                         htmlType="button"
                         type="link"
@@ -259,22 +267,23 @@ const AdminModule = (props) => {
                           : "My Account"}
                         <DownOutlined />
                       </Button>
-                    </Dropdown>
+                    </Dropdown>:  <Button type="primary" onClick={()=> dispatch({type:"PAGE",payload:{page:"login"}})  }>Login</Button>}
                   </Col>
                 </Row>
               </Col>
             </Row>
           </Header>
           <Layout>
-          <Sider   collapsedWidth={0} breakpoint="md"   style={{backgroundColor:"whitesmoke"}} 
+          {localUserId ?<Sider   collapsedWidth={0} breakpoint="md"   style={{backgroundColor:"whitesmoke"}} 
           trigger={true} >
             <SideNav
               updateTab={(tab) => setSelectedTab(tab)}
               openUploadVideo={() => { setUploadVideo(true)}}
             />
-          </Sider>
+          </Sider> : null }
             {page[state.page] ||
               "You do not have permissions to view this module"}
+            {localUserId?
             <Drawer
               title="Upload Videos"
               placement="right"
@@ -302,35 +311,11 @@ const AdminModule = (props) => {
                   ? state.dbfolderList.map((obj, ind) => {
                  return  obj.foldertype==="folder"?
                  <> <Option   key={obj.id}  value={obj.id}
-                        >  {" "}   {obj.foldername}{"      "}  </Option> </> : null
+                        >  {" "}   {obj.foldername}{"   "}  </Option> </> : null
                     })
                   : null}
               </Select>
-              {/*  <Select
-                  size="large"
-                  style={{ width: "100%" }}
-                  placeholder="search folder"
-                  optionFilterProp="children"
-                  value={ state.folderName == "" ? "default" : state.folderName}
-                  onChange={(value) =>
-                   { dispatch({   type: FOLDER_NAME,    payload: { folderName: value },
-                    }); if(state.folderName !== "") GetFiles(state,dispatch,state.userId,state.folderName); }
-                  }
-                >
-                  { state.folderList !== undefined && state.folderList !== null
-                    ? state.folderList.map((obj, ind) => {
-
-                   return   <Option
-                            key={obj}
-                            value={obj}
-                          >
-                            {" "}
-                            {obj}{" "}
-                          </Option>
-
-                      })
-                    : null}
-                    </Select>*/}{" "}
+              {" "}
               </div>
               <div className="uploadFileUppyBlock" style={{ height: "80vh" }}>
                 
@@ -344,14 +329,11 @@ const AdminModule = (props) => {
                   inline={true}
                 />
               </div>
-            </Drawer>
+            </Drawer>: null }
 
             {/*<UploadVideoFloatingBtn onClick={() => setUploadVideo(true)} />*/}
           </Layout>
         </Layout>
-      ) : (
-        <Login />
-      )}
     </>
   );
 };

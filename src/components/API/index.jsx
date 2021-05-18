@@ -295,3 +295,15 @@ export const updatePlaylist= async (state,dispatch,ftype,pid,vid,pos)=>{
    }).then(err=>{ return null; } );
    return getFiles;
 }
+
+export const getPublicItems=async(state,dispatch,key)=>{
+   const tempFolders = await axios.get(url + `/searchvideos?key=${key}`, {
+       headers: {
+          accept: 'application/json', Authorization : "bearer "+state.token,
+             }
+    }).then(res => {     
+       dispatch({type:"PUBLIC_VIDEOS",payload:{publicVideos : res.data}});
+       return res.data;   }).catch(err=> {
+         return [] });
+      return tempFolders;
+};

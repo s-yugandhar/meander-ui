@@ -17,7 +17,8 @@ import {
    FILTER_TYPE,
    ACCESS_IN,
    ACCESS_OUT,
-   ARCHIVE_ACCOUNT
+   ARCHIVE_ACCOUNT,
+   PUBLIC_VIDEOS
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -30,7 +31,7 @@ export const initialState = {
    token: localToken ? localToken : null,
    userId: localUserId ? localUserId : null,
    userName: localUserName ? localUserName : null,
-   page: 'videos',
+   page: 'player',
    folderCreated: null,
    fileUploaded: null,
    folderName: '' ,
@@ -44,7 +45,8 @@ export const initialState = {
    editVideo : null ,
    filterType : "all",
    accessIn : [] ,
-   accessOut : []
+   accessOut : [],
+   publicVideos : [],
 }
 
 export const reducer = (state = initialState, action) => {
@@ -134,6 +136,9 @@ export const reducer = (state = initialState, action) => {
 
       case ARCHIVE_ACCOUNT : 
       return { ...state , archiveAccount : action.payload.archiveAccount }
+
+      case PUBLIC_VIDEOS : 
+      return { ...state , publicVideos : action.payload.publicVideos }
 
       default:
          return state;

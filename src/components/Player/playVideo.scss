@@ -1,0 +1,16 @@
+@import "../../assets/styles/mixins";
+
+.video-player-block {
+
+}
+
+.video-player {
+   position: relative;
+   height: 400px;
+   background-color: #eee;
+}
+
+.video-plaery-content {
+   margin-top: 20px;
+   font-size: 16px;
+}

@@ -17,3 +17,4 @@ export const FILTER_TYPE = "FILTER_TYPE";
 export const ACCESS_IN = "ACCESS_IN";
 export const ACCESS_OUT = "ACCESS_OUT";
 export const DBFOLDER_LIST = "DBFOLDER_LIST";
+export const PUBLIC_VIDEOS = "PUBLIC_VIDEOS";

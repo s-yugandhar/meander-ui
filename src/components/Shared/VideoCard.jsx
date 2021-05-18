@@ -70,7 +70,7 @@ const VideoCard = (props) => {
   }
 
   const onSideNavFolderClick = (folderName) => {
-    dispatch({ type: PAGE, payload: { page: "my-videos" } });
+    dispatch({ type: PAGE, payload: { page: "videos" } });
     dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
     GetFiles(state, dispatch, state.userId, folderName).then((res) => {
       console.log("My Videos Files in sidenav - ", res);
@@ -144,6 +144,7 @@ const VideoCard = (props) => {
   };
   
   const handleMenuClick = (e) => {
+    console.log(e);
     let code = null;
     if (e.key === "iframe")
       code = embedCodeFunc(state, dispatch, props.fileObject);
@@ -231,7 +232,7 @@ const VideoCard = (props) => {
          ?<Tooltip title="copy player link">
          <LinkOutlined
            key="playnotinmenu"
-           onClick={(e) => handleMenuClick(e)}
+           onClick={(e) => handleMenuClick({key:"playnotinmenu"})}
          />
        </Tooltip> : null,
         <Popover  content={props.fileObject.itemtype.includes("audio") ? null : null

@@ -11,7 +11,7 @@ const PlayVideo = (props) => {
 
   return (
     <div className="full-width play-video-page">
-      {/*<Row> <button type="button"   onClick={(e)=>{ dispatch({ type: 'PAGE', payload: { page: "my-videos" } });   }}>Close Player</button> </Row>*/}
+      {/*<Row> <button type="button"   onClick={(e)=>{ dispatch({ type: 'PAGE', payload: { page: "videos" } });   }}>Close Player</button> </Row>*/}
       <Row>
         <Col span={24}>
           <div className="video-player-block full-width">

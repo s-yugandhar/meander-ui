@@ -7,8 +7,31 @@ import AdminModule from "./components/AdminModule";
 
 import { Context } from "./context";
 import { initialState, reducer } from './reducer';
+import {url , GetUserdetails} from '../src/components/API/index'
 import Login from "./Login";
+import axios from 'axios';
 
+let Logo = null;
+let HeaderBG = "black";
+const getLogoBG = async(window)=>{
+  let domain = window.location.hostname;
+  const tempFolders = await axios.get(url + `/getlogo?domain=${domain}`, {
+    headers: {
+       accept: 'application/json',
+          }
+ }).then(res => {
+   let sett = JSON.parse(res.data.settings);
+   let comp = JSON.parse(res.data.company);
+   Logo = sett.logo;
+   HeaderBG = sett.headerbgcolor;
+   //console.log(res.data.settings.logo , res.data.settings, res.data);
+  return { settings : sett , company: comp} ;
+});
+return tempFolders;
+}
+
+if(window.location.hostname !== "portal.meander.video")
+  getLogoBG(window);        
 const App = (props) => {
 
   let apiUrl = "";
@@ -23,16 +46,15 @@ const App = (props) => {
 
   
   useEffect((prev) => {
-    console.log('App page state - ', state);
+    console.log('App page state - ', state );
     state.userId ?
       setSignedIn(true) : setSignedIn(false);
-
   }, []);
 
 
   return (
     <Context.Provider value={{ state: state, dispatch: dispatch }}>
-      <AdminModule />
+      <AdminModule dyLogo={Logo} dyHeaderBG = {HeaderBG}/>
     </Context.Provider>
   );
 };

@@ -94,7 +94,7 @@ const Login = (props) => {
           payload: {
             token: resp.data.access_token ? resp.data.access_token : null,
             userId: resp.data.id ? resp.data.id : null,
-            page: 'my-videos'
+            page: 'videos'
           }
         });
         localStorage.setItem("userId",resp.data.id ? resp.data.id : null);

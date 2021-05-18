@@ -30,7 +30,7 @@ export const initialState = {
    token: localToken ? localToken : null,
    userId: localUserId ? localUserId : null,
    userName: localUserName ? localUserName : null,
-   page: 'my-videos',
+   page: 'videos',
    folderCreated: null,
    fileUploaded: null,
    folderName: '' ,

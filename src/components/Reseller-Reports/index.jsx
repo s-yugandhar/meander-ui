@@ -25,7 +25,7 @@ import {
 // custom imports
 import { Context } from "../../context";
 import axios from "axios";
-import { url } from "../API/index";
+import { url, GetUserdetails } from "../API/index";
 import "./reseller-reports.scss";
 
 const ResellerReports = () => {
@@ -34,7 +34,9 @@ const ResellerReports = () => {
   const { state, dispatch } = useContext(Context);
 
   useEffect(() => {
-    console.log("Storage - ", state.userObj.originsize / 4096);
+    if(state.userObj === null || state.userObj === undefined )
+        GetUserdetails(state,dispatch,state.userId);
+    console.log("Storage - ", state.userObj);
 
     return () => {};
   }, []);
@@ -77,7 +79,7 @@ const ResellerReports = () => {
                               from: "#43A047",
                               to: "#43A047",
                             }}
-                            percent={( (Number(state.userObj.originsize) / (1024*1024))/1024).toFixed(2)}
+                            percent={100*( (Number(state.userObj.originsize) / (1024*1024))/1024).toFixed(2)}
                           />
                         </div>{" "}
                       </>
@@ -103,7 +105,7 @@ const ResellerReports = () => {
                               from: "#43A047",
                               to: "#43A047",
                             }}
-                            percent={((( Number(state.userObj.originserved) + Number(state.userObj.bridgeserved) )/ (1024*1024))/10240).toFixed(2)}
+                            percent={ 100*((( Number(state.userObj.originserved) + Number(state.userObj.bridgeserved) )/ (1024*1024))/10240).toFixed(2)}
                           />
                         </div>
                       </>

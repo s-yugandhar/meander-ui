@@ -37,8 +37,10 @@ import {
 
 import { Context } from "../../context";
 
+const location = window.location;
+
 const SideNav = ({ updateTab, openUploadVideo }) => {
-  const [selectedKeys, setSelectedKeys] = useState(["my-videos"]);
+  const [selectedKeys, setSelectedKeys] = useState(["videos"]);
   const [errMsg, setErrMsg] = useState(null);
   /* const [api, contextHolder] = notification.useNotification(); */
   const [fsrch, setFsrch] = useState("");
@@ -51,8 +53,23 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     dispatch({ type: PAGE, payload: { page: name } });
   };
 
+  const pushIntoHistory=(state,dispatch,name)=>{
+      window.history.pushState(state,name,name);
+      loadPage(name);
+  }
+
   useEffect(() => {
-    //getFolders();
+    let path = location.pathname;
+    console.log(location);
+    GetUserdetails(state,dispatch,state.userId).then( res => {
+      if(path.replace("/","") === "accounts"){
+      if(   state.userObj !== null &&
+            state.userObj !== undefined && 
+          (state.userObj.roles === "super_admin" || state.userObj.roles === "reseller") )
+           loadPage("accounts");else loadPage("forbidden");}
+    else 
+      loadPage(path.replace("/","")); }).catch(err=> loadPage("videos"));
+    
   }, []);
 
   const switchToSelf = (state,dispatch)=>{
@@ -61,7 +78,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       localStorage.setItem("token",state.archiveAccount.token);
       localStorage.setItem("archive",null);
       dispatch({type:"ARCHIVE_ACCOUNT", payload : {archiveAccount :null }});
-      dispatch({type:"LOGIN_SUCCESS", payload:{  token:state.archiveAccount.token,userId : state.archiveAccount.userId,page:"my-videos" } });
+      dispatch({type:"LOGIN_SUCCESS", payload:{  token:state.archiveAccount.token,userId : state.archiveAccount.userId,page:"videos" } });
       GetUserdetails(state,dispatch, state.userId);
       window.location.reload(false);
     }
@@ -72,7 +89,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
-          defaultOpenKeys={["my-videos-submenu"]}
+          defaultOpenKeys={["products-menu"]}
           selectedKeys={selectedKeys}
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}
           style={{ height: "100%", borderRight: 0 }}
@@ -82,88 +99,31 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           (state.userObj.roles === "super_admin" || state.userObj.roles === "reseller") ? 
           <SubMenu key="partners-submenu" title={ state.userObj.roles === "super_admin" ? "Super Admin Panel":"Partners"}>
             {/*<Menu.Item key="customers">Customers</Menu.Item>*/}
-            <Menu.Item key="listu" onClick={() => loadPage("manage-users")}>
+            <Menu.Item key="listu" onClick={() => 
+            pushIntoHistory(state,dispatch,"accounts") }>
               Accounts
             </Menu.Item>
           </SubMenu> : "" }
-          <SubMenu key="my-videos-submenu" title="Products">
+          <SubMenu key="products-menu" title="Products">
             <Menu.Item
               key="dashboard"
-              onClick={() => GetFolders(state, dispatch, state.userId)}
+              onClick={() => {GetFolders(state, dispatch, state.userId);
+                pushIntoHistory(state,dispatch,"videos") }}
             >
               All Videos
             </Menu.Item>
-            {/*<Menu.Item
-              disabled={true}
-              className="createFolderMenuItem"
-              key="cfv"
-            >
-              <Button
-                key={"xcvz"}
-                type="primary"
-                shape="round"
-                icon={<FolderAddOutlined className="createFolderBtnIcon" />}
-                size="middle"
-                onClick={showCreateFolder}
-                className="createFolderBtn"
-              >
-                {" "}
-                Create Folder
-              </Button>
-            </Menu.Item>*/}
-            {/*<Menu.Item>
-            <><SearchOutlined/>
-            <Input  placeholder="folder, 3 letters" value={fsrch}
-             onChange={(e)=>{ setFsrch(e.target.value);   }}  />
-             </>
-              </Menu.Item>
-              {state.folderList !== undefined && state.folderList.length > 0
-              ? state.folderList.map((folder, index) => {
-                  return fsrch.length>2 && folder.includes(fsrch)?
-                  (
-                    <Menu.Item
-                      key={"folder-" + index}
-                      onClick={() => folderDetail(folder)}
-                      title={folder}
-                    >
-                      <FolderOutlined /> {folder}
-                    </Menu.Item>
-                  ): null;
-                })
-              : null}
-              // search in menu above , do not delete 
-              <Menu key="foldersearch" 
-             title={ state.folderList !== undefined && state.folderList.length > 0
-             ? "Folders "+state.folderList.length : "Folders "+0 }> 
-              {state.folderList !== undefined && state.folderList.length > 0
-              ? state.folderList.map((folder, index) => {
-                  return (
-                    <Menu.Item
-                      key={"folder-" + index}
-                      onClick={() => folderDetail(folder)}
-                      title={folder}
-                    >
-                       {folder}
-                    </Menu.Item>
-                  );
-                })
-              : null}
-            </Menu>*/}
             </SubMenu>
-            {/* <Menu.Item key="" onClick={() => openUploadVideo(true)}>
-              Add Video
-            </Menu.Item> */}
             {state.archiveAccount !== null ?
             <Menu.Item onClick={()=> switchToSelf(state,dispatch)}>
                 Switch To Own Account     </Menu.Item> :null }
               {state.userObj !== null && state.userObj !== undefined && 
             state.userObj.roles !== "user" && state.userObj.roles !== "editor"  ?
             <Menu.Item onClick={() => { 
-                  dispatch({ type: PAGE, payload: { page: 'my-profile' } }); }}>
+              pushIntoHistory(state,dispatch,"profile")  }}>
                 My Account  </Menu.Item> : null}
             <Menu.Item key="ureport" title="Coming soon"
-              onClick={() => loadPage("reseller-reports")}>
-              Usage Report
+              onClick={() => pushIntoHistory(state,dispatch,"usage")} >
+               Usage Report              
             </Menu.Item>          
         </Menu>
       </Sider>      

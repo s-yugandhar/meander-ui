@@ -76,7 +76,7 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
     localStorage.setItem("token",sharedtoken);
     localStorage.setItem("archive",JSON.stringify({"userId":previd , "token" : prevtoken  } ));
     dispatch({type:"ARCHIVE_ACCOUNT", payload:{ archiveAccount : { token : prevtoken , userId :previd } }});
-    dispatch({type:"LOGIN_SUCCESS", payload:{  token : sharedtoken , userId : sharedid,page:"my-videos" } });
+    dispatch({type:"LOGIN_SUCCESS", payload:{  token : sharedtoken , userId : sharedid,page:"videos" } });
     GetUserdetails(state,dispatch, state.userId);
 }
 

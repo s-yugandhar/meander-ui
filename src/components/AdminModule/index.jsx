@@ -59,7 +59,9 @@ const AdminModule = (props) => {
   const { Paragraph, Text } = Typography;
   const videomime = "video/*";
   const audiomime = "audio/*";
-  const [selectedTab, setSelectedTab] = useState("my-videos");
+  const dyHeaderBG = props.dyHeaderBG;
+  const dyLogo = props.dyLogo;
+  const [selectedTab, setSelectedTab] = useState("videos");
   const [uploadVideo, setUploadVideo] = useState(false);
   const [logedIn, setLogedIn] = useState(false);
   const [stateEdit, setStateEdit] = useState(false);
@@ -158,8 +160,8 @@ const AdminModule = (props) => {
         <Menu.Item onClick={()=> switchToSelf(state,dispatch)}>
         Switch To Own Account
       </Menu.Item> : null
-      /*<Menu.Item onClick={() => { setSelectedTab('my-profile') ;
-      dispatch({ type: PAGE, payload: { page: 'my-profile' } }); }}>
+      /*<Menu.Item onClick={() => { setSelectedTab('profile') ;
+      dispatch({ type: PAGE, payload: { page: 'profile' } }); }}>
         My Profile
       </Menu.Item>*/}
       <Menu.Item onClick={(e)=>logout()}>
@@ -169,15 +171,16 @@ const AdminModule = (props) => {
   );
 
   const page = {
-    "my-videos": <MyVideos openUploadVideo={() => { setUploadVideo(true)}} />,
+    "videos": <MyVideos openUploadVideo={() => { setUploadVideo(true)}} />,
     "add-video": <AddVideo />,
-    "my-profile": <MyProfile />,
+    "profile": <MyProfile />,
     "edit-video": <EditVideo />,
     "manage-videos": <ManageVideos />,
-    "manage-users": <ManageUsers />,
+    "accounts": <ManageUsers />,
     "share-access" : <ShareAccess/>,
     "reseller-settings": <Settings />,
-    "reseller-reports": <ResellerReports />,
+    "usage": <ResellerReports />,
+    "forbidden" : <><div> <p> You have no permission to view this page</p></div></>
   };
 
 
@@ -211,7 +214,7 @@ const AdminModule = (props) => {
       localStorage.setItem("token",state.archiveAccount.token);
       localStorage.setItem("archive",null);
       dispatch({type:"ARCHIVE_ACCOUNT", payload : {archiveAccount :null }});
-      dispatch({type:"LOGIN_SUCCESS", payload:{  token:state.archiveAccount.token,userId : state.archiveAccount.userId,page:"my-videos" } });
+      dispatch({type:"LOGIN_SUCCESS", payload:{  token:state.archiveAccount.token,userId : state.archiveAccount.userId,page:"videos" } });
       GetUserdetails(state,dispatch, state.userId);
     }
   }
@@ -228,8 +231,8 @@ const AdminModule = (props) => {
                 <div style={{ color: "white" }} className="brandingLogoBlock">
                   <img src={Logo} alt=""  className="brandingLogo" />
                 </div>:
-                  <div style={{ color: HeaderBG }} className="brandingLogoBlock">
-                  <img src={Logo} alt=""  className="brandingLogo" />
+                  <div style={{ color: dyHeaderBG }} className="brandingLogoBlock">
+                  <img src={ dyLogo} alt=""  className="brandingLogo" />
                 </div>
                     }
               </Col>

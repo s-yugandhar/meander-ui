@@ -181,12 +181,13 @@ useEffect(()=>{
 
   useEffect(() => {
     setLoading(true);
-    listPlaylist(state,dispatch);
+    listPlaylist(state,dispatch).then(res=>{
+      if(state.dbfolderList.length === 0)  
+         createPlaylist(state,dispatch,"default","folder") });
     updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     GetFolders(state, dispatch, state.userId);
-      //CreateNewFolder(state, dispatch, state.userId, "default");
       GetUserdetails(state,dispatch,state.userId);
     console.log('State - ', state.videoList);
  }, []);
@@ -211,7 +212,7 @@ dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
 };
 
 const folderDetail = (folderName) => {
-  dispatch({ type: 'PAGE', payload: { page: "my-videos" } });
+  dispatch({ type: 'PAGE', payload: { page: "videos" } });
   dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
   dbGetObjByPath(
     state,    dispatch,    "bucket-" + state.userId + "/" + folderName,   true

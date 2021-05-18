@@ -7,8 +7,8 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 import { Content } from 'antd/lib/layout/layout';
 
-export const url = "https://meander.video";
-//export const url = "http://127.0.0.1:8002";
+//export const url = "https://meander.video";
+export const url = "http://127.0.0.1:8002";
 export const cdn_url = "https://cdns.meander.video/";
 
 
@@ -74,7 +74,7 @@ export const GetFolders= async (state,dispatch ,userId)=>{
    dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
    dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });
    dispatch({ type : VIDEO_LIST , payload : {videoList :tempFolders.dblist } });
-   dispatch({   type: PAGE,   payload: {    page: 'my-videos'    } });
+   dispatch({   type: PAGE,   payload: {    page: 'videos'    } });
    console.log(" data in get folders", state.folderList);
    return tempFolders;
 }
@@ -96,8 +96,8 @@ export async function GetFiles(state,dispatch,userId, folderName) {
 
 export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
    if(folderName in state.folderList)
-      {  notification.open({message:"Folder Exists with files in it",
-      icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
+      {  //notification.open({message:"Folder Exists with files in it",
+         //icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
          return "";}
    const crtFolder = axios.post(url + '/create_folder?id=' + userId + '&foldername=' + folderName, null, {
       headers: {
@@ -108,23 +108,22 @@ export const CreateNewFolder = async (state,dispatch ,userId, folderName) => {
           payload: { folderList:  Array.from( new Set(state.folderList).add(folderName)  ) } });
           dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
           dispatch({ type: FOLDER_CREATED, payload: { folderCreated: folderName } });
-      if( folderName !== "default")
-         notification.open({message:"Folder Exists, Upload a file to retain folder",
-          icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
+      if( folderName !== "default");
+         //notification.open({message:"Folder Exists, Upload a file to retain folder",
+          //icon: <ExclamationCircleOutlined style={{ color: "red" }}/>    });
     } else if (res.data.status_code === 201) {
       if( folderName !== "default")
-      notification.open({
-        message: `Successfully created : ${folderName} `,
-        description: `Upload a file to retain folder `,
-        icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,
-      });
+      //notification.open({
+       // message: `Successfully created : ${folderName} `,
+        //description: `Upload a file to retain folder `,
+       // icon: <CheckCircleOutlined style={{ color: "#5b8c00" }} />,      });
       dispatch({ type: FOLDER_CREATED, payload: { folderCreated: folderName } });
       //GetFolders(state,dispatch,state.userId);
       dispatch({ type: 'FOLDER_LIST',
           payload: { folderList:  Array.from( new Set(state.folderList).add(folderName)  ) } });
           dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
-    } else {
-      notification.open({message:'Unknown error occured in create Folder'});
+    } else {;
+      //notification.open({message:'Unknown error occured in create Folder'});
     }});
 
    return crtFolder;
@@ -157,10 +156,12 @@ export const deleteFile_Folder = async (state,dispatch, userId,objectName , recu
          accept: 'application/json',
       }
    }).then(res => {
-      notification.open({ message : "Delete file in  cdn" });
+      //notification.open({ message : "Delete file in  cdn" });
       console.log(  "delete success" , res , objectName , recursive , userId);
-      return "";   });
-   /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
+      return "";   }).catch(err=>  
+         notification.open({ message : "Error in deleting file in cdn" })
+         );
+   
       if (getFiles === ""){
          let path = recursive ===true ? objectName+"/" : objectName;
             dbRemoveObj( state, dispatch , "bucket-"+userId +"/"+path , recursive );
@@ -212,12 +213,9 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
        notification.open({message : " Update succesful"});
        console.log(  "update success" , res );
       dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});}
-      else {
-         notification.open({message : " Update failed"});
-
-      }
-   });
-   /*.then(err=>{ console.log(  "delete failed" , err , objectName , recursive , userId); } );*/
+   }).catch(err=> notification.open({message : " Update failed"}))
+   ;
+   
    return getFiles;
 }
 
@@ -250,15 +248,10 @@ export const dbRemoveObj=async( state , dispatch ,path , recursive )=>{
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
    }).then(res => {
-      notification.open({ message : "Removed metadata f" });
-      //if(res.status === 200){
+      notification.open({ message : "Deleted the video succesfully" });
          console.log(  "delete video obj " , res );
-     // dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});
-      //return "";}
-      //else{
-      //   console.log("Error in getting objects from db");
-      // }
-   });
+     
+   }).catch(err=> notification.open({ message : "Error while deleting video" }) );
    return getFiles;
 }
 

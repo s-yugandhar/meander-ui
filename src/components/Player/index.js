@@ -5,23 +5,29 @@ import {Context} from '../../context';
 import 'video.js/dist/video-js.css';
 import Logo from "../../assets/images/Meander_Logo.svg";
 import videojs from 'video.js'; 
+import videoJsContribQualityLevels from 'videojs-contrib-quality-levels';
+import videojsHlsQualitySelector from 'videojs-hls-quality-selector';
 import axios from 'axios';
-import {url , cdn_url } from "../API/index";
+import {url , cdn_url, getPublicItems } from "../API/index";
 
+videojs.registerPlugin('qualityLevel', videoJsContribQualityLevels)
+videojs.registerPlugin('hlsQualitySelector', videojsHlsQualitySelector)
 
 // eslint-disable-next-line import/prefer-default-export
 const usePlayer = ({ src, controls, autoplay }) => {
   const options = {
     fill: true,
-    fluid: true,
+    fluid: false,
     preload: 'auto',
+    responsive:true,
     html5: {
       hls: {
         enableLowInitialPlaylist: true,
         smoothQualityChange: true,
         overrideNative: true,
-      },
-    },
+      },},
+      plugins:{
+      qualityLevel: {}, hlsQualitySelector: { displayCurrentQuality: true },}
   };
   const videoRef = useRef(null);
   const [player, setPlayer] = useState(null);
@@ -54,8 +60,8 @@ export const VideoPlayer = ({ src, controls, autoplay }) => {
   const playerRef = usePlayer({ src, controls, autoplay });
 
   return (
-    <div data-vjs-player>
-      <video ref={playerRef} className="video-js" />
+    <div data-vjs-player style={{width:'70vh*(4/3)',height:'70vh !important',}}>
+      <video ref={playerRef} className="video-js" style={{height:'70vh',width:'70vh*(4/3)'}} />
     </div>
   );
 };
@@ -106,15 +112,19 @@ export const PlayerPage=()=>{
             ob.mp4 = mp4;
             setAVideo(hls);
       }
+
+      useEffect(()=>{
+          getPublicItems(state,dispatch,"m");
+      },[])
     
     return (       
         <Layout>
             <Row>
                 <Col span={aVideo === null ? 0 : 18}>
-                    <Card title={null}>
+                    <Card title={null} >
                         {aVideo !== null?
                         <VideoPlayer src={aVideo} controls={true}
-                        autoplay={true}
+                        autoplay={true} 
                         ></VideoPlayer> : null }             
                     </Card>
                 </Col>

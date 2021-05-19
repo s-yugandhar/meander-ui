@@ -212,7 +212,7 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
       if( res.data === true){
        notification.open({message : " Update succesful"});
        console.log(  "update success" , res );
-      dispatch({ type : VIDEO_LIST , payload :{ videoList : res.data   }});}
+      }
    }).catch(err=> notification.open({message : " Update failed"}))
    ;
    

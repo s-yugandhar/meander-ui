@@ -23,6 +23,9 @@
     "styled-components": "^5.2.3",
     "uppy": "^1.25.2",
     "video.js": "^7.12.1",
+    "videojs-contrib-quality-levels": "^2.1.0",
+    "videojs-hls-quality-selector": "^1.1.4",
+    "videojs-hls-source-selector": "^1.0.1",
     "web-vitals": "^1.0.1"
   },
   "scripts": {

@@ -240,7 +240,7 @@ const AdminModule = (props) => {
               </Col>
               <Col span={12}>
               <Input.Search onChange={(e)=>getPublicItems(state,dispatch,e.target.value)}
-                placeholder={"Search Public videos by title or description & click to play"} 
+                placeholder={"Search Public videos by title or description & play, Eg : Luke"} 
                 style={{ marginTop:"15px" }}>
                 </Input.Search>
               </Col>

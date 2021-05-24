@@ -89,7 +89,8 @@ role=${value}&friend_id=${record.id}&remove=${rem}`,{
         }
 }).then(res => {
   if(res.status === 200)
-  message.success(`Update succesful , refresh to see changes`);
+  message.success(`Update succesful `);
+  GetSharedUsersdetails(state,dispatch,state.userId); setAllUsers([]);
   console.log(res);
   return res.data;   })
 return tempFolders;
@@ -104,8 +105,9 @@ const writeRecord= async (state,dispatch ,obj )=>{
            }
   }).then(res => {
     setEditUser(null);
+    setSrch(res.data.email);searchEmail(state,dispatch,res.data.email)
     message.success(`User with email ${res.data.email} created`);
-     return res.data;   })
+     return res.data;   }).catch(err => message.success(`Error while creating User`))
   console.log(" userdata in get manageuser ", tempFolders);
   return tempFolders;
 }
@@ -189,22 +191,23 @@ const setwriteRecord=(values)=>{
           icon={<ReloadOutlined  title={"refresh data"} >   </ReloadOutlined>}></Button>
         </Col>
         </Row>
+        <Row>
         { allUsers.length > 0 ?
         "   Use make buttons to update roles and click reload in top right":null}
         { allUsers.length > 0 ?
             allUsers.map((ob)=>{
               return  <Row >
                 <Col span={12}>{ob.email}</Col>
-                <Col span={6}><button key={ob.id+"dfsdf"}
+                <Col span={6}><button key={ob.id+"dfsdf"} size="small"
                 onClick={(e)=> changePermission("user",ob,false) }
                 >Make Editor</button></Col>
-                <Col span={6}><button key={ob.id+"vifsf"}
+                <Col span={6}><button key={ob.id+"vifsf"} size="small"
                 onClick={(e)=> changePermission("viewer",ob,false) }
                 >Make Viewer</button></Col>
               </Row>
             })
             :null}
-        <Row></Row>
+        </Row>
         <Row align="middle" >
           <Col span={24}>
             <Table
@@ -217,6 +220,23 @@ const setwriteRecord=(values)=>{
           { editUser !== null ?
           <Modal title={"Edit User "}  visible={ editUser !== null }  centered={true}
           onCancel={()=>setEditUser(null)} closable={true} footer={null}>
+            <Row>
+        { allUsers.length > 0 ?
+        "   Use make buttons to update roles and click reload in top right":null}
+        { allUsers.length > 0 ?
+            allUsers.map((ob)=>{
+              return  <Row >
+                <Col span={12}>{ob.email}</Col>
+                <Col span={6}><button key={ob.id+"dfsdf"} size="small"
+                onClick={(e)=> changePermission("user",ob,false) }
+                >Make Editor</button></Col>
+                <Col span={6}><button key={ob.id+"vifsf"} size="small"
+                onClick={(e)=> changePermission("viewer",ob,false) }
+                >Make Viewer</button></Col>
+              </Row>
+            })
+            :null}
+        </Row>
           <Form      name="basic"
               initialValues={{ username: editUser.username, email: editUser.email,
                 phone : editUser.phone, password : editUser.password }}
@@ -242,7 +262,10 @@ const setwriteRecord=(values)=>{
                   },
                 ]}
               >
-            <Input  type={"email"} key={editUser.id+"em"}  ></Input>
+            <Input  type={"email"} key={editUser.id+"em"}  
+            onChange={e  => { setSrch(e.target.value);searchEmail(state,dispatch,e.target.value)}}
+            onBlur={e=> setSrch("")}
+            ></Input>
               </Form.Item>
               { createUser ?
                 <Form.Item

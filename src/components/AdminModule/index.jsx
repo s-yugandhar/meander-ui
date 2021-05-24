@@ -15,6 +15,7 @@ import MyVideos from "../MyVideos";
 import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
 import Login from "../../Login";
+import Plans  from "../AllPlan";
 import Loading from "../Loading";
 import {FILE_LIST, FILE_UPLOADED ,FOLDER_NAME , UPPY_SUCCESS ,UPPY_BATCHID,UPPY_FAILED,PAGE } from "../../reducer/types";
 import { dbAddObj,dbGetObjByPath,deleteAfterUpload , GetFiles  ,
@@ -183,6 +184,7 @@ const AdminModule = (props) => {
     "usage": <ResellerReports />,
     "player" : <PlayerPage/>,
     "login" : <Login/>,
+    "appplans" : <Plans/>,
     "forbidden" : <><div> <p> You have no permission to view this page</p></div></>
   };
 

@@ -125,6 +125,10 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               onClick={() => pushIntoHistory(state,dispatch,"usage")} >
                Usage Report              
             </Menu.Item>          
+            <Menu.Item key="appplans" onClick={() => 
+              loadPage("appplans") }>
+              Application Plans
+            </Menu.Item>
         </Menu>
       </Sider>      
     </>

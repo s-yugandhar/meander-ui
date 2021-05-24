@@ -18,7 +18,8 @@ import {
    ACCESS_IN,
    ACCESS_OUT,
    ARCHIVE_ACCOUNT,
-   PUBLIC_VIDEOS
+   PUBLIC_VIDEOS,
+   APP_PLANS
 } from './types'
 
 const localUserId = localStorage.getItem('userId');
@@ -47,6 +48,7 @@ export const initialState = {
    accessIn : [] ,
    accessOut : [],
    publicVideos : [],
+   appPlans : [] ,
 }
 
 export const reducer = (state = initialState, action) => {
@@ -139,6 +141,10 @@ export const reducer = (state = initialState, action) => {
 
       case PUBLIC_VIDEOS : 
       return { ...state , publicVideos : action.payload.publicVideos }
+
+      case APP_PLANS : 
+      return { ...state , appPlans : action.payload.appPlans }
+
 
       default:
          return state;

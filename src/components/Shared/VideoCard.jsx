@@ -1,5 +1,5 @@
-import React, { useContext, useState ,lazy ,Suspense} from "react";
-import { Menu, Card, Button, message,Row,Col ,Dropdown, Modal,Tooltip,Image, Popover } from "antd";
+import React, { useContext, useState ,lazy ,Suspense, useEffect} from "react";
+import { Menu, Card, Button, message,Row,Col ,Dropdown, Modal,Tooltip,Image, Popover,Badge } from "antd";
 import {
   SwapOutlined,
   EditOutlined,
@@ -12,20 +12,14 @@ import {
   EllipsisOutlined
 } from "@ant-design/icons";
 import { deleteFile_Folder } from "../API";
+import ImageLoad from '../Shared/ImageLoader';
 import {
-  PAGE,
-  FOLDER_CREATED,
-  FILE_UPLOADED,
-  FOLDER_NAME,
-  FILE_LIST,
-  FOLDER_LIST,
+  PAGE,  FOLDER_CREATED,  FILE_UPLOADED,
+  FOLDER_NAME,  FILE_LIST,  FOLDER_LIST,
 } from "../../reducer/types";
 import {
-  dbGetObjByPath,
-  GetFolders,
-  url,cdn_url,
-  GetFiles,
-  CreateNewFolder,
+  dbGetObjByPath, GetFolders,  url,cdn_url,
+  GetFiles,  CreateNewFolder, getServedLinks
 } from "../API/index";
 import { Context } from "../../context";
 import "../../assets/styles/videoCard.scss";
@@ -39,34 +33,29 @@ const VideoCard = (props) => {
   const [visible, setVisible] = useState(false);
   const [codesModal,setCodesModal] = useState(false);
   const [code , setCode] = useState("<---- Click on any button to copy the code");
+  const [links,setLinks] = useState(null);
 
-  function getMp4Url(props, type) {
-    let tempdoc = ["img720", "img480", "img240"];
-    let ipath = props.fileObject.itempath;
-    let tempcdn_url = cdn_url + ipath.split(".")[0];
-    let dash_cdn = cdn_url+"dash/";
-    let hls_cdn = cdn_url +"hls/";
-    let img1080 = "/thumbs/img1080/frame_0000.jpg";
-    let mp34 = "/audio4.mp3";
-    let mp4 = {
-      "1080p": "/mp41080k.mp4",
-      "720p": "/mp4720k.mp4",
-      "480p": "/mp4480k.mp4",
-      "240p": "/mp4240k.mp4",
-    };
-    let dash_url =      dash_cdn + ipath.split(".")[0] +
-      "/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
-    let hls_url =   hls_cdn +   ipath.split(".")[0] +
-      "/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
-    let mp4_url = tempcdn_url + mp4["1080p"];
-    let mp3_url = tempcdn_url + "/audio4.mp3";
-    let img_url = tempcdn_url + img1080;
-    if (type == "mp3" && props.fileObject.itemtype.includes("audio"))
-      return mp3_url;
-    if (type == "mp4") return mp4_url;
-    if (type == "img") return img_url;
-    if (type == "dash") return dash_url;
-    if (type == "hls") return hls_url;
+  const callServedLinks= (play)=>{
+    setLinks(null);
+    if(links === null || play === true){
+      getServedLinks(state,dispatch,props.fileObject.id,play)
+    .then(res => {  setLinks(res); }).catch(err=> {});
+    }
+  }
+  
+  useEffect(()=>{
+        callServedLinks(false);
+  },[]);
+
+  
+
+  function getMp4Url(props, type) {  
+    if (type === "mp3" && props.fileObject.itemtype.includes("audio"))
+      return links['mp3_url'];
+    if (type === "mp4") return links['mp4_url'];
+    if (type === "img") return links['img_url'];
+    if (type === "dash") return links['dash_url'];
+    if (type === "hls") return links['hls_url'];
   }
 
   const onSideNavFolderClick = (folderName) => {
@@ -84,17 +73,12 @@ const VideoCard = (props) => {
 
   async function deleteFile(state, dispatch, id, file) {
     let flag = window.confirm("Do you really want to delete file ?");
-    if (flag == false) return;
+    if (flag === false) return;
     if (!file.itempath.includes("temp.dod"))
-      deleteFile_Folder(
-        state,
-        dispatch,
-        id,
+      deleteFile_Folder(   state,  dispatch,  id,
         file.itempath.split("/")[1] + "/" + file.itempath.split("/")[2],
-        false
-      ).then((res) => {
-        state.folderName === ""
-          ? showAllvideos()
+        false  ).then((res) => {
+        state.folderName === ""  ? showAllvideos()
           : onSideNavFolderClick(state.folderName);
       });
     else alert("this is not a file to delete");
@@ -132,16 +116,6 @@ const VideoCard = (props) => {
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: obj } });
     //dbGetObjByPath(state, dispatch, obj.itempath, false);
   };
-
-  const copyCode = (state, dipatch, url, props) => {
-    let code = getPlayUrl(state, dispatch, url, props);
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(code);
-      message.success(`Code Copied `);
-    } else {
-      alert(`Sorry your browser does not support, please copy here: ${code}`);
-    }
-  };
   
   const handleMenuClick = (e) => {
     console.log(e);
@@ -177,9 +151,10 @@ const VideoCard = (props) => {
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
+      {links ?<>
       <Menu.Item key="mp4"> Mp4</Menu.Item>
       <Menu.Item key="dash">Android</Menu.Item>
-      <Menu.Item key="hls"> Ios</Menu.Item>{" "}
+      <Menu.Item key="hls"> Ios</Menu.Item>{" "} </>: null }
     </Menu>
   );
   const menuaudio = (
@@ -187,24 +162,30 @@ const VideoCard = (props) => {
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
-      <Menu.Item key="mp3">Mp3</Menu.Item>{" "}
+      {links ?<> <Menu.Item key="mp3">Mp3</Menu.Item>{" "}</>:null}
     </Menu>
   );
 
   
   return (
+    
     <Card
       bordered={true}
       hoverable={true}
-      title={
-        <>
-          {props.videoTitle}
-          <h6>
-            {  new Date( props.fileObject.updatetime === "-1" || props.fileObject.updatetime === -1?
+      title={ <>   {  props.videoTitle}
+          <h6>  {  new Date( props.fileObject.updatetime === "-1" || props.fileObject.updatetime === -1?
               null : props.fileObject.updatetime * 1  ).toLocaleString() }
-          </h6>
-        </>
-      }
+          </h6>  </>   }
+      extra={<>
+      <Popover content={<>
+      <Badge count={props.fileObject.dislikes} title="dislikes" showZero
+      style={{backgroundColor:"red"}} overflowCount={999999999}></Badge>
+      <Badge count={props.fileObject.likes} title="likes" overflowCount={999999999} showZero
+      style={{backgroundColor:"yellowgreen"}} ></Badge>
+      <Badge count={props.fileObject.hits} title="views" overflowCount={999999999} showZero
+      style={{backgroundColor:"green"}} ></Badge></>}>...</Popover> 
+      </>}
+      
       headStyle={{ height: "25%" }}
       bodyStyle={{ height: "55%" }}
       actions={[
@@ -241,7 +222,7 @@ const VideoCard = (props) => {
           <Button
             htmlType="a"
             key="link"
-            onClick={(e) => {setCodesModal(true)}}
+            onClick={(e) => {callServedLinks(true);setCodesModal(true); }}
             aria-hidden={true}
             style={{ borderColor: "white", padding: 0 }}  >
               <Tooltip title="Copy links to video">
@@ -260,13 +241,10 @@ const VideoCard = (props) => {
         <div className="videoBlock">
           
           {/*<VideoCameraOutlined className="videoIconLoading" />*/}
-          { document.getElementById(props.fileObject.id)  ?
-          <img alt="Thumbnail" 
-           src={   
-            props.fileObject.itemtype.includes("audio")
-            ? mp3img  : getMp4Url(props, "img")
-           }
-             /> : <img src={logo} alt=""/>}
+          { 
+            <ImageLoad src={ links === null ? null : links['img_url']} placeholder={logo}
+            alt={props.fileObject.title + " " +props.fileObject.description} />
+          }
           <Button
             className="playBtn"
             type="button"

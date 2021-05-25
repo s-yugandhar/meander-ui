@@ -7,10 +7,9 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 import { Content } from 'antd/lib/layout/layout';
 
-export const url = "https://meander.video";
-//export const url = "http://127.0.0.1:8002";
+//export const url = "https://meander.video";
+export const url = "http://127.0.0.1:8002";
 export const cdn_url = "https://cdns.meander.video/";
-
 
 const getParentAssingnedRole = async (child_id) => {
    const arcAcc = JSON.parse(localStorage.getItem("archive"));
@@ -297,13 +296,40 @@ export const updatePlaylist= async (state,dispatch,ftype,pid,vid,pos)=>{
 }
 
 export const getPublicItems=async(state,dispatch,key)=>{
-   const tempFolders = await axios.get(url + `/searchvideos?key=${key}`, {
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+  
+   const tempFolders = await axios.get(url + `/searchvideos?key=${key}&token=${token}&user_id=${userId}`, {
        headers: {
           accept: 'application/json', Authorization : "bearer "+state.token,
              }
     }).then(res => {     
        dispatch({type:"PUBLIC_VIDEOS",payload:{publicVideos : res.data}});
+
+       if(userId !== null){
+         dispatch({type:"VIDEO_LIST",payload:{ videoList : res.data}});
+       }
        return res.data;   }).catch(err=> {
          return [] });
       return tempFolders;
 };
+
+export const getServedLinks = async (state,dispatch,contentid,play=false)=>{
+   const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+
+   const tempFolders = await axios.get(url +
+      `/serve_links?contentid=${contentid}&play=${play}&user_id=${userId}&token=${token}`, {
+      headers: {
+         accept: 'application/json', Authorization : "bearer "+state.token,
+            }
+      }).then(res=>{
+         console.log(res.data) ;
+         return res.data;
+      }).catch(err=>{
+         console.log(err) ;
+         return null;
+      });
+   return tempFolders;
+
+}

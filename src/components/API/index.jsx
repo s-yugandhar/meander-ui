@@ -7,8 +7,8 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 import { Content } from 'antd/lib/layout/layout';
 
-export const url = "https://meander.video";
-//export const url = "http://127.0.0.1:8002";
+//export const url = "https://meander.video";
+export const url = "http://127.0.0.1:8002";
 export const cdn_url = "https://cdns.meander.video/";
 
 const getParentAssingnedRole = async (child_id) => {
@@ -298,8 +298,10 @@ export const updatePlaylist= async (state,dispatch,ftype,pid,vid,pos)=>{
 export const getPublicItems=async(state,dispatch,key)=>{
   const userId = localStorage.getItem('userId');
   const token = localStorage.getItem('token');
-  
-   const tempFolders = await axios.get(url + `/searchvideos?key=${key}&token=${token}&user_id=${userId}`, {
+  let path = `/searchvideos?key=${key}&token=${token}&user_id=${userId}`;
+  if( userId === null || userId === undefined || token === null || token === undefined)
+            path= `/searchvideos?key=${key}`
+   const tempFolders = await axios.get(url + path , {
        headers: {
           accept: 'application/json', Authorization : "bearer "+state.token,
              }
@@ -317,14 +319,16 @@ export const getPublicItems=async(state,dispatch,key)=>{
 export const getServedLinks = async (state,dispatch,contentid,play=false)=>{
    const userId = localStorage.getItem('userId');
   const token = localStorage.getItem('token');
+  let path = `/serve_links?contentid=${contentid}&play=${play}&user_id=${userId}&token=${token}`;
+  if( userId === null || userId === undefined || token === null || token === undefined)
+            path= `/serve_links?contentid=${contentid}&play=${play}`
 
-   const tempFolders = await axios.get(url +
-      `/serve_links?contentid=${contentid}&play=${play}&user_id=${userId}&token=${token}`, {
+   const tempFolders = await axios.get(url + path , {
       headers: {
          accept: 'application/json', Authorization : "bearer "+state.token,
             }
       }).then(res=>{
-         console.log(res.data) ;
+         //console.log(res.data) ;
          return res.data;
       }).catch(err=>{
          console.log(err) ;

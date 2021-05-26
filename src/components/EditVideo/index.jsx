@@ -9,7 +9,7 @@ import { PlayCircleOutlined ,ReloadOutlined,  DeleteOutlined,
   LoadingOutlined , PlusSquareOutlined } from "@ant-design/icons";
 import "./editVideo.scss";
 import axios from 'axios';
-import {dbUpdateObj , url , cdn_url , listPlaylist, createPlaylist } from '../API';
+import {dbUpdateObj , url , cdn_url , listPlaylist, createPlaylist , getServedLinks } from '../API';
 import { Context } from '../../context';
 import PlayVideo from "../PlayVideo";
 import Logo from "../../assets/images/Meander_Logo.svg";
@@ -31,13 +31,14 @@ const EditVideo = (props) => {
   const [ fileList, setFileList] = useState([]);
   const [ previewImage , setPreviewImage] = useState(null);
   const [seePreview , setSeePreview] = useState(false);
-  const [trans,setTrans] =  useState(false);
+  const [trans,setTrans] =  useState(true);
   const [seewhat,setSeeWhat] = useState(1);
   const [copywhat,setCopyWhat] = useState("play");
   const [showcode,setShowCode] = useState(null);
   const [loading,setLoading] = useState(false);
   const [plist,setPlist] = useState([]);
   const [flag,setFlag] = useState(false);
+  const [links , setLinks] = useState(null);
   let editV = { ...state.editVideo };
 
   let mp4 = {    "1080p": "/mp41080k.mp4",
@@ -53,29 +54,15 @@ const EditVideo = (props) => {
       }
 
       function getMp4Url( state, type) {
-        if( state.editVideo !== null && state.editVideo !== undefined){
-        let tempdoc = ["img720", "img480", "img240"];
-        let ipath = state.editVideo.itempath;
-        let tempcdn_url = cdn_url + ipath.split(".")[0];
-        let dash_cdn = cdn_url+"dash/";
-        let hls_cdn = cdn_url+"hls/";
-        let img1080 = "/thumbs/img1080/frame_0000.jpg";
-        let mp34 = "/audio4.mp3";
-        let mp4 = {  "1080p": "/mp41080k.mp4",      "720p": "/mp4720k.mp4",
-          "480p": "/mp4480k.mp4",       "240p": "/mp4240k.mp4",       };
-        let dash_url =   dash_cdn +  ipath.split(".")[0] +
-          "/mp4,108,72,48,24,0k.mp4/urlset/manifest.mpd";
-        let hls_url =   hls_cdn +  ipath.split(".")[0] +
-          "/mp4,108,72,48,24,0k.mp4/urlset/master.m3u8";
-        let mp4_url = tempcdn_url + mp4["1080p"];
-        let mp3_url = tempcdn_url + "/audio4.mp3";
-        let img_url = tempcdn_url + img1080;
-        if (type == "mp3" && state.editVideo.itemtype.includes("audio"))
-          return mp3_url;
-        if (type == "mp4") return mp4_url;
-        if (type == "img") return img_url;
-        if (type == "dash") return dash_url;
-        if (type == "hls") return hls_url;        }
+        
+        if (links === null || links === undefined)
+              return null;
+        if (type === "mp3" && state.editVideo.itemtype.includes("audio"))
+          return links.mp3_url;
+        if (type === "mp4") return links.mp4_url;
+        if (type === "img") return links.img_url;
+        if (type === "dash") return links.dash_url;
+        if (type === "hls") return links.hls_url;      
       }
     
       const getPlayUrl = (state, dispatch) => {
@@ -208,7 +195,11 @@ const EditVideo = (props) => {
   };
 
       useEffect(()=>{
-
+        if( links === null){
+          getServedLinks(state,dispatch,state.editVideo.id,true).then(
+            res=> {  setLinks(res)}
+          ).catch(err=>{ setLinks(null)});
+        }
         listPlaylist(state,dispatch);
 
         form.setFieldsValue({ 

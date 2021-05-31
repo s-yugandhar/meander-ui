@@ -82,7 +82,8 @@ const TopHeader = (props) => {
            page: "videos",
          },
        });
-       GetUserdetails(state, dispatch, state.userId);
+       GetUserdetails(state, dispatch, state.userId).then(res=>
+        window.location.reload());
      }
    };
 
@@ -168,7 +169,7 @@ const TopHeader = (props) => {
         GetAllUserdetails( {token:token},dispatch,userId);
       }
       else{}
-    },[state.userId]);
+    },[state.videoList]);
 
    return (
      <Header
@@ -201,14 +202,16 @@ const TopHeader = (props) => {
          { (state.userObj && (state.userObj.roles === "reseller" || state.userObj.roles === "super_admin"))
          || archive !== null ?
          <Select                 
-                  size="large"
+                  size="middle"
+                  style={{width:"auto"}}
                   placeholder="search email"
                   optionFilterProp="children"
                   showSearch={true}
                   value={ acUser !== null ? acUser : null }
                   onChange={(value) => { 
-                    if(value === "Switch to Self")
+                    if(value === "Switch to Self"){
                         switchToSelf(state,dispatch,archive);
+                      return ;}
                     if(acUser !== value){
                       let user = listUsers.find(o => o.email === value );
                       if(user)

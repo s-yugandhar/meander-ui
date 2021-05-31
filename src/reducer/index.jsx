@@ -32,7 +32,7 @@ export const initialState = {
    token: localToken ? localToken : null,
    userId: localUserId ? localUserId : null,
    userName: localUserName ? localUserName : null,
-   page: 'videos',
+   page: localToken ? 'videos' : 'login',
    folderCreated: null,
    fileUploaded: null,
    folderName: '' ,

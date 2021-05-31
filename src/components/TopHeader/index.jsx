@@ -7,7 +7,6 @@ import {
 } from "antd";
 import { UserOutlined, DownOutlined } from "@ant-design/icons";
 // custom imports
-import impLogo from "../../assets/images/Meander_Logo.svg";
 import {
   GetUserdetails,
   url, getPublicItems,
@@ -17,11 +16,9 @@ import axios from 'axios';
 import { Context } from "../../context";
 import { Header } from 'antd/lib/layout/layout';
 
-
 const TopHeader = (props) => {
-   let Logo = impLogo;
-   let HeaderBG = "black";
-   const dyHeaderBG = props.dyHeaderBG;
+
+  const dyHeaderBG = props.dyHeaderBG;
    const dyLogo = props.dyLogo;
    const { Option } = Select;
    const { state, dispatch } = useContext(Context);
@@ -30,6 +27,11 @@ const TopHeader = (props) => {
    const [acUser,setAcUser] = useState(null);
 
    const archive  = JSON.parse(localStorage.getItem("archive"));
+
+    useEffect(()=>{
+      console.log(props);
+    })
+
 
    const toggleToUser = async( state , dispatch , record)=>{
     let flag = window.confirm("Do you really want to switch profile");
@@ -174,13 +176,13 @@ const TopHeader = (props) => {
    return (
      <Header
        className="header"
-       style={{ backgroundColor: HeaderBG, borderBottom: "1px solid #ddd" }}
+       style={{ backgroundColor: dyHeaderBG, borderBottom: "1px solid #ddd" }}
      >
        <Row>
          <Col span={6}>
            {window.location.hostname === "portal.meander.video" ? (
              <div style={{ color: "white" }} className="brandingLogoBlock">
-               <img src={Logo} alt="" className="brandingLogo" />
+               <img src={dyLogo} alt="" className="brandingLogo" />
              </div>
            ) : (
              <div style={{ color: dyHeaderBG }} className="brandingLogoBlock">
@@ -246,7 +248,7 @@ const TopHeader = (props) => {
                      className="ant-dropdown-link"
                      onClick={(e) => e.preventDefault()}
                      style={{
-                       color: HeaderBG === "black" ? "white" : "black",
+                       color: dyHeaderBG === "black" ? "white" : "black",
                      }}
                    >
                      <Avatar

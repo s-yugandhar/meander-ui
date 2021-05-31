@@ -53,10 +53,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     dispatch({ type: PAGE, payload: { page: name } });
   };
 
-  const pushIntoHistory=(state,dispatch,name)=>{
-      window.history.pushState(state,name,name);
-      loadPage(name);
-  }
+  const archive  = JSON.parse(localStorage.getItem("archive"));
 
   useEffect(() => {
     let path = location.pathname;
@@ -100,35 +97,38 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           <SubMenu key="partners-submenu" title={ state.userObj.roles === "super_admin" ? "Super Admin Panel":"Partners"}>
             {/*<Menu.Item key="customers">Customers</Menu.Item>*/}
             <Menu.Item key="listu" onClick={() => 
-            pushIntoHistory(state,dispatch,"accounts") }>
+            loadPage("accounts") }>
               Accounts
             </Menu.Item>
-          </SubMenu> : "" }
+          </SubMenu> : null }
           <SubMenu key="products-menu" title="Products">
             <Menu.Item
               key="dashboard"
               onClick={() => {GetFolders(state, dispatch, state.userId);
-                pushIntoHistory(state,dispatch,"videos") }}
+                loadPage("videos") }}
             >
-              All Videos
+              Videos
             </Menu.Item>
             </SubMenu>
             {state.archiveAccount !== null ?
             <Menu.Item onClick={()=> switchToSelf(state,dispatch)}>
                 Switch To Own Account     </Menu.Item> :null }
-              {state.userObj !== null && state.userObj !== undefined && 
-            state.userObj.roles !== "user" && state.userObj.roles !== "editor"  ?
+              {(state.userObj !== null && state.userObj !== undefined && 
+            state.userObj.roles !== "user" && state.userObj.roles !== "editor")
+              ?
             <Menu.Item onClick={() => { 
-              pushIntoHistory(state,dispatch,"profile")  }}>
+              loadPage("profile")  }}>
                 My Account  </Menu.Item> : null}
             <Menu.Item key="ureport" title="Coming soon"
-              onClick={() => pushIntoHistory(state,dispatch,"usage")} >
+              onClick={() => loadPage("usage")} >
                Usage Report              
-            </Menu.Item>          
+            </Menu.Item> 
+            {state.userObj !== null && state.userObj !== undefined && 
+            state.userObj.roles === "super_admin"  ?         
             <Menu.Item key="appplans" onClick={() => 
               loadPage("appplans") }>
               Application Plans
-            </Menu.Item>
+            </Menu.Item>: null }
         </Menu>
       </Sider>      
     </>

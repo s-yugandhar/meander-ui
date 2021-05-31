@@ -29,7 +29,7 @@ import {
 import {
   url, GetFolders,dbGetObjByPath,
   GetFiles,  GetUserdetails,CreateNewFolder,
-  listPlaylist,createPlaylist
+  listPlaylist,createPlaylist , getPublicItems
 } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
@@ -42,14 +42,11 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Paragraph, Text } = Typography;
   const [ellipsis, setEllipsis] = useState(true);
   const [addVideo, setAddvideo] = useState("");
-  const [folders, setFolders] = useState([]);
-  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [levels, setLevels] = useState(null);
+  const [buildRoles,setBuildRoles] = useState(false);
   const [toggleEmbed, setToggleEmbed] = useState(false);
   const [embedCode, setEmbedCode] = useState(null);
-  const [tableCols, setTableCols] = useState([]);
-  const [filterType,setFilterType] = useState("all");
   const [folderSubmitBtn, setFolderSubmitBtn] = useState(false);
   const [cModal, setCModal] = useState(false);
   const { state, dispatch } = useContext(Context);
@@ -161,10 +158,32 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     createFolderModalClose();
   };
 
+  useEffect(()=>{
+    const uobj = state.userObj;
+
+    if(buildRoles){
+    if(uobj !== null && uobj !== undefined ){
+      const VL = [];
+      state.videoList.map((ob) => {
+        if( uobj.access !== undefined && uobj.access !== null){
+        if( uobj.access.admin.includes(ob.owner_id)  )  ob.userRole = "admin";
+        if( uobj.access.user.includes(ob.owner_id)    ) ob.userRole = "user";
+        if( uobj.access.viewer.includes(ob.owner_id)    )  ob.userRole = "viewer"; }
+        if(uobj.userId === ob.owner_id) ob.userRole = "admin";
+        if(uobj.roles === "user") ob.userRole = "user";
+        if(uobj.roles === "viewer") ob.userRole = "viewer";
+        //if(uobj.roles === "super_admin" || uobj.roles === "reseller") ob.userRole = "admin";
+        console.log(ob.userRole);
+        VL.push(ob);
+      });
+      dispatch({type:"VIDEO_LIST",payload:{ videoList : VL   }});
+      setBuildRoles(false);
+    } }
+
+    },[buildRoles]);
 
 
-useEffect(()=>{
-  
+useEffect(()=>{  
   let filterType = state.filterType;
   if( (filterType === "all" || filterType === "folder") )
   GetFolders(state, dispatch, state.userId);
@@ -236,11 +255,11 @@ const folderDetail = (folderName) => {
           }}
         >
           <Row align="middle" type="flex">
-          <Col span={2}>
-          <Switch size={"small"}
-          defaultChecked={nfApi} onChange={()=> setNFApi(!nfApi) }></Switch>
+          <Col span={0}>
+          {/*<Switch size={"small"}
+          defaultChecked={nfApi} onChange={()=> setNFApi(!nfApi) }></Switch>*/}
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Tooltip title={"Select folder to see folder wise Videos"}>
               {nfApi === true ?<Select
                   size="medium"
@@ -319,13 +338,19 @@ const folderDetail = (folderName) => {
               > sort
               </Button>
             </Col>
-            <Col span={4}>
-              <Input
+            <Col span={8}>
+              {/*<Input
                 placeholder="Search Title..."
                 allowClear
                 onChange={(e)=>triggerSearch(e)}
                 //enterButton
-              />
+              />*/}
+              <Input.Search allowClear
+             onChange={(e) => {getPublicItems(state, dispatch, e.target.value).then(rs=>{
+                setBuildRoles(true);
+             }); }}
+             placeholder={ "Search Team or own videos by Title" }
+           ></Input.Search>
             </Col>
           </Row>
           <Divider orientation="left"></Divider>

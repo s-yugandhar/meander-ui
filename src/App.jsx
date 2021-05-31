@@ -10,8 +10,9 @@ import { initialState, reducer } from './reducer';
 import {url , GetUserdetails} from '../src/components/API/index'
 import Login from "./Login";
 import axios from 'axios';
+import impLogo from "../src/assets/images/Meander_Logo.svg";
 
-let Logo = null;
+let Logo = impLogo;
 let HeaderBG = "black";
 const getLogoBG = async(window)=>{
   let domain = window.location.hostname;
@@ -20,12 +21,11 @@ const getLogoBG = async(window)=>{
        accept: 'application/json',
           }
  }).then(res => {
-   let sett = JSON.parse(res.data.settings);
-   let comp = JSON.parse(res.data.company);
-   Logo = sett.logo;
-   HeaderBG = sett.headerbgcolor;
-   //console.log(res.data.settings.logo , res.data.settings, res.data);
-  return { settings : sett , company: comp} ;
+   const sett = res.data.settings;
+   HeaderBG = sett.HeaderBG !== null ? sett.HeaderBG : HeaderBG;
+   Logo = sett.logo !== null ? sett.logo : impLogo;
+   //console.log(res.data.settings.logo , res.data.settings, res.data , Logo , HeaderBG );
+  return { settings : sett } ;
 });
 return tempFolders;
 }
@@ -46,7 +46,7 @@ const App = (props) => {
 
   
   useEffect((prev) => {
-    console.log('App page state - ', state );
+   // console.log('App page state - ', state , Logo,HeaderBG );
     state.userId ?
       setSignedIn(true) : setSignedIn(false);
   }, []);

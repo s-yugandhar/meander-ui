@@ -47,7 +47,6 @@ const VideoCard = (props) => {
         callServedLinks(false);
   },[]);
 
-  
 
   function getMp4Url(props, type) {  
     if (type === "mp3" && props.fileObject.itemtype.includes("audio"))
@@ -189,9 +188,8 @@ const VideoCard = (props) => {
       headStyle={{ height: "25%" }}
       bodyStyle={{ height: "55%" }}
       actions={[
-        state.userObj !== undefined && state.userObj !== null && 
-        state.userObj.roles !== "user" &&   state.userObj.roles !== "viewer"
-          ?  <Tooltip title="Click to delete video">
+        props.fileObject.userRole !== "viewer" &&
+        props.fileObject.userRole !== "user" ?  <Tooltip title="Click to delete video">
           <DeleteOutlined
             key="delete"
             title={"click to delete object"}
@@ -200,22 +198,18 @@ const VideoCard = (props) => {
             }
           />
         </Tooltip> : null,
-         state.userObj !== undefined &&
-         state.userObj !== null && state.userObj.roles !== "viewer"
-          ?<Tooltip title="Click to edit Metadata">
+         props.fileObject.userRole !== "viewer" ?<Tooltip title="Click to edit Metadata">
           <EditOutlined
             key="edit"
             onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
           />
         </Tooltip> : null,
-        state.userObj !== undefined &&
-        state.userObj !== null && state.userObj.roles !== "viewer"
-         ?<Tooltip title="copy player link">
+        <Tooltip title="copy player link">
          <LinkOutlined
            key="playnotinmenu"
            onClick={(e) => handleMenuClick({key:"playnotinmenu"})}
          />
-       </Tooltip> : null,
+       </Tooltip> ,
         <Popover  content={props.fileObject.itemtype.includes("audio") ? null : null
            }
         title={null}>

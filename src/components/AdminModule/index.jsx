@@ -61,29 +61,6 @@ import axios from "axios";
 import { PlayerPage } from "../Player";
 import TopHeader from "../TopHeader";
 
-let Logo = impLogo;
-let HeaderBG = "black";
-const getLogoBG = async (window) => {
-  let domain = window.location.hostname;
-  const tempFolders = await axios
-    .get(url + `/getlogo?domain=${domain}`, {
-      headers: {
-        accept: "application/json",
-      },
-    })
-    .then((res) => {
-      let sett = JSON.parse(res.data.settings);
-      let comp = JSON.parse(res.data.company);
-      Logo = sett.logo;
-      HeaderBG = sett.headerbgcolor;
-      //console.log(res.data.settings.logo , res.data.settings, res.data);
-      return { settings: sett, company: comp };
-    });
-  return tempFolders;
-};
-
-if (window.location.hostname !== "portal.meander.video") getLogoBG(window);
-
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
   const { SubMenu } = Menu;
@@ -257,7 +234,7 @@ const AdminModule = (props) => {
   };
 
   useEffect(() => {
-    console.log("Admin modules context - ", state);
+    console.log("Admin modules context - ", state , props);
     console.log("Page name - ", state.page);
     console.log("Got user id - ", state.userId);
     localUserId ? setLogedIn(true) : setLogedIn(false);
@@ -320,7 +297,7 @@ const AdminModule = (props) => {
     <>
       {loading ? <Loading show={loading} /> : null}
       <Layout>
-        <TopHeader  props={props}  />
+        <TopHeader  dyHeaderBG={props.dyHeaderBG} dyLogo={props.dyLogo}/>
        <Layout>
           {localUserId ? (
             <Sider

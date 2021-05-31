@@ -10,7 +10,7 @@ import axios from 'axios';
 import {GetUserdetails, url} from '../API/index';
 import Modal from "antd/lib/modal/Modal";
 
-const GetSharedUsersdetails= async (state,dispatch ,userId)=>{
+const GetIncomingRoledetails= async (state,dispatch ,userId)=>{
   if (userId === undefined )
      return []; 
   let ob = state.userObj;
@@ -47,7 +47,7 @@ useEffect(()=>{
         let dex =  state.accessIn.find( e=> e.id == ob);
         if(dex !== undefined) sh.push(dex)
     }); 
-    GetSharedUsersdetails(state,dispatch,state.userId);
+    GetIncomingRoledetails(state,dispatch,state.userId);
   }
     dispatch({type:"ACCESS_IN",payload:{ accessIn : sh }});
     

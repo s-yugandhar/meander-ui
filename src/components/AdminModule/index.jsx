@@ -92,8 +92,6 @@ const AdminModule = (props) => {
   const { Paragraph, Text } = Typography;
   const videomime = "video/*";
   const audiomime = "audio/*";
-  const dyHeaderBG = props.dyHeaderBG;
-  const dyLogo = props.dyLogo;
   const [selectedTab, setSelectedTab] = useState("videos");
   const [uploadVideo, setUploadVideo] = useState(false);
   const [logedIn, setLogedIn] = useState(false);
@@ -230,7 +228,7 @@ const AdminModule = (props) => {
   );
 
   const page = {
-    videos: (
+    "videos": (
       <MyVideos
         openUploadVideo={() => {
           setUploadVideo(true);
@@ -238,17 +236,17 @@ const AdminModule = (props) => {
       />
     ),
     "add-video": <AddVideo />,
-    profile: <MyProfile />,
+    "profile": <MyProfile />,
     "edit-video": <EditVideo />,
     "manage-videos": <ManageVideos />,
-    accounts: <ManageUsers />,
+    "accounts": <ManageUsers />,
     "share-access": <ShareAccess />,
     "reseller-settings": <Settings />,
-    usage: <ResellerReports />,
-    player: <PlayerPage />,
-    login: <Login />,
-    appplans: <Plans />,
-    forbidden: (
+    "usage": <ResellerReports />,
+    "player": <PlayerPage />,
+    "login": <Login />,
+    "appplans": <Plans />,
+    "forbidden": (
       <>
         <div>
           {" "}
@@ -322,7 +320,7 @@ const AdminModule = (props) => {
     <>
       {loading ? <Loading show={loading} /> : null}
       <Layout>
-        <TopHeader />
+        <TopHeader  props={props}  />
        <Layout>
           {localUserId ? (
             <Sider

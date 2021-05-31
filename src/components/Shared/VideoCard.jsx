@@ -151,7 +151,7 @@ const VideoCard = (props) => {
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
-      {links ?<>
+      {links && ("mp4_url" in links ) ?<>
       <Menu.Item key="mp4"> Mp4</Menu.Item>
       <Menu.Item key="dash">Android</Menu.Item>
       <Menu.Item key="hls"> Ios</Menu.Item>{" "} </>: null }

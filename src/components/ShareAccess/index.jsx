@@ -150,10 +150,11 @@ const setwriteRecord=(values)=>{
       render:(e,record)=>(  
         record.access !== undefined || record.access !== null?
          <Select  value={ record.access.viewer.includes(state.userObj.id)? "viewer": 
-      record.access.user.includes( state.userObj.id)? "user" : ""}
+      record.access.user.includes( state.userObj.id)? "user" :
+      record.access.admin.includes( state.userObj.id)? "admin" : ""}
       onChange={(value)=> changePermission(value , record,false) }
       >
-        {/*<Option key="admin" value="admin" >Admin</Option>*/}
+        <Option key="admin" value="admin" >Admin</Option>
         <Option key="" value=""></Option>
         <Option key="user" value="user">Editor</Option>
         <Option key="viewer" value="viewer">Viewer</Option>

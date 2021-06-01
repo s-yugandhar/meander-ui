@@ -309,7 +309,6 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
               onChange={(value)=>{ setEditUser({ ...editUser, roles: value}); console.log(editUser)} }     >
               { state.userObj.roles === "super_admin" ?
               <Option key="reseller" value="reseller">reseller</Option>:null}
-              <Option key="team" value="team">team</Option>
               <Option key="admin" value="admin">admin</Option>
               <Option key="user" value="user">user</Option>
               <Option key="viewer" value="viewer">viewer</Option>

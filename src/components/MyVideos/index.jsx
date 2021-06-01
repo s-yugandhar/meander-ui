@@ -294,7 +294,7 @@ const folderDetail = (folderName) => {
                   }); innerFolder(value); }
                 }
               >
-                { state.dbfolderList.length > 0
+                { state.dbfolderList !== undefined && state.dbfolderList !== null
                   ? state.dbfolderList.map((obj, ind) => {
                  return  obj.foldertype==="folder"?
                  <> <Option   key={obj.id}  value={obj.id}

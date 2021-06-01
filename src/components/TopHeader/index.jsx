@@ -25,8 +25,10 @@ const TopHeader = (props) => {
    const localUserId = localStorage.getItem("userId");
    const [listUsers , setListUsers] = useState([]);
    const [acUser,setAcUser] = useState(null);
+   const [fUser,setFUser] = useState(null);
 
    const archive  = JSON.parse(localStorage.getItem("archive"));
+   const friend = JSON.parse(localStorage.getItem("friend"));
 
     useEffect(()=>{
       console.log(props);
@@ -38,9 +40,9 @@ const TopHeader = (props) => {
     if (flag === false){return;}
     let userId = state.userId;
     let token = state.token;
-    if(state.archiveAccount !== null) {
-      userId = state.archiveAccount.userId;
-      token = state.archiveAccount.token;}
+    if(archive !== null) {
+      userId = archive.userId;
+      token = archive.token;}
 
     const tempFolders = await axios.get(url + `/sharedtoken/${userId}/${record.id}`, {
       headers: {
@@ -53,6 +55,29 @@ const TopHeader = (props) => {
    console.log(" userdata in get manageuser ", tempFolders);
    return tempFolders;
   }
+
+  const toggleToFriend = async( state , dispatch , record)=>{
+    let flag = window.confirm("Do you really want to switch profile");
+    if (flag === false){return;}
+    let userId = state.userId;
+    let token = state.token;
+    const friend = JSON.parse(localStorage.getItem("friend"));
+    if(friend !== null) {
+      userId = friend.userId;
+      token = friend.token;}
+
+    const tempFolders = await axios.get(url + `/sharedtoken/${userId}/${record.id}`, {
+      headers: {
+         accept: 'application/json', Authorization : "bearer "+token,
+            }
+   }).then(res => {
+     //message.success(`No of rows updated ${res.data}`);
+          switchToFriend(state,dispatch, res.data.id , res.data.access_token);
+     return res.data;   })
+   console.log(" userdata in get manageuser ", tempFolders);
+   return tempFolders;
+  }
+
 
   const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
     let previd = localStorage.getItem("userId");
@@ -68,6 +93,43 @@ const TopHeader = (props) => {
     GetUserdetails(state,dispatch, state.userId);
     window.location.reload();
 }
+
+const switchToFriend = (state,dispatch , sharedid , sharedtoken)=>{
+  let previd = localStorage.getItem("userId");
+  let prevtoken = localStorage.getItem("token");
+  localStorage.setItem("userId",sharedid);
+  localStorage.setItem("token",sharedtoken);
+  const friend  = JSON.parse(localStorage.getItem("friend"));
+  if( friend === null){
+  localStorage.setItem("friend",JSON.stringify({"userId":previd , "token" : prevtoken  } ));
+  dispatch({type:"ARCHIVE_ACCOUNT", payload:{ archiveAccount : { token : prevtoken , userId :previd } }});
+  }
+  dispatch({type:"LOGIN_SUCCESS", payload:{  token : sharedtoken , userId : sharedid,page:"videos" } });
+  GetUserdetails(state,dispatch, state.userId);
+  window.location.reload();
+}
+
+
+const switchToFSelf = (state, dispatch , friend) => {
+  if (friend !== null) {
+    localStorage.setItem("userId", friend.userId);
+    localStorage.setItem("token", friend.token);
+    localStorage.setItem("friend", null);
+    dispatch({
+      type: "LOGIN_SUCCESS",
+      payload: {
+        token: friend.token,
+        userId: friend.userId,
+        page: "videos",
+      },
+    });
+    GetUserdetails(state, dispatch, state.userId).then(res=>
+     window.location.reload());
+  }
+};
+
+
+
 
 
    const switchToSelf = (state, dispatch , archive) => {
@@ -190,20 +252,19 @@ const TopHeader = (props) => {
              </div>
            )}
          </Col>
-         <Col span={6}>
+         <Col span={2}> 
          {/*<Input.Search
              onChange={(e) => getPublicItems(state, dispatch, e.target.value)}
              placeholder={
                "Search Public videos by title or description & play, Eg : Luke"
              }
              style={{ marginTop: "15px" }}
-           ></Input.Search>*/}
-         </Col>
-         <Col span={6}>
+           ></Input.Search>*/}</Col>
+          <Col span={6}>
          
          { (state.userObj && (state.userObj.roles === "reseller" || state.userObj.roles === "super_admin"))
-         || archive !== null ?
-         <Select                 
+         || archive !== null ?<>
+         <label>Switch</label><Select                 
                   size="middle"
                   style={{width:"auto"}}
                   placeholder="search email"
@@ -235,9 +296,44 @@ const TopHeader = (props) => {
                         ) 
                       })
                     : null}
-                </Select>: null }
-         </Col>
+                </Select></>: null }
+         </Col> 
          <Col span={6}>
+             { state.userObj !== null && state.userObj !== undefined && state.userObj.access !== null &&
+             friend === null?
+                <><label>upload To</label>
+                <Select                 
+                size="middle"
+                style={{width:"auto"}}
+                placeholder="search id"
+                optionFilterProp="children"
+                showSearch={true}
+                value={ fUser !== null ? fUser : null }
+                onChange={(value) => { 
+                  setFUser(value) ;toggleToFriend(state,dispatch,{id:value}); }     }>
+                { state.userObj !== undefined && state.userObj !== null &&
+                state.userObj.access !== null 
+                  ? state.userObj.access.admin.map((obj, ind) => {
+                      return  (
+                        <>  {" "}
+                          <Option key={obj} value={
+                            friend === null ? obj :
+                            friend && friend.userId !== obj ? obj : "Switch to Self"}>
+                            {" "}
+                            { friend === null ? obj :
+                            friend && friend.userId !== obj ? obj : "Switch to Self" }
+                            {"   "}{" "}
+                          </Option>{" "}
+                        </>
+                      ) 
+                    })
+                  : null}
+              </Select></>: friend !== null?
+                <Button onClick={(e)=>
+                  switchToFSelf(state,dispatch,friend)}>Switch To Self</Button>  : null
+            }  
+         </Col>
+         <Col span={4}>
            <Row justify="end">
              <Col>
                {localUserId ? (

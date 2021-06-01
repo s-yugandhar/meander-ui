@@ -63,10 +63,9 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
       if(   state.userObj !== null &&
             state.userObj !== undefined && 
           (state.userObj.roles === "super_admin" || state.userObj.roles === "reseller") )
-           loadPage("accounts");else loadPage("forbidden");}
+           loadPage("accounts");else loadPage("videos");}
     else 
-      loadPage(path.replace("/","")); }).catch(err=> loadPage("videos"));
-    
+      loadPage("videos")}).catch(err=> loadPage("videos"));
   }, []);
 
   const switchToSelf = (state,dispatch)=>{

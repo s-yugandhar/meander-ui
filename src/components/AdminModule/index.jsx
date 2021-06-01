@@ -240,9 +240,10 @@ const AdminModule = (props) => {
     localUserId ? setLogedIn(true) : setLogedIn(false);
     //Dashboard( { locale :{ strings : { dropHere : "hint"} }        } )
 
-    const dispName = state.dbfolderList.find(
+    const dispName = state.dbfolderList !== undefined && state.dbfolderList !== null
+    ?state.dbfolderList.find(
       (ob) => ob.id === state.folderName
-    );
+    ) : undefined;
     uppy.setOptions({
       onBeforeFileAdded: (currentFile, files) => {
         let time = Date.now();
@@ -344,7 +345,7 @@ const AdminModule = (props) => {
                       GetFiles(state, dispatch, state.userId, state.folderName);
                   }}
                 >
-                  {state.dbfolderList.length > 0
+                  { state.dbfolderList !== undefined && state.dbfolderList !== null 
                     ? state.dbfolderList.map((obj, ind) => {
                         return obj.foldertype === "folder" ? (
                           <>

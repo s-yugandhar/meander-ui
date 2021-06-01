@@ -15,6 +15,7 @@
 
 .site-layout-background {
   background: #fff;
+  height: 100%;
 }
 
 .leftSidebarMenu {
@@ -96,6 +97,8 @@
   .createFolderBtn {
     display: flex;
     align-items: center;
+    margin-left: 3px;
+    margin-right: 3px;
   }
 
   .createFolderBtnIcon {
@@ -130,5 +133,45 @@
     &:hover {
       color: #333;
     }
+  }
+}
+
+.top-header-col {
+  line-height: 1;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.my-account-dropdown {
+  height: auto;
+  line-height: 1;
+}
+
+.copyCodeButtonsList {
+  border-right: none !important;
+  .ant-menu-item {
+    margin-bottom: 6px !important;
+    margin-top: 6px !important;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    color: #888;
+
+    &.ant-menu-item-selected {
+      border-color: #1890ff;
+      background-color: #1890ff;
+      color: #fff;
+    }
+  }
+}
+
+.newActionsList {
+  .createFolderBtn {
+    margin-left: 3px;
+    margin-right: 3px;
   }
 }

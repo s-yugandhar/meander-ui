@@ -1,5 +1,18 @@
-import React, { useContext, useState ,lazy ,Suspense, useEffect} from "react";
-import { Menu, Card, Button, message,Row,Col ,Dropdown, Modal,Tooltip,Image, Popover,Badge } from "antd";
+import React, { useContext, useState, lazy, Suspense, useEffect } from "react";
+import {
+  Menu,
+  Card,
+  Button,
+  message,
+  Row,
+  Col,
+  Dropdown,
+  Modal,
+  Tooltip,
+  Image,
+  Popover,
+  Badge,
+} from "antd";
 import {
   SwapOutlined,
   EditOutlined,
@@ -9,52 +22,67 @@ import {
   VideoCameraOutlined,
   AudioOutlined,
   FileTextOutlined,
-  EllipsisOutlined
+  EllipsisOutlined,
+  InfoCircleOutlined,
+  ArrowDownOutlined,
 } from "@ant-design/icons";
 import { deleteFile_Folder } from "../API";
-import ImageLoad from '../Shared/ImageLoader';
+import ImageLoad from "../Shared/ImageLoader";
 import {
-  PAGE,  FOLDER_CREATED,  FILE_UPLOADED,
-  FOLDER_NAME,  FILE_LIST,  FOLDER_LIST,
+  PAGE,
+  FOLDER_CREATED,
+  FILE_UPLOADED,
+  FOLDER_NAME,
+  FILE_LIST,
+  FOLDER_LIST,
 } from "../../reducer/types";
 import {
-  dbGetObjByPath, GetFolders,  url,cdn_url,
-  GetFiles,  CreateNewFolder, getServedLinks
+  dbGetObjByPath,
+  GetFolders,
+  url,
+  cdn_url,
+  GetFiles,
+  CreateNewFolder,
+  getServedLinks,
 } from "../API/index";
 import { Context } from "../../context";
 import "../../assets/styles/videoCard.scss";
 import mp3img from "../../assets/mp3img.png";
-import logo from "../../assets/images/meander-1920x1080.png"
+import logo from "../../assets/images/meander-1920x1080.png";
 import { icons } from "antd/lib/image/PreviewGroup";
 
 const VideoCard = (props) => {
   const { state, dispatch } = useContext(Context);
   const { Meta } = Card;
   const [visible, setVisible] = useState(false);
-  const [codesModal,setCodesModal] = useState(false);
-  const [code , setCode] = useState("<---- Click on any button to copy the code");
-  const [links,setLinks] = useState(null);
+  const [codesModal, setCodesModal] = useState(false);
+  const [code, setCode] = useState(
+    "<---- Click on any button to copy the code"
+  );
+  const [links, setLinks] = useState(null);
 
-  const callServedLinks= (play)=>{
+  const callServedLinks = (play) => {
     setLinks(null);
-    if(links === null || play === true){
-      getServedLinks(state,dispatch,props.fileObject.id,play)
-    .then(res => {  setLinks(res); }).catch(err=> {});
+    if (links === null || play === true) {
+      getServedLinks(state, dispatch, props.fileObject.id, play)
+        .then((res) => {
+          setLinks(res);
+        })
+        .catch((err) => {});
     }
-  }
-  
-  useEffect(()=>{
-        callServedLinks(false);
-  },[]);
+  };
 
+  useEffect(() => {
+    callServedLinks(false);
+  }, []);
 
-  function getMp4Url(props, type) {  
+  function getMp4Url(props, type) {
     if (type === "mp3" && props.fileObject.itemtype.includes("audio"))
-      return links['mp3_url'];
-    if (type === "mp4") return links['mp4_url'];
-    if (type === "img") return links['img_url'];
-    if (type === "dash") return links['dash_url'];
-    if (type === "hls") return links['hls_url'];
+      return links["mp3_url"];
+    if (type === "mp4") return links["mp4_url"];
+    if (type === "img") return links["img_url"];
+    if (type === "dash") return links["dash_url"];
+    if (type === "hls") return links["hls_url"];
   }
 
   const onSideNavFolderClick = (folderName) => {
@@ -74,10 +102,15 @@ const VideoCard = (props) => {
     let flag = window.confirm("Do you really want to delete file ?");
     if (flag === false) return;
     if (!file.itempath.includes("temp.dod"))
-      deleteFile_Folder(   state,  dispatch,  id,
+      deleteFile_Folder(
+        state,
+        dispatch,
+        id,
         file.itempath.split("/")[1] + "/" + file.itempath.split("/")[2],
-        false  ).then((res) => {
-        state.folderName === ""  ? showAllvideos()
+        false
+      ).then((res) => {
+        state.folderName === ""
+          ? showAllvideos()
           : onSideNavFolderClick(state.folderName);
       });
     else alert("this is not a file to delete");
@@ -115,7 +148,7 @@ const VideoCard = (props) => {
     dispatch({ type: "EDIT_VIDEO", payload: { editVideo: obj } });
     //dbGetObjByPath(state, dispatch, obj.itempath, false);
   };
-  
+
   const handleMenuClick = (e) => {
     console.log(e);
     let code = null;
@@ -129,7 +162,7 @@ const VideoCard = (props) => {
       code = getPlayUrl(state, dispatch, url, props);
       code = code + "?embed=true";
     }
-    if (e.key === "play" || e.key === "playnotinmenu") 
+    if (e.key === "play" || e.key === "playnotinmenu")
       code = getPlayUrl(state, dispatch, url, props);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(code);
@@ -146,84 +179,150 @@ const VideoCard = (props) => {
   };
 
   const menuvideo = (
-    <Menu onClick={handleMenuClick} key="dbahdlca" title="Click below names to copy code">
+    <Menu
+      onClick={handleMenuClick}
+      key="dbahdlca"
+      title="Click below names to copy code"
+      className="copyCodeButtonsList"
+    >
       <Menu.Item key="play"> Play</Menu.Item>
       <Menu.Item key="embed">Embed</Menu.Item>
       <Menu.Item key="iframe">Iframe</Menu.Item>
-      {links && ("mp4_url" in links ) ?<>
-      <Menu.Item key="mp4"> Mp4</Menu.Item>
-      <Menu.Item key="dash">Android</Menu.Item>
-      <Menu.Item key="hls"> Ios</Menu.Item>{" "} </>: null }
+      {links && "mp4_url" in links ? (
+        <>
+          <Menu.Item key="mp4"> Mp4</Menu.Item>
+          <Menu.Item key="dash">Android</Menu.Item>
+          <Menu.Item key="hls"> Ios</Menu.Item>{" "}
+        </>
+      ) : null}
     </Menu>
   );
   const menuaudio = (
-    <Menu onClick={handleMenuClick} key="sbdsldl" title="Click below names to copy code">
-      <Menu.Item key="play"> Play</Menu.Item>
-      <Menu.Item key="embed">Embed</Menu.Item>
-      <Menu.Item key="iframe">Iframe</Menu.Item>
-      {links ?<> <Menu.Item key="mp3">Mp3</Menu.Item>{" "}</>:null}
+    <Menu
+      onClick={handleMenuClick}
+      key="sbdsldl"
+      title="Click below names to copy code"
+      className="copyCodeButtonsList"
+    >
+      <Menu.Item key="play">
+        {" "}
+        Play
+      </Menu.Item>
+      <Menu.Item key="embed">
+        Embed
+      </Menu.Item>
+      <Menu.Item key="iframe">
+        Iframe
+      </Menu.Item>
+      {links ? (
+        <>
+          {" "}
+          <Menu.Item key="mp3">Mp3</Menu.Item>{" "}
+        </>
+      ) : null}
     </Menu>
   );
 
-  
   return (
-    
     <Card
       bordered={true}
       hoverable={true}
-      title={ <>   {  props.videoTitle}
-          <h6>  {  new Date( props.fileObject.updatetime === "-1" || props.fileObject.updatetime === -1?
-              null : props.fileObject.updatetime * 1  ).toLocaleString() }
-          </h6>  </>   }
-      extra={<>
-      <Popover content={<>
-      <Badge count={props.fileObject.dislikes} title="dislikes" showZero
-      style={{backgroundColor:"red"}} overflowCount={999999999}></Badge>
-      <Badge count={props.fileObject.likes} title="likes" overflowCount={999999999} showZero
-      style={{backgroundColor:"yellowgreen"}} ></Badge>
-      <Badge count={props.fileObject.hits} title="views" overflowCount={999999999} showZero
-      style={{backgroundColor:"green"}} ></Badge></>}>...</Popover> 
-      </>}
-      
+      title={
+        <>
+          {" "}
+          {props.videoTitle}
+          <h6>
+            {" "}
+            {new Date(
+              props.fileObject.updatetime === "-1" ||
+              props.fileObject.updatetime === -1
+                ? null
+                : props.fileObject.updatetime * 1
+            ).toLocaleString()}
+          </h6>{" "}
+        </>
+      }
+      extra={
+        <>
+          <Popover
+            content={
+              <>
+                <Badge
+                  count={props.fileObject.dislikes}
+                  title="dislikes"
+                  showZero
+                  style={{ backgroundColor: "red" }}
+                  overflowCount={999999999}
+                ></Badge>
+                <Badge
+                  count={props.fileObject.likes}
+                  title="likes"
+                  overflowCount={999999999}
+                  showZero
+                  style={{ backgroundColor: "yellowgreen" }}
+                ></Badge>
+                <Badge
+                  count={props.fileObject.hits}
+                  title="views"
+                  overflowCount={999999999}
+                  showZero
+                  style={{ backgroundColor: "green" }}
+                ></Badge>
+              </>
+            }
+          >
+            ...
+          </Popover>
+        </>
+      }
       headStyle={{ height: "25%" }}
       bodyStyle={{ height: "55%" }}
       actions={[
         props.fileObject.userRole !== "viewer" &&
-        props.fileObject.userRole !== "user" ?  <Tooltip title="Click to delete video">
-          <DeleteOutlined
-            key="delete"
-            title={"click to delete object"}
-            onClick={(e) =>
-              deleteFile(state, dispatch, props.userId, props.fileObject)
-            }
-          />
-        </Tooltip> : null,
-         props.fileObject.userRole !== "viewer" ?<Tooltip title="Click to edit Metadata">
-          <EditOutlined
-            key="edit"
-            onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
-          />
-        </Tooltip> : null,
+        props.fileObject.userRole !== "user" ? (
+          <Tooltip title="Click to delete video">
+            <DeleteOutlined
+              key="delete"
+              title={"click to delete object"}
+              onClick={(e) =>
+                deleteFile(state, dispatch, props.userId, props.fileObject)
+              }
+            />
+          </Tooltip>
+        ) : null,
+        props.fileObject.userRole !== "viewer" ? (
+          <Tooltip title="Click to edit Metadata">
+            <EditOutlined
+              key="edit"
+              onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
+            />
+          </Tooltip>
+        ) : null,
         <Tooltip title="copy player link">
-         <LinkOutlined
-           key="playnotinmenu"
-           onClick={(e) => handleMenuClick({key:"playnotinmenu"})}
-         />
-       </Tooltip> ,
-        <Popover  content={props.fileObject.itemtype.includes("audio") ? null : null
-           }
-        title={null}>
+          <LinkOutlined
+            key="playnotinmenu"
+            onClick={(e) => handleMenuClick({ key: "playnotinmenu" })}
+          />
+        </Tooltip>,
+        <Popover
+          content={props.fileObject.itemtype.includes("audio") ? null : null}
+          title={null}
+        >
           <Button
             htmlType="a"
             key="link"
-            onClick={(e) => {callServedLinks(true);setCodesModal(true); }}
+            onClick={(e) => {
+              callServedLinks(true);
+              setCodesModal(true);
+            }}
             aria-hidden={true}
-            style={{ borderColor: "white", padding: 0 }}  >
-              <Tooltip title="Copy links to video">
-              <EllipsisOutlined style={{ fontSize: "24px" }} /></Tooltip>
+            style={{ borderColor: "white", padding: 0 }}
+          >
+            <Tooltip title="Copy links to video">
+              <EllipsisOutlined style={{ fontSize: "24px" }} />
+            </Tooltip>
           </Button>
-          </Popover>
-        ,
+        </Popover>,
       ]}
       className="cardVideo"
     >
@@ -233,18 +332,20 @@ const VideoCard = (props) => {
         href={getPlayUrl(state, dispatch, url, props)}
         */}
         <div className="videoBlock">
-          
           {/*<VideoCameraOutlined className="videoIconLoading" />*/}
-          { 
-            <ImageLoad src={ links === null ? null : links['img_url']} placeholder={logo}
-            alt={props.fileObject.title + " " +props.fileObject.description} />
+          {
+            <ImageLoad
+              src={links === null ? null : links["img_url"]}
+              placeholder={logo}
+              alt={props.fileObject.title + " " + props.fileObject.description}
+            />
           }
           <Button
             className="playBtn"
             type="button"
             onClick={(e) => editVideoFunc(state, dispatch, props, url, true)}
           >
-            <PlayCircleOutlined  />
+            <PlayCircleOutlined />
           </Button>
         </div>
         {/*<div className="videoCardInfoBlock" style={{  }}>ss
@@ -252,21 +353,57 @@ const VideoCard = (props) => {
           <div className="publishedDate">{props.postedOn}</div>
         </div> */}
       </div>
-      <Modal title={null}  visible={ codesModal  }  centered={true}
-          onCancel={()=> {setCode("<---- Click on any button to copy the code");
-          setCodesModal(false);}} closable={true} footer={null}  
+      <Modal
+        title={null}
+        visible={codesModal}
+        centered={true}
+        onCancel={() => {
+          setCode("<---- Click on any button to copy the code");
+          setCodesModal(false);
+        }}
+        closable={true}
+        footer={null}
+      >
+        <Row>
+          <Col
+            span={24}
+            style={{
+              color: "#888",
+              fontStyle: "italic",
+              fontSize: "13px",
+              paddingBottom: "12px",
+              textAlign: "left",
+              paddingLeft: '30px'
+            }}
           >
-            <Row >
-              <Col span={6}>
-            {props.fileObject.itemtype.includes("audio") ? menuaudio : menuvideo}
-              </Col>
-              <Col span={2}></Col>
-              <Col span={12}>
-                {code}
-              </Col>
-            </Row>
-          
-          </Modal>
+            {" "}
+            <ArrowDownOutlined width={'8px'} height={"8px"} color={"#ccc"} /> Click on any button to copy the code
+          </Col>
+          <Col span={6}>
+            {props.fileObject.itemtype.includes("audio")
+              ? menuaudio
+              : menuvideo}
+          </Col>
+          <Col span={1}></Col>
+          <Col
+            span={15}
+            style={{
+              wordBreak: "break-all",
+              display: "flex",
+              alignItems: "center",
+              fontSize: "16px",
+              lineHeight: "1.5",
+              border: "2px dashed #e0e0e0",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "3px",
+              padding: "20px",
+              color: "#666",
+            }}
+          >
+            {code}
+          </Col>
+        </Row>
+      </Modal>
     </Card>
   );
 };

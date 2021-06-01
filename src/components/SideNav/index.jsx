@@ -61,10 +61,10 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
     GetUserdetails(state,dispatch,state.userId).then( res => {
       if(path.replace("/","") === "accounts"){
       if(   state.userObj !== null &&
-            state.userObj !== undefined && 
+            state.userObj !== undefined &&
           (state.userObj.roles === "super_admin" || state.userObj.roles === "reseller") )
            loadPage("accounts");else loadPage("videos");}
-    else 
+    else
       loadPage("videos")}).catch(err=> loadPage("videos"));
   }, []);
 
@@ -90,46 +90,71 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}
           style={{ height: "100%", borderRight: 0 }}
         >
-          { state.userObj !== null &&
-            state.userObj !== undefined && 
-          (state.userObj.roles === "super_admin" || state.userObj.roles === "reseller") ? 
-          <SubMenu key="partners-submenu" title={ state.userObj.roles === "super_admin" ? "Super Admin Panel":"Partners"}>
-            {/*<Menu.Item key="customers">Customers</Menu.Item>*/}
-            <Menu.Item key="listu" onClick={() => 
-            loadPage("accounts") }>
-              Accounts
-            </Menu.Item>
-          </SubMenu> : null }
+          {state.userObj !== null &&
+          state.userObj !== undefined &&
+          (state.userObj.roles === "super_admin" ||
+            state.userObj.roles === "reseller") ? (
+            <>
+              <SubMenu
+                key="partners-submenu"
+                title={
+                  state.userObj.roles === "super_admin"
+                    ? "Super Admin Panel"
+                    : "Partners"
+                }
+              >
+                {/*<Menu.Item key="customers">Customers</Menu.Item>*/}
+                <Menu.Item key="listu" onClick={() => loadPage("accounts")}>
+                  Accounts
+                </Menu.Item>
+              </SubMenu>
+              <Divider style={{ marginTop: "5px", marginBottom: "5px" }} />
+            </>
+          ) : null}
           <SubMenu key="products-menu" title="Products">
             <Menu.Item
               key="dashboard"
-              onClick={() => {GetFolders(state, dispatch, state.userId);
-                loadPage("videos") }}
+              onClick={() => {
+                GetFolders(state, dispatch, state.userId);
+                loadPage("videos");
+              }}
             >
               Videos
             </Menu.Item>
-            </SubMenu>
-            {state.archiveAccount !== null ?
-            <Menu.Item onClick={()=> switchToSelf(state,dispatch)}>
-                Switch To Own Account     </Menu.Item> :null }
-              {(state.userObj !== null && state.userObj !== undefined && 
-            state.userObj.roles !== "user" && state.userObj.roles !== "editor")
-              ?
-            <Menu.Item onClick={() => { 
-              loadPage("profile")  }}>
-                My Account  </Menu.Item> : null}
-            <Menu.Item key="ureport" title="Coming soon"
-              onClick={() => loadPage("usage")} >
-               Usage Report              
-            </Menu.Item> 
-            {state.userObj !== null && state.userObj !== undefined && 
-            state.userObj.roles === "super_admin"  ?         
-            <Menu.Item key="appplans" onClick={() => 
-              loadPage("appplans") }>
+          </SubMenu>
+          {state.archiveAccount !== null ? (
+            <Menu.Item onClick={() => switchToSelf(state, dispatch)}>
+              Switch To Own Account{" "}
+            </Menu.Item>
+          ) : null}
+          {state.userObj !== null &&
+          state.userObj !== undefined &&
+          state.userObj.roles !== "user" &&
+          state.userObj.roles !== "editor" ? (
+            <Menu.Item
+              onClick={() => {
+                loadPage("profile");
+              }}
+            >
+              My Account{" "}
+            </Menu.Item>
+          ) : null}
+          <Menu.Item
+            key="ureport"
+            title="Coming soon"
+            onClick={() => loadPage("usage")}
+          >
+            Usage Report
+          </Menu.Item>
+          {state.userObj !== null &&
+          state.userObj !== undefined &&
+          state.userObj.roles === "super_admin" ? (
+            <Menu.Item key="appplans" onClick={() => loadPage("appplans")}>
               Application Plans
-            </Menu.Item>: null }
+            </Menu.Item>
+          ) : null}
         </Menu>
-      </Sider>      
+      </Sider>
     </>
   );
 };

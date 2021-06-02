@@ -1,11 +1,31 @@
-import React from 'react'
+import React, {useState, useEffect, useContext} from 'react';
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+
+
+// Custom imports
+import {Context} from "../context";
 
 
 
 const PageRouter = () => {
+
+   const [logedIn, setLogedIn] = useState();
+
+   const {state, dispatch} = useContext(Context);
+
+
+
    return (
-      <h1>Page Router</h1>
-   )
+     <Router>
+       <Switch>
+
+         <Route exact={true} path="/all-videos">
+
+         </Route>
+
+       </Switch>
+     </Router>
+   );
 }
 
 

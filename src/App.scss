@@ -1,5 +1,9 @@
 @import "./assets/styles/common";
 
+.w-100 {
+  width: 100%;
+}
+
 .full-width {
   float: left;
   width: 100%;
@@ -193,4 +197,20 @@
 
 .delete-folder-btn {
   color: #e64a19;
+}
+
+
+.text-align-center {
+  text-align: center;
+}
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.font-size-lg {
+  font-size: 20px;
 }

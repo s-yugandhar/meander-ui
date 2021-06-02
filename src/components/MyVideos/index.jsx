@@ -2,12 +2,27 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import {
-  Layout, Menu,  Row,
-  Col,  Divider,  Input,
-  Select,  Typography,  Empty,
-  Modal,  Form,  Button,
-  message,  Card,  notification,
-  Table,  Tag,  Space,  Switch,Tooltip
+  Layout,
+  Menu,
+  Row,
+  Col,
+  Divider,
+  Input,
+  Select,
+  Typography,
+  Empty,
+  Modal,
+  Form,
+  Button,
+  message,
+  Card,
+  notification,
+  Table,
+  Tag,
+  Space,
+  Switch,
+  Tooltip,
+  Badge,
 } from "antd";
 
 import {
@@ -17,19 +32,25 @@ import {
   DeleteOutlined,
   LinkOutlined,
   PlusOutlined,
-  SortAscendingOutlined,SortDescendingOutlined
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+  FolderAddOutlined,
+  CloudUploadOutlined
 } from "@ant-design/icons";
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import Loading from "../Loading";
+import { FILE_LIST, FOLDER_NAME } from "../../reducer/types";
 import {
-  FILE_LIST,
-  FOLDER_NAME,
-} from "../../reducer/types";
-import {
-  url, GetFolders,dbGetObjByPath,
-  GetFiles,  GetUserdetails,CreateNewFolder,
-  listPlaylist,createPlaylist , getPublicItems
+  url,
+  GetFolders,
+  dbGetObjByPath,
+  GetFiles,
+  GetUserdetails,
+  CreateNewFolder,
+  listPlaylist,
+  createPlaylist,
+  getPublicItems,
 } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
@@ -44,14 +65,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [addVideo, setAddvideo] = useState("");
   const [loading, setLoading] = useState(false);
   const [levels, setLevels] = useState(null);
-  const [buildRoles,setBuildRoles] = useState(false);
+  const [buildRoles, setBuildRoles] = useState(false);
   const [toggleEmbed, setToggleEmbed] = useState(false);
   const [embedCode, setEmbedCode] = useState(null);
   const [folderSubmitBtn, setFolderSubmitBtn] = useState(false);
   const [cModal, setCModal] = useState(false);
   const { state, dispatch } = useContext(Context);
-  const [sortState, setSortState] =  useState(null);
-  const [nfApi, setNFApi] =  useState(false);
+  const [sortState, setSortState] = useState(null);
+  const [nfApi, setNFApi] = useState(false);
   const { Column } = Table;
 
   let initialAnimate;
@@ -80,17 +101,18 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     let cnt = 0;
     state.videoList.map((obj, ind) => {
       //&& obj._object_name.includes(state.userId) === false
-      if (obj.itempath.includes("/"+val+"/")) cnt = cnt + 1;
+      if (obj.itempath.includes("/" + val + "/")) cnt = cnt + 1;
     });
     return cnt;
   }
 
   const innerFolder = (folderName) => {
     setLoading(true);
-    if (folderName === "All"){
+    if (folderName === "All") {
       GetFolders(state, dispatch, state.userId);
-    return ;   }
-    if (folderName === "") folderName ="default" ;
+      return;
+    }
+    if (folderName === "") folderName = "default";
     GetFiles(state, dispatch, state.userId, folderName)
       .then((res) => {
         console.log("My Videos Files res - ", res);
@@ -148,100 +170,110 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const callCreateFolder = (values) => {
     console.log(state);
     CreateNewFolder(state, dispatch, state.userId, values.folderName);
-    
-    createPlaylist(state,dispatch,values.folderName,'folder').then(res=>{
-      //notification.open({message:"Folder Created succesfully"});
-      listPlaylist(state,dispatch);
-    }).catch((err)=> {}
-      //notification.open({message:"Cannot create duplicate folder"});
-      )
+
+    createPlaylist(state, dispatch, values.folderName, "folder")
+      .then((res) => {
+        //notification.open({message:"Folder Created succesfully"});
+        listPlaylist(state, dispatch);
+      })
+      .catch(
+        (err) => {}
+        //notification.open({message:"Cannot create duplicate folder"});
+      );
     createFolderModalClose();
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     const uobj = state.userObj;
 
-    if(buildRoles){
-    if(uobj !== null && uobj !== undefined ){
-      const VL = [];
-      state.videoList.map((ob) => {
-        if( uobj.access !== undefined && uobj.access !== null){
-        if( uobj.access.admin.includes(ob.owner_id)  )  ob.userRole = "admin";
-        if( uobj.access.user.includes(ob.owner_id)    ) ob.userRole = "user";
-        if( uobj.access.viewer.includes(ob.owner_id)    )  ob.userRole = "viewer"; }
-        if(uobj.userId === ob.owner_id) ob.userRole = "admin";
-        if(uobj.roles === "user") ob.userRole = "user";
-        if(uobj.roles === "viewer") ob.userRole = "viewer";
-        //if(uobj.roles === "super_admin" || uobj.roles === "reseller") ob.userRole = "admin";
-        console.log(ob.userRole);
-        VL.push(ob);
-      });
-      dispatch({type:"VIDEO_LIST",payload:{ videoList : VL   }});
-      setBuildRoles(false);
-    } }
+    if (buildRoles) {
+      if (uobj !== null && uobj !== undefined) {
+        const VL = [];
+        state.videoList.map((ob) => {
+          if (uobj.access !== undefined && uobj.access !== null) {
+            if (uobj.access.admin.includes(ob.owner_id)) ob.userRole = "admin";
+            if (uobj.access.user.includes(ob.owner_id)) ob.userRole = "user";
+            if (uobj.access.viewer.includes(ob.owner_id))
+              ob.userRole = "viewer";
+          }
+          if (uobj.userId === ob.owner_id) ob.userRole = "admin";
+          if (uobj.roles === "user") ob.userRole = "user";
+          if (uobj.roles === "viewer") ob.userRole = "viewer";
+          //if(uobj.roles === "super_admin" || uobj.roles === "reseller") ob.userRole = "admin";
+          console.log(ob.userRole);
+          VL.push(ob);
+        });
+        dispatch({ type: "VIDEO_LIST", payload: { videoList: VL } });
+        setBuildRoles(false);
+      }
+    }
+  }, [buildRoles]);
 
-    },[buildRoles]);
+  useEffect(() => {
+    let filterType = state.filterType;
+    if (filterType === "all" || filterType === "folder")
+      GetFolders(state, dispatch, state.userId);
+    if (filterType === "audio" || filterType === "video")
+      GetFiles(state, dispatch, state.userId, state.folderName);
+  }, [state.filterType]);
 
-
-useEffect(()=>{  
-  let filterType = state.filterType;
-  if( (filterType === "all" || filterType === "folder") )
-  GetFolders(state, dispatch, state.userId);
-  if( filterType === "audio" || filterType === "video")
-      GetFiles(state,dispatch,state.userId,state.folderName);
-
-},[state.filterType]);
-
-useEffect(()=>{
-  //setFilterType("all");
-  dispatch({type:"FILTER_TYPE",payload : { filterType : "video" }});
-},[state.folderName])
-
+  useEffect(() => {
+    //setFilterType("all");
+    dispatch({ type: "FILTER_TYPE", payload: { filterType: "video" } });
+  }, [state.folderName]);
 
   useEffect(() => {
     setLoading(true);
-    listPlaylist(state,dispatch).then(res=>{
-      if(state.dbfolderList.length === 0)  
-         createPlaylist(state,dispatch,"default","folder") });
+    listPlaylist(state, dispatch).then((res) => {
+      if (state.dbfolderList.length === 0)
+        createPlaylist(state, dispatch, "default", "folder");
+    });
     updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     GetFolders(state, dispatch, state.userId);
-      GetUserdetails(state,dispatch,state.userId);
-    console.log('State - ', state.videoList);
- }, []);
+    GetUserdetails(state, dispatch, state.userId);
+    console.log("State - ", state.videoList);
+  }, []);
 
+  const sortvideoList = () => {
+    console.log(sortState);
+    if (sortState === null) return;
+    let temp = [];
+    if (sortState === "asc")
+      temp = state.videoList.sort(
+        (a, b) => Number(a.updatetime) - Number(b.updatetime)
+      );
+    if (sortState === "desc")
+      temp = state.videoList.sort(
+        (a, b) => Number(b.updatetime) - Number(a.updatetime)
+      );
+    dispatch({ type: "VIDEO_LIST", payload: { videoList: temp } });
+  };
 
- const sortvideoList=()=>{
-  console.log(sortState);
-  if(sortState === null ) return;
-  let temp = []
-  if( sortState === "asc")
-  temp = state.videoList.sort((a,b)=> Number(a.updatetime) - Number(b.updatetime) );
-  if( sortState === "desc")
-  temp = state.videoList.sort((a,b)=> Number(b.updatetime) - Number(a.updatetime) );
-  dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
- }
+  const triggerSearch = (value) => {
+    let key = value.target.value;
+    let temp = [];
+    temp = state.videoList.sort((a, b) => {
+      return a.title.includes(key) ? -1 : b.title.includes(key) ? 1 : 0;
+    });
+    dispatch({ type: "VIDEO_LIST", payload: { videoList: temp } });
+  };
 
-const triggerSearch=(value)=>{
-  let key = value.target.value;
-let temp= [];
-temp = state.videoList.sort((a,b)=> {return a.title.includes( key)?-1 : b.title.includes(key) ? 1 : 0 });
-dispatch({ type : "VIDEO_LIST" , payload:{  videoList : temp  }   });
-};
-
-const folderDetail = (folderName) => {
-  dispatch({ type: 'PAGE', payload: { page: "videos" } });
-  dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
-  dbGetObjByPath(
-    state,    dispatch,    "bucket-" + state.userId + "/" + folderName,   true
-  );
-  GetFiles(state, dispatch, state.userId, folderName).then((res) => {
-    console.log("My Videos Files in sidenav - ", res);
-    dispatch({ type: FILE_LIST, payload: { fileList: res } });
-  });
-};
-
+  const folderDetail = (folderName) => {
+    dispatch({ type: "PAGE", payload: { page: "videos" } });
+    dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
+    dbGetObjByPath(
+      state,
+      dispatch,
+      "bucket-" + state.userId + "/" + folderName,
+      true
+    );
+    GetFiles(state, dispatch, state.userId, folderName).then((res) => {
+      console.log("My Videos Files in sidenav - ", res);
+      dispatch({ type: FILE_LIST, payload: { fileList: res } });
+    });
+  };
 
   return (
     <>
@@ -255,87 +287,149 @@ const folderDetail = (folderName) => {
           }}
         >
           <Row align="middle" type="flex">
-          <Col span={0}>
-          {/*<Switch size={"small"}
+            <Col span={0}>
+              {/*<Switch size={"small"}
           defaultChecked={nfApi} onChange={()=> setNFApi(!nfApi) }></Switch>*/}
-          </Col>
-          <Col span={8}>
-            <Tooltip title={"Select folder to see folder wise Videos"}>
-              {nfApi === true ?<Select
-                  size="medium"
-                  style={{ width: "60%" }}
-                  placeholder="search folder"
-                  optionFilterProp="children"
-                  showSearch={true}
-                  value={ state.folderName === "" ? "default" : state.folderName}
-                  onChange={(value) =>
-                   { dispatch({   type: FOLDER_NAME,
-                      payload: { folderName: value },
-                    }); innerFolder(value); }
-                  }
-                >
-                  { state.folderList !== undefined && state.folderList !== null
-                    ? state.folderList.map((obj, ind) => {
-                   return  <> <Option   key={obj}  value={obj}
-                          >  {" "}   {obj}{"      "}  </Option> </>
-                      })
-                    : null}
-                </Select>:
-                <Select
-                size="medium"
-                style={{ width: "60%" }}
-                placeholder="search folder"
-                optionFilterProp="children"
-                showSearch={true}
-                value={ state.folderName === "" ? "default" : state.folderName}
-                onChange={(value) =>
-                 { dispatch({   type: FOLDER_NAME,
-                    payload: { folderName: value },
-                  }); innerFolder(value); }
-                }
-              >
-                { state.dbfolderList !== undefined && state.dbfolderList !== null
-                  ? state.dbfolderList.map((obj, ind) => {
-                 return  obj.foldertype==="folder"?
-                 <> <Option   key={obj.id}  value={obj.id}
-                        >  {" "}   {obj.foldername}{"      "}  </Option> </> : null
-                    })
-                  : null}
-              </Select>                
-                }&nbsp;&nbsp;&nbsp;&nbsp;{"-"}&nbsp;&nbsp;&nbsp;
-                 {  state.videoList === undefined || state.videoList === null ? 0 : state.videoList.length  } </Tooltip>
-                </Col>
+            </Col>
             <Col span={8}>
-            <Tooltip title={"Create new folder to upload video"}><Button
-                key={"xcvz"}
-                type="primary"
-                //icon={<FolderAddOutlined className="createFolderBtnIcon" />}
-                shape="round"
-                size="medium"
-                onClick={showCreateFolder}
-                className="createFolderBtn"
-              >
-                {" + "}
-                 Folder
-              </Button></Tooltip>
-            <Tooltip title={"Click to upload video"}>
-            <Button
-                key={"xcvz"}
-                type="primary"
-                //icon={<VideoCameraAddOutlined className="createFolderBtnIcon" /> }
-                shape="round"
-                size="medium"
-                onClick={() => openUploadVideo(true)}
-                className="createFolderBtn"
-              >Upload</Button></Tooltip>
+              <Tooltip title={"Select folder to see folder wise Videos"}>
+                {nfApi === true ? (
+                  <Select
+                    size="medium"
+                    style={{ width: "60%" }}
+                    placeholder="search folder"
+                    optionFilterProp="children"
+                    showSearch={true}
+                    value={
+                      state.folderName === "" ? "default" : state.folderName
+                    }
+                    onChange={(value) => {
+                      dispatch({
+                        type: FOLDER_NAME,
+                        payload: { folderName: value },
+                      });
+                      innerFolder(value);
+                    }}
+                  >
+                    {state.folderList !== undefined && state.folderList !== null
+                      ? state.folderList.map((obj, ind) => {
+                          return (
+                            <>
+                              {" "}
+                              <Option key={obj} value={obj}>
+                                {" "}
+                                {obj}
+                                {"      "}{" "}
+                              </Option>{" "}
+                            </>
+                          );
+                        })
+                      : null}
+                  </Select>
+                ) : (
+                  <Select
+                    size="medium"
+                    style={{ width: "60%" }}
+                    placeholder="search folder"
+                    optionFilterProp="children"
+                    showSearch={true}
+                    value={
+                      state.folderName === "" ? "default" : state.folderName
+                    }
+                    onChange={(value) => {
+                      dispatch({
+                        type: FOLDER_NAME,
+                        payload: { folderName: value },
+                      });
+                      innerFolder(value);
+                    }}
+                  >
+                    {state.dbfolderList !== undefined &&
+                    state.dbfolderList !== null
+                      ? state.dbfolderList.map((obj, ind) => {
+                          return obj.foldertype === "folder" ? (
+                            <>
+                              {" "}
+                              <Option key={obj.id} value={obj.id}>
+                                {" "}
+                                {obj.foldername}
+                                {"      "}{" "}
+                              </Option>{" "}
+                            </>
+                          ) : null;
+                        })
+                      : null}
+                  </Select>
+                )}
+                &nbsp;&nbsp;&nbsp;&nbsp;{"-"}&nbsp;&nbsp;&nbsp;
+                <Badge
+                  count={
+                    state.videoList === undefined || state.videoList === null
+                      ? 0
+                      : state.videoList.length
+                  }
+                  style={{ backgroundColor: "#888", color: "#fff" }}
+                />
+                {/* {state.videoList === undefined || state.videoList === null
+                  ? 0
+                  : state.videoList.length}{" "} */}
+              </Tooltip>
+            </Col>
+            <Col span={8} className="newActionsList">
+              <Tooltip title={"Create new folder to upload video"}>
+                <Button
+                  key={"xcvz"}
+                  type="primary"
+                  icon={<FolderAddOutlined className="createFolderBtnIcon" />}
+                  shape="round"
+                  size="medium"
+                  onClick={showCreateFolder}
+                  className="createFolderBtn"
+                >
+                  New Folder
+                </Button>
+              </Tooltip>
+              <Tooltip title={"Click to upload video"}>
+                <Button
+                  key={"xcvz"}
+                  type="primary"
+                  //icon={<VideoCameraAddOutlined className="createFolderBtnIcon" /> }
+                  icon={<CloudUploadOutlined />}
+                  shape="round"
+                  size="medium"
+                  onClick={() => openUploadVideo(true)}
+                  className="createFolderBtn"
+                >
+                  Upload
+                </Button>
+              </Tooltip>
               <Button
                 type="primary"
                 shape="round"
                 size="medium"
-                icon={sortState === "asc"? <SortAscendingOutlined /> :sortState === "desc"? <SortDescendingOutlined /> : null}
+                icon={
+                  sortState === "asc" ? (
+                    <SortAscendingOutlined />
+                  ) : sortState === "desc" ? (
+                    <SortDescendingOutlined />
+                  ) : (
+                    <SortAscendingOutlined />
+                  )
+                }
                 //onClick={() => updateTab("add-video")}
-                onClick={()=> {setSortState( sortState === null? "asc":sortState === "asc"? "desc" : "asc" );sortvideoList()}}
-              > sort
+                onClick={() => {
+                  setSortState(
+                    sortState === null
+                      ? "asc"
+                      : sortState === "asc"
+                      ? "desc"
+                      : "asc"
+                  );
+                  sortvideoList();
+                }}
+              >
+                {" "}
+                Sort
               </Button>
             </Col>
             <Col span={8}>
@@ -345,12 +439,15 @@ const folderDetail = (folderName) => {
                 onChange={(e)=>triggerSearch(e)}
                 //enterButton
               />*/}
-              <Input.Search allowClear
-             onChange={(e) => {getPublicItems(state, dispatch, e.target.value).then(rs=>{
-                setBuildRoles(true);
-             }); }}
-             placeholder={ "Search Team or own videos by Title" }
-           ></Input.Search>
+              <Input.Search
+                allowClear
+                onChange={(e) => {
+                  getPublicItems(state, dispatch, e.target.value).then((rs) => {
+                    setBuildRoles(true);
+                  });
+                }}
+                placeholder={"Search Team or own videos by Title"}
+              ></Input.Search>
             </Col>
           </Row>
           <Divider orientation="left"></Divider>
@@ -364,8 +461,8 @@ const folderDetail = (folderName) => {
             >
               {state.folderName === "" &&
                 state.folderList.map((folder, index) => {
-                    return (
-                    state.filterType === "all" || state.filterType === "folder"?
+                  return state.filterType === "all" ||
+                    state.filterType === "folder" ? (
                     <motion.div
                       key={"folder-" + index}
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
@@ -374,19 +471,17 @@ const folderDetail = (folderName) => {
                       <FolderCard
                         folderName={folder}
                         userId={state.userId}
-                        videosCount={countVideos( folder)}
-                        folderOnClick={() =>
-                          innerFolder(folder)
-                        }
+                        videosCount={countVideos(folder)}
+                        folderOnClick={() => innerFolder(folder)}
                       />
-                    </motion.div> : null)
+                    </motion.div>
+                  ) : null;
                 })}
 
               {state.folderName === "" &&
                 state.videoList.map((obj, index) => {
-
-                  return (
-                    state.filterType === "all" || obj.itemtype.includes(state.filterType) ?
+                  return state.filterType === "all" ||
+                    obj.itemtype.includes(state.filterType) ? (
                     <motion.div
                       className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
                       variants={item}
@@ -398,29 +493,30 @@ const folderDetail = (folderName) => {
                         userId={state.userId}
                         embedClick={() => embedPopup(state, dispatch, obj)}
                       />
-                    </motion.div> : null
-                  );
+                    </motion.div>
+                  ) : null;
                 })}
 
               {
                 // Showing Files
                 state.folderName !== "" && state.videoList.length > 0
                   ? state.videoList.map((file, index) => {
-                    return (
-                      state.filterType === "all" || file.itemtype.includes(state.filterType) ?
-                      <motion.div
-                        className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
-                        variants={item}
-                        key={"file-" + index}
-                      >
-                        <VideoCard
-                          videoTitle={file.title}
-                          fileObject={file}
-                          userId={state.userId}
-                          embedClick={() => embedPopup(state, dispatch, file)}
-                        />
-                      </motion.div> : null
-                  )})
+                      return state.filterType === "all" ||
+                        file.itemtype.includes(state.filterType) ? (
+                        <motion.div
+                          className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
+                          variants={item}
+                          key={"file-" + index}
+                        >
+                          <VideoCard
+                            videoTitle={file.title}
+                            fileObject={file}
+                            userId={state.userId}
+                            embedClick={() => embedPopup(state, dispatch, file)}
+                          />
+                        </motion.div>
+                      ) : null;
+                    })
                   : ""
               }
 

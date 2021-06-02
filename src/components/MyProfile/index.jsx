@@ -9,6 +9,7 @@ import ManageUsers from "../ManageUsers";
 import Friends from "../Friends";
 import Settings from  "../Settings";
 import ShareAccess from "../ShareAccess";
+import MyPlans from "../MyPlans";
 
 
 const MyProfile = () => {
@@ -32,6 +33,7 @@ const MyProfile = () => {
     //{    key: 'general',   tab: 'General',  },
     {     key: 'settings',    tab: 'Profile',   },
     {    key: 'inviteusers',   tab: 'Team',  },
+    {    key: 'plans',   tab: 'Plans',  },
     //{    key: 'friends',   tab: 'Member of',  },
     //{    key: 'project',   tab: 'project'  },
   ];
@@ -43,6 +45,7 @@ const MyProfile = () => {
     friends:  <Friends/>,
     settings: <Settings/> ,
     inviteusers : <ShareAccess/>,
+    plans: <MyPlans />,
     project: <p>To Do</p>,
   };
 

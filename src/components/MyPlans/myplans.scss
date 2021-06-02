@@ -1,0 +1,32 @@
+.compare-table-row {
+   display: flex;
+   flex-direction: row;
+   align-items: stretch;
+   border-bottom: 1px solid #eee;
+
+   &.header {
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      color: #888;
+   }
+
+   .compare-table-col {
+      padding: 10px 15px;
+   }
+
+   .desc {
+      display: inline-flex;
+      flex: 0 0 300px;
+   }
+
+   .each-plan {
+      display: inline-flex;
+      flex: 1 1 100px;
+   }
+
+   .icon-block {
+      font-size: 20px;
+   }
+
+}

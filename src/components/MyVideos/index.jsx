@@ -368,7 +368,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       ? 0
                       : state.videoList.length
                   }
-                  style={{backgroundColor: "#888", color: '#fff'}}
+                  style={{ backgroundColor: "#888", color: "#fff" }}
                 />
                 {/* {state.videoList === undefined || state.videoList === null
                   ? 0

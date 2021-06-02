@@ -62,7 +62,7 @@ const Settings = () => {
         { userObj : { ...state.userObj, settings : {...state.userObj.settings  ,logo : res.data.uploadURL} } }});
         setPreviewImage(res.data.uploadURL);
         setFileList([]);
-        message.success("Thumbnail updated , now save settings");        
+        message.success("Thumbnail updated , now save settings");
         }
       }).catch(err => {
         console.log("err", err);
@@ -88,15 +88,15 @@ const Settings = () => {
   useEffect(()=>{
 
     if( state.userObj !== null && state.userObj !== undefined ){
-    form.setFieldsValue({ 
+    form.setFieldsValue({
       'is_person' : state.userObj.is_person,
       'companyname' : state.userObj.company  ? state.userObj.company.name :null,
       'address' : state.userObj.company  ? state.userObj.company.address :null,
-      'contact' : state.userObj.company  ? state.userObj.company.contact :null, 
+      'contact' : state.userObj.company  ? state.userObj.company.contact :null,
       'gstn' : state.userObj.gstn ,
       'headerbgcolor' : state.userObj.settings  ? state.userObj.settings.headerbgcolor :null ,
-      'logo' : state.userObj.settings  ? state.userObj.settings.logo : previewImage ,   
-    });      
+      'logo' : state.userObj.settings  ? state.userObj.settings.logo : previewImage ,
+    });
       setPreviewImage(state.userObj.settings  ? state.userObj.settings.logo :null);
       setColorCode(state.userObj.settings  ? state.userObj.settings.headerbgcolor :null);
   }
@@ -121,7 +121,7 @@ const Settings = () => {
     let company= { "name": values.companyname , "address": values.address , "contact":values.address};
     let settings = { "logo": previewImage , 'headerbgcolor' : colorcode };
     let obj = { ...state.userObj , "company" : company , "settings" : settings};
-    console.log(values , obj);    
+    console.log(values , obj);
     let ke = Object.keys(values);
     ke.forEach((ke,index)=>{
         obj[ke] = values[ke];
@@ -147,10 +147,10 @@ const Settings = () => {
                 </Col>
                 <Col span={12} xs={12} md={16} lg={10}>
                   <Form.Item className="editFormItem" name="is_person">
-                  <Radio.Group onChange={(e)=> 
-                  dispatch({type:"USER_OBJ",payload:{ userObj : { ...state.userObj , is_person :e.target.value }}}) } 
+                  <Radio.Group onChange={(e)=>
+                  dispatch({type:"USER_OBJ",payload:{ userObj : { ...state.userObj , is_person :e.target.value }}}) }
                   value={state.userObj.is_person} >
-                  <Radio defaultChecked value={true}>{"person"}</Radio>
+                  <Radio defaultChecked value={true}>{"Person"}</Radio>
                   <Radio  value={false}>{"Company"}</Radio></Radio.Group>
                   </Form.Item>
                 </Col>
@@ -200,7 +200,7 @@ const Settings = () => {
               <h3> <strong>{"your domain : " + state.userObj.domain_name }</strong></h3>
               <Row>
                 <Col span={8} xs={8} md={8} lg={8}>
-                <img  style={{height:"120px",width:"180px"}} src={ state.userObj.settings ? state.userObj.settings.logo : null} 
+                <img  style={{height:"120px",width:"180px"}} src={ state.userObj.settings ? state.userObj.settings.logo : null}
                   alt="Logo loads here "/>
                 </Col>
                 <Col span={8} xs={8} md={8} lg={8}>
@@ -208,10 +208,10 @@ const Settings = () => {
                 fileList={fileList}          onPreview={handlePreview}
                 onChange={handleUpload}
                 beforeUpload={() => handleBeforeUpload} // return false so that antd doesn't upload the picture right away
-                >  {uploadButton}  </Upload> 
+                >  {uploadButton}  </Upload>
                 { fileList.length === 1 ? <Button onClick={handleSubmit} // this button click will trigger the manual upload
                 >  Upload Logo </Button>:null}
-                
+
                 </Col>
               </Row>
                   <br/>

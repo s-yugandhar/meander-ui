@@ -4,22 +4,15 @@ import axios from 'axios';
 import {
   CheckCircleOutlined
 } from "@ant-design/icons";
-
-
-
 //custom imports
 import {Context} from '../../context';
 import {url} from '../API';
 import "./myplans.scss";
 
-
-
 const MyPlans = () => {
   const [visible, setVisible] = useState(false);
   const [plansData, setPlansData] = useState([]);
-
     const {state, dispatch} = useContext(Context);
-
    const { Column, ColumnGroup } = Table;
 
    const columns = [
@@ -74,7 +67,7 @@ const MyPlans = () => {
    ];
 
    const getPlansData = () => {
-     axios.get("https://meander.video/plans").then((res) => {
+     axios.get(url+"/plans").then((res) => {
        setPlansData(res.data);
      });
    };
@@ -82,7 +75,7 @@ const MyPlans = () => {
    const buyPlan = (id) => {
     axios
       .post(
-        url + "/orders/" + state.userId + "/" + state.userId + "?planid=" + id, null,
+        url + `/orders/${state.userId}/${state.userId}/?planid=${id}`, null,
         {
           headers: {
             Authorization: "bearer " + state.token,
@@ -91,36 +84,36 @@ const MyPlans = () => {
       )
       .then((ordRes) => {
         console.log("Orders res - ", ordRes.data);
+        if(ordRes.data.success === false) 
+        {alert(` Error in order Creation : ${ordRes.data.detail} `);
+      return;}
+        if ( ordRes.data.amount <= 0) {
 
-        // Razorpay Starts
-        if (ordRes.data.amount <= 0) {
-
-          alert('Hurray!!!, there is nothing to pay, Enjoy!')
+          alert('Hurray!!!, there is nothing to pay, Enjoy!');
+          return ;
         } else {
           const rzrpy = new window.Razorpay({
-            // key: "rzp_test_UFO2oInWXoDIAA",
-            key: "r0t5plwwIlrcdiHvi1V0cPKZ",
+            // key: "rzp_test_AnDnT0POdzl9fb",
+            key: "rzp_test_AnDnT0POdzl9fb",
             name: "Meander",
             order_id: ordRes.data.id,
             handler: function (response) {
-              const razorBody = JSON.stringify({
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-              });
-
-              axios
-                .post(
-                  url + "/orders/" + ordRes.data.id + "/charge",
-                  razorBody,
+              axios.post(
+                  `${url}/orders/${ordRes.data.id}/${response.razorpay_payment_id}/${response.razorpay_signature}`,
+                  null,
                   {
                     headers: {
                       accept: "application/json",
-                      Authorization: "Bearer " + state.token,
+                      Authorization: "bearer " + state.token,
                     },
                   }
                 )
                 .then((res) => {
                   console.log("Order ID Charge", res.data);
+                  if(res.data.success === true)
+                    alert(`hurray ${res.data.detail}`);
+                  else 
+                  alert(`  Nooooooooooo ${res.data.detail}`)
                 });
             },
             prefill: {

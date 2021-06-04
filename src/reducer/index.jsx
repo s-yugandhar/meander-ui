@@ -1,26 +1,27 @@
 import {
-   LOGIN_SUCCESS,
-   LOGOUT_SUCCESS,
-   PAGE,
-   FOLDER_CREATED,
-   FILE_UPLOADED,
-   FOLDER_NAME ,
-   FOLDER_LIST ,
-   DBFOLDER_LIST,
-   FILE_LIST,
-   UPPY_SUCCESS,
-   UPPY_FAILED,
-   UPPY_BATCHID ,
-   VIDEO_LIST ,
-   EDIT_VIDEO,
-   USER_OBJ,
-   FILTER_TYPE,
-   ACCESS_IN,
-   ACCESS_OUT,
-   ARCHIVE_ACCOUNT,
-   PUBLIC_VIDEOS,
-   APP_PLANS
-} from './types'
+  LOGIN_SUCCESS,
+  LOGOUT_SUCCESS,
+  PAGE,
+  FOLDER_CREATED,
+  FILE_UPLOADED,
+  FOLDER_NAME,
+  FOLDER_LIST,
+  DBFOLDER_LIST,
+  FILE_LIST,
+  UPPY_SUCCESS,
+  UPPY_FAILED,
+  UPPY_BATCHID,
+  VIDEO_LIST,
+  EDIT_VIDEO,
+  USER_OBJ,
+  FILTER_TYPE,
+  ACCESS_IN,
+  ACCESS_OUT,
+  ARCHIVE_ACCOUNT,
+  PUBLIC_VIDEOS,
+  APP_PLANS,
+  USER_PLANS,
+} from "./types";
 
 const localUserId = localStorage.getItem('userId');
 const localToken = localStorage.getItem('token');
@@ -49,6 +50,7 @@ export const initialState = {
    accessOut : [],
    publicVideos : [],
    appPlans : [] ,
+   userPlans: [],
 }
 
 export const reducer = (state = initialState, action) => {
@@ -99,16 +101,16 @@ export const reducer = (state = initialState, action) => {
             ...state,
             folderName: action.payload.folderName
          }
-      
+
       case FOLDER_LIST:
          return {   ...state,  folderList : action.payload.folderList}
-      
+
       case DBFOLDER_LIST:
             return {   ...state,  dbfolderList : action.payload.dbfolderList}
 
       case FILE_LIST:
          return {   ...state,  fileList : action.payload.fileList}
-      
+
       case UPPY_SUCCESS:
          return {   ...state,  uppySuccess : action.payload.uppySuccess}
 
@@ -117,32 +119,38 @@ export const reducer = (state = initialState, action) => {
 
       case UPPY_BATCHID:
          return {  ...state,  uppyBatchId: action.payload.uppyBatchId}
- 
+
       case VIDEO_LIST :
          return {  ...state,    videoList : action.payload.videoList }
 
       case EDIT_VIDEO :
          return {  ...state , editVideo : action.payload.editVideo }
- 
+
       case USER_OBJ :
          return { ...state , userObj : action.payload.userObj}
-      
+
+      case USER_PLANS:
+         return {
+            ...state,
+            userPlans: action.payload.userPlans
+         }
+
       case FILTER_TYPE :
          return { ...state , filterType : action.payload.filterType}
-      
+
       case ACCESS_IN :
          return { ...state , accessIn : action.payload.accessIn }
-      
+
       case ACCESS_OUT :
          return { ...state , accessOut : action.payload.accessOut }
 
-      case ARCHIVE_ACCOUNT : 
+      case ARCHIVE_ACCOUNT :
       return { ...state , archiveAccount : action.payload.archiveAccount }
 
-      case PUBLIC_VIDEOS : 
+      case PUBLIC_VIDEOS :
       return { ...state , publicVideos : action.payload.publicVideos }
 
-      case APP_PLANS : 
+      case APP_PLANS :
       return { ...state , appPlans : action.payload.appPlans }
 
 

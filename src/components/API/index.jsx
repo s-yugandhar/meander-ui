@@ -23,16 +23,16 @@ const getParentAssingnedRole = async (child_id) => {
    }).then(res => {
       console.log(res);
       return res.data;   });
-      if( tempFolders !== undefined && tempFolders !== null && 
+      if( tempFolders !== undefined && tempFolders !== null &&
           tempFolders.roles === "reseller" || tempFolders.roles === "super_admin")
             return "self";
-   if(  tempFolders !== undefined && tempFolders !== null && 
+   if(  tempFolders !== undefined && tempFolders !== null &&
       tempFolders.access !== undefined && tempFolders.access !== null   ){
          if( tempFolders.access.admin.includes(child_id))
             return "admin";
          if( tempFolders.access.user.includes(child_id))
             return "user";
-         
+
       }   return "viewer";
 }
 
@@ -55,7 +55,7 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
    return tempFolders;
 }
 
-export const GetFolders= async (state,dispatch ,userId)=>{
+export const GetFolders= async (state,dispatch,userId)=>{
    if (userId === undefined )   return [];
    let setfolders = new Set();
    //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
@@ -157,10 +157,10 @@ export const deleteFile_Folder = async (state,dispatch, userId,objectName , recu
    }).then(res => {
       //notification.open({ message : "Delete file in  cdn" });
       console.log(  "delete success" , res , objectName , recursive , userId);
-      return "";   }).catch(err=>  
+      return "";   }).catch(err=>
          notification.open({ message : "Error in deleting file in cdn" })
          );
-   
+
       if (getFiles === ""){
          let path = recursive ===true ? objectName+"/" : objectName;
             dbRemoveObj( state, dispatch , "bucket-"+userId +"/"+path , recursive );
@@ -214,7 +214,7 @@ export const dbUpdateObj=async(state,dispatch ,obj)=>{
       }
    }).catch(err=> notification.open({message : " Update failed"}))
    ;
-   
+
    return getFiles;
 }
 
@@ -249,19 +249,19 @@ export const dbRemoveObj=async( state , dispatch ,path , recursive )=>{
    }).then(res => {
       notification.open({ message : "Deleted the video succesfully" });
          console.log(  "delete video obj " , res );
-     
+
    }).catch(err=> notification.open({ message : "Error while deleting video" }) );
    return getFiles;
 }
 
 
-export const listPlaylist=async (state,dispatch)=>{ 
+export const listPlaylist=async (state,dispatch)=>{
    const getFiles = await axios.get(url + `/listplaylist?user_id=${state.userId}` , {
       headers: {
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }
    }).then(res => {
-      
+
          console.log(  "playlist list" , res );
       dispatch({ type : "DBFOLDER_LIST" , payload :{ dbfolderList : res.data   }});
       return res.data;
@@ -305,7 +305,7 @@ export const getPublicItems=async(state,dispatch,key)=>{
        headers: {
           accept: 'application/json', Authorization : "bearer "+state.token,
              }
-    }).then(res => {     
+    }).then(res => {
        dispatch({type:"PUBLIC_VIDEOS",payload:{publicVideos : res.data}});
 
        if(userId !== null){
@@ -337,3 +337,27 @@ export const getServedLinks = async (state,dispatch,contentid,play=false)=>{
    return tempFolders;
 
 }
+
+// Converting bytes to KB OR MB OR GB
+export const convertBytes = (bytes, key)=>{
+
+    let kb = bytes/(1024);
+    let mb = kb/(1024);
+    let gb = mb/(1024);
+
+    let keyTxt = key.toUpperCase();
+
+    if(['KB',"MB","GB"].includes(key) !== true)
+      return null;
+
+    if (keyTxt === "KB") return Number(kb).toFixed(2);
+    if (keyTxt === "MB") return Number(mb).toFixed(2);
+    if (keyTxt === "GB") return Number(gb).toFixed(2);
+  };
+
+
+// Converting Date string to Local String
+export const convertDate = (date) => {
+  const dt = new Date(date).toLocaleDateString();
+  return dt;
+};

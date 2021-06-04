@@ -19,4 +19,4 @@ export const ACCESS_OUT = "ACCESS_OUT";
 export const DBFOLDER_LIST = "DBFOLDER_LIST";
 export const PUBLIC_VIDEOS = "PUBLIC_VIDEOS";
 export const APP_PLANS = "APP_PLANS";
-
+export const USER_PLANS = "USER_PLANS";

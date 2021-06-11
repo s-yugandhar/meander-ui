@@ -1,25 +1,56 @@
-import React from "react";
-import {
-  Layout,
-  Row,
-  Col,
-  Input,
-  Select,
-  Typography,
-  Button,
-  Card,
-  List,
-  Upload,
-} from "antd";
+import React,{useContext,useEffect,useState} from "react";
+import {  Layout,  Row,  Col,
+  Input,  Select,  Typography,  Button,
+  Card,  List,  Upload,} from "antd";
 import { IoCalendarOutline, IoAdd, IoArrowForward } from "react-icons/io5";
 import { BiRupee } from "react-icons/bi";
-
 // Custom imports
 import "./pDashboard.scss";
+import axios from 'axios';
+import {url} from '../API/index';
+import { Context } from '../../context';
+import {LineChart , Line,XAxis,YAxis , Label, Tooltip} from 'recharts';
 
 const PDashboard = () => {
   const { Option } = Select;
   const { Text } = Typography;
+  const {state , dispatch} = useContext(Context);
+  const [pageData,setPageData] = useState(null);
+  const [chartData,setChartData] = useState(null);
+
+
+  const getDashboardData= async (state,dispatch,ndays)=>{
+
+    const dData = await axios.get(url + `/dashboard?user_id=${state.userId}&ndays=${ndays}`, {
+      headers: {
+         accept: 'application/json', Authorization : "bearer "+state.token,
+            }
+   }).then(res => {
+      console.log(res.data);
+      setPageData(res.data);
+      return res.data;   }).catch(
+        err => {setPageData(null);}
+      );
+      return dData;
+  }
+
+
+  useEffect(()=>{
+    if(pageData == null){
+      getDashboardData(state,dispatch,30);
+    }else{
+      let cf = pageData.cfmetrics;
+      let cdata = []
+      cf.map(obj=>{
+        let temp = { 'date' : obj.dimensions.date , 
+        'Bytes_MB' : Number( obj.sum.edgeResponseBytes/(1024*1024)).toFixed(2) , 
+         'Hits': Number(obj.sum.visits)  }
+        cdata.push(temp);
+      })
+      setChartData(cdata);
+    };
+  },[pageData])
+  
 
   return (
     <Layout className="full-width page-layout">
@@ -27,21 +58,21 @@ const PDashboard = () => {
       <Row className="bg-white p-15" align="middle">
         <Col span="10">
           <Select
-            defaultValue="last30days"
+            defaultValue="30"
             style={{ width: "150px" }}
-            onChange=""
+            onChange={(value)=>getDashboardData(state,dispatch , value)}
           >
-            <Option value="last30days">Last 30 days</Option>
-            <Option value="">Last 2 months</Option>
-            <Option value="">Last 3 months</Option>
-            <Option value="">Last 4 months</Option>
+            <Option value="30">Last 30 days</Option>
+            <Option value="15">Last 15 days</Option>
+            <Option value="7">Last 7 days</Option>
+            
           </Select>
-          <Input
+          {/*<Input
             addonAfter={<IoCalendarOutline style={{ fontSize: "18px" }} />}
             defaultValue=""
             placeholder="Select date"
             style={{ width: "170px" }}
-          />
+          />*/}
         </Col>
         <Col span="4"></Col>
         <Col span="10">
@@ -71,32 +102,32 @@ const PDashboard = () => {
         {/* Total Videos Column */}
         <Col span="6">
           <Card title="Total Videos" className="totalColumn">
-            <div className="totalNumber">9,99,999</div>
-            <div className="totalCompare">20% up from Last Month</div>
+        <div className="totalNumber">{pageData ? pageData.total_video : 0}</div>
+        <div className="totalCompare">{pageData ? Number(100*(pageData['30d_video']/(pageData.total_video-pageData['30d_video']))).toFixed(2) : 0}% up from Last Month</div>
           </Card>
         </Col>
 
         {/* Total Audios Column */}
         <Col span="6">
           <Card title="Total Audios" className="totalColumn">
-            <div className="totalNumber">9,99,999</div>
-            <div className="totalCompare">20% up from Last Month</div>
+          <div className="totalNumber">{pageData ? pageData.total_audio : 0}</div>
+          <div className="totalCompare">{pageData ? Number(100*(pageData['30d_audio']/(pageData.total_audio-pageData['30d_audio']))).toFixed(2) : 0}% up from Last Month</div>
           </Card>
         </Col>
 
         {/* Data Transfer Column */}
         <Col span="6">
           <Card title="Data Transfer" className="totalColumn">
-            <div className="totalNumber">300 TB</div>
-            <div className="totalCompare">20% up from Last Month</div>
+            <div className="totalNumber">NA</div>
+            <div className="totalCompare">NA</div>
           </Card>
         </Col>
 
         {/* API Requests Column */}
         <Col span="6">
           <Card title="API Requests" className="totalColumn">
-            <div className="totalNumber">9,99,999</div>
-            <div className="totalCompare">20% up from Last Month</div>
+            <div className="totalNumber">NA</div>
+            <div className="totalCompar">NA</div>
           </Card>
         </Col>
       </Row>
@@ -108,7 +139,21 @@ const PDashboard = () => {
           <Card
             title="Data Transfer, Storage, API requests"
             className="bigGraph"
-          />
+        >
+          { chartData !== null ?
+          <LineChart width={500} height={200} data={chartData}>
+          <XAxis dataKey={'date'}>        </XAxis>
+          <YAxis  yAxisId="right" domain={['auto','dataMax']} orientation="right" dataKey="Hits">
+          <Label value="API Requests" angle={-90}/>       </YAxis>
+          <YAxis  yAxisId="left" domain={['auto','dataMax']} dataKey="Bytes_MB" > 
+              <Label value="Data Served in MB" angle={-90}/>
+                 </YAxis>
+             <Line dataKey={'Hits'} yAxisId="right" stroke="green"   ></Line>
+             <Line dataKey={'Bytes_MB'} yAxisId="left" stroke="orange" ></Line>
+            
+            <Tooltip />
+          </LineChart>: null }
+        </Card>
         </Col>
       </Row>
       {/* Big Graph Ends */}
@@ -126,32 +171,17 @@ const PDashboard = () => {
         <Col span="12">
           <Card title="Recent Activity" style={{ height: "300px" }}>
             <List itemLayout="horizontal" className="activityList">
-              <List.Item className="activityItem">
+              
+              { pageData !== null && pageData !== undefined ?
+              pageData.recent_video.map((obj)=>{
+                return <List.Item className="activityItem" key={obj.id}>
                 <Text ellipsis="1" className="activityTitle">
-                  Some activity title runs here like this Some activity title
-                  runs here like this Some activity title runs here like this
+                  {obj.title}
                 </Text>
-                <Text className="activityTiming">30min ago</Text>
+                <Text className="activityTiming">{new Date(obj.updatetime).toLocaleString()}</Text>
               </List.Item>
-              <List.Item className="activityItem">
-                <Text ellipsis="1" className="activityTitle">
-                  Some activity title runs here like this Some activity title
-                  runs here like this some times
-                </Text>
-                <Text className="activityTiming">30min ago</Text>
-              </List.Item>
-              <List.Item className="activityItem">
-                <Text ellipsis="1" className="activityTitle">
-                  Some activity title runs here like this
-                </Text>
-                <Text className="activityTiming">30min ago</Text>
-              </List.Item>
-              <List.Item className="activityItem">
-                <Text ellipsis="1" className="activityTitle">
-                  Some activity title runs here title runs here like this
-                </Text>
-                <Text className="activityTiming">30min ago</Text>
-              </List.Item>
+
+              }): "Recently uploaded videos List Here" }
             </List>
           </Card>
         </Col>

@@ -26,6 +26,14 @@ import {
 import axios from "axios";
 import { Context } from "../../context";
 import { Header } from "antd/lib/layout/layout";
+import { Link } from "react-router-dom";
+import { IoGridSharp } from "react-icons/io5";
+import {ImUser } from "react-icons/im";
+import {
+  IoGrid,
+  IoNotificationsSharp,
+  IoChevronDownSharp,
+} from "react-icons/io5";
 
 const TopHeader = (props) => {
   const dyHeaderBG = props.dyHeaderBG;
@@ -297,7 +305,7 @@ const TopHeader = (props) => {
       style={{ backgroundColor: dyHeaderBG, borderBottom: "1px solid #ddd" }}
     >
       <Row>
-        <Col span={6}>
+        <Col span={4}>
           {window.location.hostname === "portal.meander.video" ? (
             <div style={{ color: "white" }} className="brandingLogoBlock">
               <img src={dyLogo} alt="" className="brandingLogo" />
@@ -318,77 +326,68 @@ const TopHeader = (props) => {
            ></Input.Search>*/}
         </Col>
 
-        <Col span={16}>
+        <Col span={18}>
           <Row justify="end" align="middle" style={{ height: "64px" }}>
             {/* Switch User drodpwon */}
-            <Col span={6} className="top-header-col">
+            <Col className="top-header-col">
               {(state.userObj &&
                 (state.userObj.roles === "reseller" ||
                   state.userObj.roles === "super_admin")) ||
               archive !== null ? (
-                <Row justify="end">
-                  <Col
-                    span={24}
-                    style={{ color: "#aaa", paddingBottom: "3px" }}
-                  >
-                    Switch to
-                  </Col>
-                  <Col span={24}>
-                    {" "}
-                    <Select
-                      size="middle"
-                      className="w-100"
-                      placeholder="search email"
-                      optionFilterProp="children"
-                      showSearch={true}
-                      value={acUser !== null ? acUser : null}
-                      onChange={(value) => {
-                        if (value === "Switch to Self") {
-                          switchToSelf(state, dispatch, archive);
-                          return;
-                        }
-                        if (acUser !== value) {
-                          let user = listUsers.find((o) => o.email === value);
-                          if (user) setAcUser(user.email);
-                          toggleToUser(state, dispatch, { id: user.id });
-                        }
-                      }}
-                    >
-                      {listUsers.length > 0
-                        ? listUsers.map((obj, ind) => {
-                            return (
-                              <>
-                                {" "}
-                                <Option
-                                  key={obj.id}
-                                  value={
-                                    archive === null
-                                      ? obj.email
-                                      : archive && archive.userId !== obj.id
-                                      ? obj.email
-                                      : "Switch to Self"
-                                  }
-                                >
-                                  {" "}
-                                  {archive === null
-                                    ? obj.email
-                                    : archive && archive.userId !== obj.id
-                                    ? obj.email
-                                    : "Switch to Self"}
-                                  {"   "}{" "}
-                                </Option>{" "}
-                              </>
-                            );
-                          })
-                        : null}
-                    </Select>
-                  </Col>
-                </Row>
+                <Select
+                  size="middle"
+                  className="switchAccountSelect whiteSelect"
+                  style={{ width: "200px" }}
+                  placeholder="Switch to"
+                  optionFilterProp="children"
+                  showSearch={true}
+                  value={acUser !== null ? acUser : null}
+                  bordered={false}
+                  onChange={(value) => {
+                    if (value === "Switch to Self") {
+                      switchToSelf(state, dispatch, archive);
+                      return;
+                    }
+                    if (acUser !== value) {
+                      let user = listUsers.find((o) => o.email === value);
+                      if (user) setAcUser(user.email);
+                      toggleToUser(state, dispatch, { id: user.id });
+                    }
+                  }}
+                >
+                  {listUsers.length > 0
+                    ? listUsers.map((obj, ind) => {
+                        return (
+                          <>
+                            {" "}
+                            <Option
+                              key={obj.id}
+                              value={
+                                archive === null
+                                  ? obj.email
+                                  : archive && archive.userId !== obj.id
+                                  ? obj.email
+                                  : "Switch to Self"
+                              }
+                            >
+                              {" "}
+                              {archive === null
+                                ? obj.email
+                                : archive && archive.userId !== obj.id
+                                ? obj.email
+                                : "Switch to Self"}
+                              {"   "}{" "}
+                            </Option>{" "}
+                          </>
+                        );
+                      })
+                    : null}
+                </Select>
               ) : null}
             </Col>
 
             {/* Upload to dropdown */}
-            <Col span={6} className="top-header-col">
+            {/* <Col span={6} className="top-header-col">
               {state.userObj !== null &&
               state.userObj !== undefined &&
               state.userObj.access !== null &&
@@ -450,42 +449,55 @@ const TopHeader = (props) => {
                   Switch To Self
                 </Button>
               ) : null}
+            </Col> */}
+
+            {/* Docs */}
+            <Col className="top-header-col">
+              <Button type="link" className="topHeaderIconBtn text">
+                Docs
+              </Button>
+            </Col>
+
+            {/* Group List */}
+            <Col className="top-header-col">
+              <Button type="link" className="topHeaderIconBtn">
+                <IoGrid className="topHeaderIcon" />
+              </Button>
+            </Col>
+
+            {/* Group List */}
+            <Col className="top-header-col">
+              <Button type="link" className="topHeaderIconBtn">
+                <IoNotificationsSharp className="topHeaderIcon" />
+              </Button>
             </Col>
 
             {/* User Account Dropdown */}
-            <Col span={6} className="top-header-col" ju>
+            <Col className="top-header-col">
               {localUserId ? (
                 <Dropdown overlay={userMenu} trigger={["click"]}>
                   <Button
                     htmlType="button"
                     type="link"
-                    className="ant-dropdown-link w-100 my-account-dropdown"
+                    className="ant-dropdown-link w-100 my-account-dropdown topHeaderIconBtn"
                     onClick={(e) => e.preventDefault()}
                     style={{
                       color: dyHeaderBG === "black" ? "white" : "black",
                     }}
                   >
-                    <Avatar
-                      size={30}
-                      icon={<UserOutlined />}
-                      style={{ marginRight: "5px" }}
-                    />{" "}
-                    {state.archiveAccount !== null
-                      ? "Shared Account"
-                      : state.userObj !== undefined && state.userObj !== null
-                      ? state.userObj.username
-                      : "My Account"}
-                    <DownOutlined />
+                    <ImUser className="topHeaderIcon" />
+                    <IoChevronDownSharp style={{ width: "15px" }} />
                   </Button>
                 </Dropdown>
               ) : (
                 <Button
                   type="primary"
+                  pl="0px"
                   onClick={() =>
                     dispatch({ type: "PAGE", payload: { page: "login" } })
                   }
                 >
-                  Login
+                  <Avatar size={30} icon={<UserOutlined />} />
                 </Button>
               )}
             </Col>

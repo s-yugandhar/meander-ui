@@ -113,7 +113,15 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
           ) : null}
           <SubMenu key="products-menu" title="Products">
             <Menu.Item
-              key="dashboard"
+              key="p-dashboard"
+              onClick={() => {
+                loadPage("p-dashboard");
+              }}
+            >
+              Dashboard
+            </Menu.Item>
+            <Menu.Item
+              key="videos"
               onClick={() => {
                 GetFolders(state, dispatch, state.userId);
                 loadPage("videos");
@@ -121,8 +129,97 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             >
               Videos
             </Menu.Item>
+            <Menu.Item
+              key="p-audio"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Audio
+            </Menu.Item>
+            <Menu.Item
+              key="p-images"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Images
+            </Menu.Item>
+            <Menu.Item
+              key="p-object-detection"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Object Detection
+            </Menu.Item>
+            <Menu.Item
+              key="p-nsfw-filters"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              NSFW Filters
+            </Menu.Item>
+            <Menu.Item
+              key="p-video-classification"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Video Classification
+            </Menu.Item>
+            <Menu.Item
+              key="p-live-streaming"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Live Streaming
+            </Menu.Item>
+            <Menu.Item
+              key="p-multi-streaming"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Multi Streaming
+            </Menu.Item>
+            <Menu.Item
+              key="p-studio"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Studio
+            </Menu.Item>
+            <Menu.Item
+              key="usage"
+              onClick={() => {
+                loadPage("usage");
+              }}
+            >
+              Reports
+            </Menu.Item>
+            <Menu.Item
+              key="profile"
+              onClick={() => {
+                loadPage("profile");
+              }}
+            >
+              My Account
+            </Menu.Item>
+            <Menu.Item
+              key="p-settings"
+              onClick={() => {
+                loadPage("forbidden");
+              }}
+            >
+              Settings
+            </Menu.Item>
           </SubMenu>
-          {state.archiveAccount !== null ? (
+
+          {/* {state.archiveAccount !== null ? (
             <Menu.Item onClick={() => switchToSelf(state, dispatch)}>
               Switch To Own Account{" "}
             </Menu.Item>
@@ -145,7 +242,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             onClick={() => loadPage("usage")}
           >
             Usage Report
-          </Menu.Item>
+          </Menu.Item> */}
           {state.userObj !== null &&
           state.userObj !== undefined &&
           state.userObj.roles === "super_admin" ? (

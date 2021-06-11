@@ -1,0 +1,61 @@
+
+.totalColumn {
+   position: relative;
+   height: 100%;
+   .totalNumber {
+   font-size: xx-large;
+   color: #222;
+}
+
+.totalCompare {
+   padding-top: 10px;
+   font-size:medium;
+   color: #777;
+}
+}
+
+
+.bigGraph {
+   width: 100%;
+   height: 300px;
+}
+
+.activityList {
+   .activityTitle {
+      font-size: medium;
+      font-weight: 700;
+      padding-right: 15px;
+      color: #555;
+   }
+
+   .activityTiming {
+      padding-left: 10px;
+      color: #888;
+      font-size: small;
+      white-space: nowrap;
+   }
+}
+
+.recent-add-video {
+   position: relative;
+   height: 100%;
+   .ant-upload {
+      width: 100%;
+      height: 100%;
+      margin-bottom: 0;
+
+      .ant-upload {
+         svg {
+            font-size: 60px !important;
+         }
+      }
+   }
+}
+
+.viewAllBtn {
+   width: 100%;
+   height: 100%;
+   color: #1890ff;
+   font-size: large;
+   border-color: #f0f0f0;
+}

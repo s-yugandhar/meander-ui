@@ -65,7 +65,7 @@
   }
 
   &.ant-drawer-open {
-    width: 100% !important
+    width: 100% !important;
   }
 
   .uppy-Dashboard-inner,
@@ -76,13 +76,12 @@
   @include bp(md) {
     /* width: 500px !important; */
     &.ant-drawer-open {
-    width: 500px !important
-  }
+      width: 500px !important;
+    }
   }
 }
 
 .ant-drawer-open {
-
 }
 
 .createFolderMenuItem {
@@ -93,7 +92,7 @@
   margin-bottom: 4px !important;
   display: flex;
   align-items: center;
-  justify-content: center;;
+  justify-content: center;
   .createFolderBtn {
     display: flex;
     align-items: center;
@@ -106,7 +105,6 @@
     margin-right: 5px;
   }
 }
-
 
 .uploadSelectfolderBlock {
   padding: 7px;
@@ -136,24 +134,12 @@
   }
 }
 
-.top-header-col {
-  line-height: 1;
-  position: relative;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
 .my-account-dropdown {
   height: auto;
   line-height: 1;
   padding-right: 0;
+  padding-left: 0px;
 }
-
 
 .copyCodeButtonsList {
   border-right: none !important;
@@ -176,5 +162,47 @@
   .createFolderBtn {
     margin-left: 3px;
     margin-right: 3px;
+  }
+}
+
+.switchAccountSelect {
+  color: white;
+  font-size: 16px;
+
+  .ant-select-arrow {
+    color: #ccc;
+  }
+}
+
+.top-header-col {
+  line-height: 1;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+
+.topHeaderIconBtn {
+  padding: 0;
+  line-height: 1;
+  width: 40px;
+  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &.text {
+    font-size: 16px;
+    color: white;
+  }
+
+  .topHeaderIcon {
+    width: 40px;
+    color: #eee;
   }
 }

@@ -60,6 +60,7 @@ import ResellerReports from "../Reseller-Reports";
 import axios from "axios";
 import { PlayerPage } from "../Player";
 import TopHeader from "../TopHeader";
+import PDashboard from "../P-Dashboard";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -205,6 +206,7 @@ const AdminModule = (props) => {
   );
 
   const page = {
+    "p-dashboard": <PDashboard />,
     "videos": (
       <MyVideos
         openUploadVideo={() => {
@@ -345,7 +347,7 @@ const AdminModule = (props) => {
                       GetFiles(state, dispatch, state.userId, state.folderName);
                   }}
                 >
-                  { state.dbfolderList !== undefined && state.dbfolderList !== null 
+                  { state.dbfolderList !== undefined && state.dbfolderList !== null
                     ? state.dbfolderList.map((obj, ind) => {
                         return obj.foldertype === "folder" ? (
                           <>

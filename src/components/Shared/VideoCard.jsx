@@ -12,6 +12,7 @@ import {
   Image,
   Popover,
   Badge,
+  Typography
 } from "antd";
 import {
   SwapOutlined,
@@ -60,6 +61,8 @@ const VideoCard = (props) => {
     "<---- Click on any button to copy the code"
   );
   const [links, setLinks] = useState(null);
+
+    const { Text } = Typography;
 
   const callServedLinks = (play) => {
     setLinks(null);
@@ -227,22 +230,8 @@ const VideoCard = (props) => {
     <Card
       bordered={true}
       hoverable={true}
-      title={
-        <>
-          {" "}
-          {props.videoTitle}
-          <h6>
-            {" "}
-            {new Date(
-              props.fileObject.updatetime === "-1" ||
-              props.fileObject.updatetime === -1
-                ? null
-                : props.fileObject.updatetime * 1
-            ).toLocaleString()}
-          </h6>{" "}
-        </>
-      }
-      extra={
+      title=""
+      /* extra={
         <>
           <Popover
             content={
@@ -276,7 +265,7 @@ const VideoCard = (props) => {
         </>
       }
       headStyle={{ height: "25%" }}
-      bodyStyle={{ height: "55%" }}
+      bodyStyle={{ height: "55%" }} */
       actions={[
         props.fileObject.userRole !== "viewer" &&
         props.fileObject.userRole !== "user" ? (
@@ -324,14 +313,14 @@ const VideoCard = (props) => {
           </Button>
         </Popover>,
       ]}
-      className="cardVideo"
+      className="cardVideo full-width"
     >
-      <div className="videoCardBlock" id={props.fileObject.id}>
+      <div className="videoCardBlock full-width" id={props.fileObject.id}>
         {/*<div className="videoDuration">10:00</div>
         //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }}
         href={getPlayUrl(state, dispatch, url, props)}
         */}
-        <div className="videoBlock">
+        <div className="videoBlock full-width">
           {/*<VideoCameraOutlined className="videoIconLoading" />*/}
           {
             <ImageLoad
@@ -347,6 +336,17 @@ const VideoCard = (props) => {
           >
             <PlayCircleOutlined />
           </Button>
+        </div>
+        <div className="video-content full-width">
+          <Text ellipsis={true} className="video-title full-width">{props.videoTitle}</Text>
+          <Text className="video-date full-width">
+            {new Date(
+              props.fileObject.updatetime === "-1" ||
+              props.fileObject.updatetime === -1
+                ? null
+                : props.fileObject.updatetime * 1
+            ).toLocaleString()}
+          </Text>
         </div>
         {/*<div className="videoCardInfoBlock" style={{  }}>ss
           <div className="videoTitle">{ props.videoTitle}</div>
@@ -373,11 +373,16 @@ const VideoCard = (props) => {
               fontSize: "13px",
               paddingBottom: "12px",
               textAlign: "left",
-              paddingLeft: '30px'
+              paddingLeft: "30px",
             }}
           >
             {" "}
-            <ArrowDownOutlined width={'8px'} height={"8px"} color={"#ccc"} /> Click on any button to copy the code
+            <ArrowDownOutlined
+              width={"8px"}
+              height={"8px"}
+              color={"#ccc"}
+            />{" "}
+            Click on any button to copy the code
           </Col>
           <Col span={6}>
             {props.fileObject.itemtype.includes("audio")

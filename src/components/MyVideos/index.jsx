@@ -23,6 +23,7 @@ import {
   Switch,
   Tooltip,
   Badge,
+  Tabs,
 } from "antd";
 
 import {
@@ -74,6 +75,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [sortState, setSortState] = useState(null);
   const [nfApi, setNFApi] = useState(false);
   const { Column } = Table;
+
+  const [tabActive, setTabActive] = useState(null);
+
+  const { TabPane } = Tabs;
 
   let initialAnimate;
   let animateOpen;
@@ -277,20 +282,80 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   return (
     <>
-      <Layout className="main">
-        <Content
-          className="site-layout-background"
-          style={{
-            padding: 24,
-            margin: 0,
-            minHeight: "100vh",
-          }}
-        >
-          <Row align="middle" type="flex">
-            <Col span={0}>
-              {/*<Switch size={"small"}
-          defaultChecked={nfApi} onChange={()=> setNFApi(!nfApi) }></Switch>*/}
-            </Col>
+      <Layout className="main page-layout">
+        <Row className="p-15 bg-white">
+          <Col span="12" className="foldersLinksList">
+            <Button
+              type="link"
+              className="fodlerLinkItem active"
+              onClick={() => setTabActive("all-videos")}
+            >
+              All Videos
+            </Button>
+
+            <Button
+              type="link"
+              className="fodlerLinkItem"
+              onClick={() => setTabActive("all-folders")}
+            >
+              Folders
+            </Button>
+
+            <Button
+              type="link"
+              className="fodlerLinkItem"
+              onClick={() => setTabActive("all-channels")}
+            >
+              Channels
+            </Button>
+          </Col>
+
+          <Col
+            span="12"
+            style={{ textAlign: "right" }}
+            className="foldersLinksList"
+          >
+            <Button type="link" className="fodlerLink">
+              New Channel
+            </Button>
+
+            <Button
+              type="link"
+              className="fodlerLink"
+              onClick={showCreateFolder}
+            >
+              New Folder
+            </Button>
+
+            <Button
+              type="link"
+              className="fodlerLink"
+              onClick={() => openUploadVideo(true)}
+            >
+              Upload Video
+            </Button>
+          </Col>
+        </Row>
+        <Row className="py-2" align="middle">
+          <Col span="4" className="">
+            <Select
+              defaultValue="dateModified"
+              style={{ width: "100%" }}
+              onChange=""
+            >
+              <Option value="dateModified">Date Modified</Option>
+              <Option value="">Date Added</Option>
+              <Option value="">By Title</Option>
+            </Select>
+          </Col>
+          <Col span="16" className=""></Col>
+          <Col span="4" className="text-right" style={{ color: "#777" }}>
+            Total Videos - 1000
+          </Col>
+          <Divider orientation="left" className="mt-2 mb-0"></Divider>
+        </Row>
+        <Content className="">
+          {/*  <Row align="middle" type="flex">
             <Col span={8}>
               <Tooltip title={"Select folder to see folder wise Videos"}>
                 {nfApi === true ? (
@@ -370,9 +435,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                   }
                   style={{ backgroundColor: "#888", color: "#fff" }}
                 />
-                {/* {state.videoList === undefined || state.videoList === null
-                  ? 0
-                  : state.videoList.length}{" "} */}
               </Tooltip>
             </Col>
             <Col span={8} className="newActionsList">
@@ -433,12 +495,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
               </Button>
             </Col>
             <Col span={8}>
-              {/*<Input
-                placeholder="Search Title..."
-                allowClear
-                onChange={(e)=>triggerSearch(e)}
-                //enterButton
-              />*/}
               <Input.Search
                 allowClear
                 onChange={(e) => {
@@ -450,23 +506,24 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
               ></Input.Search>
             </Col>
           </Row>
-          <Divider orientation="left"></Divider>
+          */}
+
           {(state.folderList !== undefined && state.folderList.length > 0) ||
           (state.fileList !== undefined && state.videoList.length > 0) ? (
             <motion.div
-              className="ant-row ant-row-stretch position-relative"
+              className="ant-row ant-row-stretch"
               variants={container}
               initial="hidden"
               animate="show"
             >
+              <Row gutter={15}>
               {state.folderName === "" &&
                 state.folderList.map((folder, index) => {
                   return state.filterType === "all" ||
                     state.filterType === "folder" ? (
-                    <motion.div
+                    <Col
                       key={"folder-" + index}
-                      className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
-                      variants={item}
+                      className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
                     >
                       <FolderCard
                         folderName={folder}
@@ -474,51 +531,55 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                         videosCount={countVideos(folder)}
                         folderOnClick={() => innerFolder(folder)}
                       />
-                    </motion.div>
+                    </Col>
                   ) : null;
                 })}
-
-              {state.folderName === "" &&
-                state.videoList.map((obj, index) => {
-                  return state.filterType === "all" ||
-                    obj.itemtype.includes(state.filterType) ? (
-                    <motion.div
-                      className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
-                      variants={item}
-                      key={"file-" + index}
-                    >
-                      <VideoCard
-                        videoTitle={obj.title}
-                        fileObject={obj}
-                        userId={state.userId}
-                        embedClick={() => embedPopup(state, dispatch, obj)}
-                      />
-                    </motion.div>
-                  ) : null;
-                })}
-
-              {
-                // Showing Files
-                state.folderName !== "" && state.videoList.length > 0
-                  ? state.videoList.map((file, index) => {
-                      return state.filterType === "all" ||
-                        file.itemtype.includes(state.filterType) ? (
-                        <motion.div
-                          className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 eachVideo"
-                          variants={item}
-                          key={"file-" + index}
-                        >
-                          <VideoCard
-                            videoTitle={file.title}
-                            fileObject={file}
-                            userId={state.userId}
-                            embedClick={() => embedPopup(state, dispatch, file)}
-                          />
-                        </motion.div>
-                      ) : null;
-                    })
-                  : ""
-              }
+              </Row>
+              <Row gutter={15}>
+                {state.folderName === "" &&
+                  state.videoList.map((obj, index) => {
+                    return state.filterType === "all" ||
+                      obj.itemtype.includes(state.filterType) ? (
+                      <Col
+                        className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
+                        key={"file-" + index}
+                      >
+                        <VideoCard
+                          videoTitle={obj.title}
+                          fileObject={obj}
+                          userId={state.userId}
+                          embedClick={() => embedPopup(state, dispatch, obj)}
+                        />
+                      </Col>
+                    ) : null;
+                  })}
+              </Row>
+              <Row gutter={15}>
+                {
+                  // Showing Files
+                  state.folderName !== "" && state.videoList.length > 0
+                    ? state.videoList.map((file, index) => {
+                        return state.filterType === "all" ||
+                          file.itemtype.includes(state.filterType) ? (
+                          <Col
+                            className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
+                            variants={item}
+                            key={"file-" + index}
+                          >
+                            <VideoCard
+                              videoTitle={file.title}
+                              fileObject={file}
+                              userId={state.userId}
+                              embedClick={() =>
+                                embedPopup(state, dispatch, file)
+                              }
+                            />
+                          </Col>
+                        ) : null;
+                      })
+                    : ""
+                }
+              </Row>
 
               {/*
             // build a board to provide to delete temporary files when upload fails

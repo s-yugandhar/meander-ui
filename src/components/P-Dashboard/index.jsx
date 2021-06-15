@@ -1,7 +1,17 @@
 import React,{useContext,useEffect,useState} from "react";
-import {  Layout,  Row,  Col,
-  Input,  Select,  Typography,  Button,
-  Card,  List,  Upload,} from "antd";
+import {
+  Layout,
+  Row,
+  Col,
+  Input,
+  Select,
+  Typography,
+  Button,
+  Empty,
+  Card,
+  List,
+  Upload,
+} from "antd";
 import { IoCalendarOutline, IoAdd, IoArrowForward } from "react-icons/io5";
 import { BiRupee } from "react-icons/bi";
 // Custom imports
@@ -10,6 +20,7 @@ import axios from 'axios';
 import {url} from '../API/index';
 import { Context } from '../../context';
 import {LineChart , Line,XAxis,YAxis , Label, Tooltip} from 'recharts';
+import VideoCard from "../Shared/VideoCard";
 
 const PDashboard = () => {
   const { Option } = Select;
@@ -42,15 +53,15 @@ const PDashboard = () => {
       let cf = pageData.cfmetrics;
       let cdata = []
       cf.map(obj=>{
-        let temp = { 'date' : obj.dimensions.date , 
-        'Bytes_MB' : Number( obj.sum.edgeResponseBytes/(1024*1024)).toFixed(2) , 
+        let temp = { 'date' : obj.dimensions.date ,
+        'Bytes_MB' : Number( obj.sum.edgeResponseBytes/(1024*1024)).toFixed(2) ,
          'Hits': Number(obj.sum.visits)  }
         cdata.push(temp);
       })
       setChartData(cdata);
     };
   },[pageData])
-  
+
 
   return (
     <Layout className="full-width page-layout">
@@ -65,7 +76,7 @@ const PDashboard = () => {
             <Option value="30">Last 30 days</Option>
             <Option value="15">Last 15 days</Option>
             <Option value="7">Last 7 days</Option>
-            
+
           </Select>
           {/*<Input
             addonAfter={<IoCalendarOutline style={{ fontSize: "18px" }} />}
@@ -145,12 +156,12 @@ const PDashboard = () => {
           <XAxis dataKey={'date'}>        </XAxis>
           <YAxis  yAxisId="right" domain={['auto','dataMax']} orientation="right" dataKey="Hits">
           <Label value="API Requests" angle={-90}/>       </YAxis>
-          <YAxis  yAxisId="left" domain={['auto','dataMax']} dataKey="Bytes_MB" > 
+          <YAxis  yAxisId="left" domain={['auto','dataMax']} dataKey="Bytes_MB" >
               <Label value="Data Served in MB" angle={-90}/>
                  </YAxis>
              <Line dataKey={'Hits'} yAxisId="right" stroke="green"   ></Line>
              <Line dataKey={'Bytes_MB'} yAxisId="left" stroke="orange" ></Line>
-            
+
             <Tooltip />
           </LineChart>: null }
         </Card>
@@ -171,7 +182,7 @@ const PDashboard = () => {
         <Col span="12">
           <Card title="Recent Activity" style={{ height: "300px" }}>
             <List itemLayout="horizontal" className="activityList">
-              
+
               { pageData !== null && pageData !== undefined ?
               pageData.recent_video.map((obj)=>{
                 return <List.Item className="activityItem" key={obj.id}>
@@ -209,15 +220,24 @@ const PDashboard = () => {
               </Col>
 
               {/*  List of recent videos */}
-              <Col span="6">
-                <Card style={{ minHeight: "200px" }}></Card>
-              </Col>
-              <Col span="6">
-                <Card style={{ minHeight: "200px" }}></Card>
-              </Col>
-              <Col span="6">
-                <Card style={{ minHeight: "200px" }}></Card>
-              </Col>
+              {
+                pageData !== null ?
+                pageData.recent_video.map((file, index) => {
+                  return state.filterType === "all" ||
+                    file.itemtype.includes(state.filterType) ? (
+                    <Col span="6" key={"file-" + index}>
+                      <VideoCard
+                        videoTitle={file.title}
+                        fileObject={file}
+                        userId={state.userId}
+                      />
+                    </Col>
+                  ) : (
+                    <Empty style={{ marginTop: "80px" }} />
+                  );
+              }) :
+                  <Empty style={{ marginTop: "80px" }} />
+            }
 
               {/* View All Cards */}
               <Col span="3">

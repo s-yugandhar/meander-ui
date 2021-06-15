@@ -73,7 +73,7 @@ export const GetFolders= async (state,dispatch,userId)=>{
    dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
    dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });
    dispatch({ type : VIDEO_LIST , payload : {videoList :tempFolders.dblist } });
-   dispatch({   type: PAGE,   payload: {    page: 'videos'    } });
+   //dispatch({   type: PAGE,   payload: {    page: 'videos'    } });
    console.log(" data in get folders", state.folderList);
    return tempFolders;
 }

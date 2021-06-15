@@ -55,6 +55,7 @@ import {
 } from "../API/index";
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
+import UppyUpload from "../UppyUpload";
 
 const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -76,7 +77,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [nfApi, setNFApi] = useState(false);
   const { Column } = Table;
 
-  const [tabActive, setTabActive] = useState(null);
+  const [tabActive, setTabActive] = useState('videos');
 
   const { TabPane } = Tabs;
 
@@ -131,7 +132,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   };
 
   // Show Embed code popup
-  const embedPopup = (state, dispatch, obj) => {
+  /* const embedPopup = (state, dispatch, obj) => {
     let temppath = obj.itempath;
 
     console.log(state.videoList);
@@ -146,7 +147,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     } else {
       notification.open({ message: "Sorry, Embed code is not available now" });
     }
-  };
+  }; */
 
   // close Embed Code Popup
   const closeEmbedPopup = () => {
@@ -225,6 +226,8 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   useEffect(() => {
     //setFilterType("all");
     dispatch({ type: "FILTER_TYPE", payload: { filterType: "video" } });
+    console.log('Folder type - ', state.filterType);
+    console.log("Folders list - ", state.dbfolderList);
   }, [state.folderName]);
 
   useEffect(() => {
@@ -238,7 +241,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     GetFolders(state, dispatch, state.userId);
     GetUserdetails(state, dispatch, state.userId);
-    console.log("State - ", state.videoList);
+    console.log("State - ", state);
   }, []);
 
   const sortvideoList = () => {
@@ -287,24 +290,36 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           <Col span="12" className="foldersLinksList">
             <Button
               type="link"
-              className="fodlerLinkItem active"
-              onClick={() => setTabActive("all-videos")}
+              className={
+                tabActive === "videos"
+                  ? "fodlerLinkItem active"
+                  : "fodlerLinkItem"
+              }
+              onClick={() => setTabActive("videos")}
             >
               All Videos
             </Button>
 
             <Button
               type="link"
-              className="fodlerLinkItem"
-              onClick={() => setTabActive("all-folders")}
+              className={
+                tabActive === "folders"
+                  ? "fodlerLinkItem active"
+                  : "fodlerLinkItem"
+              }
+              onClick={() => setTabActive("folders")}
             >
               Folders
             </Button>
 
             <Button
               type="link"
-              className="fodlerLinkItem"
-              onClick={() => setTabActive("all-channels")}
+              className={
+                tabActive === "channels"
+                  ? "fodlerLinkItem active"
+                  : "fodlerLinkItem"
+              }
+              onClick={() => setTabActive("channels")}
             >
               Channels
             </Button>
@@ -330,184 +345,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
             <Button
               type="link"
               className="fodlerLink"
-              onClick={() => openUploadVideo(true)}
+              onClick={() => setTabActive("upload")}
             >
               Upload Video
             </Button>
           </Col>
         </Row>
-        <Row className="py-2" align="middle">
-          <Col span="4" className="">
-            <Select
-              defaultValue="dateModified"
-              style={{ width: "100%" }}
-              onChange=""
-            >
-              <Option value="dateModified">Date Modified</Option>
-              <Option value="">Date Added</Option>
-              <Option value="">By Title</Option>
-            </Select>
-          </Col>
-          <Col span="16" className=""></Col>
-          <Col span="4" className="text-right" style={{ color: "#777" }}>
-            Total Videos - 1000
-          </Col>
-          <Divider orientation="left" className="mt-2 mb-0"></Divider>
-        </Row>
-        <Content className="">
-          {/*  <Row align="middle" type="flex">
-            <Col span={8}>
-              <Tooltip title={"Select folder to see folder wise Videos"}>
-                {nfApi === true ? (
-                  <Select
-                    size="medium"
-                    style={{ width: "60%" }}
-                    placeholder="search folder"
-                    optionFilterProp="children"
-                    showSearch={true}
-                    value={
-                      state.folderName === "" ? "default" : state.folderName
-                    }
-                    onChange={(value) => {
-                      dispatch({
-                        type: FOLDER_NAME,
-                        payload: { folderName: value },
-                      });
-                      innerFolder(value);
-                    }}
-                  >
-                    {state.folderList !== undefined && state.folderList !== null
-                      ? state.folderList.map((obj, ind) => {
-                          return (
-                            <>
-                              {" "}
-                              <Option key={obj} value={obj}>
-                                {" "}
-                                {obj}
-                                {"      "}{" "}
-                              </Option>{" "}
-                            </>
-                          );
-                        })
-                      : null}
-                  </Select>
-                ) : (
-                  <Select
-                    size="medium"
-                    style={{ width: "60%" }}
-                    placeholder="search folder"
-                    optionFilterProp="children"
-                    showSearch={true}
-                    value={
-                      state.folderName === "" ? "default" : state.folderName
-                    }
-                    onChange={(value) => {
-                      dispatch({
-                        type: FOLDER_NAME,
-                        payload: { folderName: value },
-                      });
-                      innerFolder(value);
-                    }}
-                  >
-                    {state.dbfolderList !== undefined &&
-                    state.dbfolderList !== null
-                      ? state.dbfolderList.map((obj, ind) => {
-                          return obj.foldertype === "folder" ? (
-                            <>
-                              {" "}
-                              <Option key={obj.id} value={obj.id}>
-                                {" "}
-                                {obj.foldername}
-                                {"      "}{" "}
-                              </Option>{" "}
-                            </>
-                          ) : null;
-                        })
-                      : null}
-                  </Select>
-                )}
-                &nbsp;&nbsp;&nbsp;&nbsp;{"-"}&nbsp;&nbsp;&nbsp;
-                <Badge
-                  count={
-                    state.videoList === undefined || state.videoList === null
-                      ? 0
-                      : state.videoList.length
-                  }
-                  style={{ backgroundColor: "#888", color: "#fff" }}
-                />
-              </Tooltip>
-            </Col>
-            <Col span={8} className="newActionsList">
-              <Tooltip title={"Create new folder to upload video"}>
-                <Button
-                  key={"xcvz"}
-                  type="primary"
-                  icon={<FolderAddOutlined className="createFolderBtnIcon" />}
-                  shape="round"
-                  size="medium"
-                  onClick={showCreateFolder}
-                  className="createFolderBtn"
-                >
-                  New Folder
-                </Button>
-              </Tooltip>
-              <Tooltip title={"Click to upload video"}>
-                <Button
-                  key={"xcvz"}
-                  type="primary"
-                  //icon={<VideoCameraAddOutlined className="createFolderBtnIcon" /> }
-                  icon={<CloudUploadOutlined />}
-                  shape="round"
-                  size="medium"
-                  onClick={() => openUploadVideo(true)}
-                  className="createFolderBtn"
-                >
-                  Upload
-                </Button>
-              </Tooltip>
-              <Button
-                type="primary"
-                shape="round"
-                size="medium"
-                icon={
-                  sortState === "asc" ? (
-                    <SortAscendingOutlined />
-                  ) : sortState === "desc" ? (
-                    <SortDescendingOutlined />
-                  ) : (
-                    <SortAscendingOutlined />
-                  )
-                }
-                //onClick={() => updateTab("add-video")}
-                onClick={() => {
-                  setSortState(
-                    sortState === null
-                      ? "asc"
-                      : sortState === "asc"
-                      ? "desc"
-                      : "asc"
-                  );
-                  sortvideoList();
-                }}
-              >
-                {" "}
-                Sort
-              </Button>
-            </Col>
-            <Col span={8}>
-              <Input.Search
-                allowClear
-                onChange={(e) => {
-                  getPublicItems(state, dispatch, e.target.value).then((rs) => {
-                    setBuildRoles(true);
-                  });
-                }}
-                placeholder={"Search Team or own videos by Title"}
-              ></Input.Search>
-            </Col>
-          </Row>
-          */}
 
+        <Content className="">
           {(state.folderList !== undefined && state.folderList.length > 0) ||
           (state.fileList !== undefined && state.videoList.length > 0) ? (
             <motion.div
@@ -516,71 +361,119 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
               initial="hidden"
               animate="show"
             >
-              <Row gutter={15}>
-              {state.folderName === "" &&
-                state.folderList.map((folder, index) => {
-                  return state.filterType === "all" ||
-                    state.filterType === "folder" ? (
-                    <Col
-                      key={"folder-" + index}
-                      className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
-                    >
-                      <FolderCard
-                        folderName={folder}
-                        userId={state.userId}
-                        videosCount={countVideos(folder)}
-                        folderOnClick={() => innerFolder(folder)}
-                      />
-                    </Col>
-                  ) : null;
-                })}
-              </Row>
-              <Row gutter={15}>
-                {state.folderName === "" &&
-                  state.videoList.map((obj, index) => {
-                    return state.filterType === "all" ||
-                      obj.itemtype.includes(state.filterType) ? (
-                      <Col
-                        className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
-                        key={"file-" + index}
-                      >
-                        <VideoCard
-                          videoTitle={obj.title}
-                          fileObject={obj}
-                          userId={state.userId}
-                          embedClick={() => embedPopup(state, dispatch, obj)}
-                        />
+              {tabActive && tabActive === "folders" ? (
+                <Row>
+                  <Col span="24">
+                    <Row className="py-2" align="middle">
+                      <Col span="4" className="">
+                        <Select
+                          defaultValue="dateModified"
+                          style={{ width: "100%" }}
+                          onChange=""
+                        >
+                          <Option value="dateModified">Date Modified</Option>
+                          <Option value="">Date Added</Option>
+                          <Option value="">By Title</Option>
+                        </Select>
                       </Col>
-                    ) : null;
-                  })}
-              </Row>
-              <Row gutter={15}>
-                {
-                  // Showing Files
-                  state.folderName !== "" && state.videoList.length > 0
-                    ? state.videoList.map((file, index) => {
+                      <Col span="16" className=""></Col>
+                      <Col
+                        span="4"
+                        className="text-right"
+                        style={{ color: "#777" }}
+                      >
+                        Total Videos - 1000
+                      </Col>
+                      <Divider
+                        orientation="left"
+                        className="mt-2 mb-0"
+                      ></Divider>
+                    </Row>
+                  </Col>
+                  <Col>
+                    <Row gutter={15}>
+                      {state.dbfolderList.map((folder, index) => {
+                        return folder.foldertype === "folder" ? (
+                          <Col
+                            key={"folder-" + index}
+                            className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
+                          >
+                            <FolderCard
+                              folderName={folder.folderName}
+                              userId={state.userId}
+                              videosCount={0}
+                              folderOnClick={() => innerFolder(folder)}
+                            />
+                          </Col>
+                        ) : (
+                          <Empty style={{ marginTop: "80px" }} />
+                        );
+                      })}
+                    </Row>
+                  </Col>
+                </Row>
+              ) : tabActive === "videos" ? (
+                <>
+                  <Row gutter={15} className="py-2">
+                    {state.folderName === "" &&
+                      state.videoList.map((obj, index) => {
                         return state.filterType === "all" ||
-                          file.itemtype.includes(state.filterType) ? (
+                          obj.itemtype.includes(state.filterType) ? (
                           <Col
                             className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
-                            variants={item}
                             key={"file-" + index}
                           >
                             <VideoCard
-                              videoTitle={file.title}
-                              fileObject={file}
+                              videoTitle={obj.title}
+                              fileObject={obj}
                               userId={state.userId}
-                              embedClick={() =>
-                                embedPopup(state, dispatch, file)
-                              }
                             />
                           </Col>
                         ) : null;
-                      })
-                    : ""
-                }
-              </Row>
-
+                      })}
+                  </Row>
+                  <Row gutter={15} className="py-2">
+                    {
+                      // Showing Files
+                      state.folderName !== "" && state.videoList.length > 0
+                        ? state.videoList.map((file, index) => {
+                            return state.filterType === "all" ||
+                              file.itemtype.includes(state.filterType) ? (
+                              <Col
+                                className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
+                                variants={item}
+                                key={"file-" + index}
+                              >
+                                <VideoCard
+                                  videoTitle={file.title}
+                                  fileObject={file}
+                                  userId={state.userId}
+                                />
+                              </Col>
+                            ) : (
+                              <Empty style={{ marginTop: "80px" }} />
+                            );
+                          })
+                        : ""
+                    }
+                  </Row>
+                </>
+              ) : tabActive === "upload" ? (
+                <Col span="24">
+                  <Row className="py-2">
+                    <Col span="24" className="uploadVideoTitle">
+                      Upload Video
+                    </Col>
+                  </Row>
+                  <Row className="py-2 bg-white">
+                    <Col span="16" push="4">
+                      <UppyUpload />
+                    </Col>
+                  </Row>
+                </Col>
+              ) : (
+                <Empty style={{ marginTop: "80px" }} />
+              )}
               {/*
             // build a board to provide to delete temporary files when upload fails
             <h2>{"Failed upload temporary files"}</h2>
@@ -680,7 +573,27 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           >
             <Input />
           </Form.Item>
-
+          <Form.Item
+            label="Access to"
+            name="accessTo"
+            rules={[
+              {
+                require: true,
+              },
+            ]}
+          >
+            <Select
+              mode="multiple"
+              size="middle"
+              placeholder="Please select"
+              onChange=""
+              style={{ width: "100%" }}
+            >
+              <Option>Access 1</Option>
+              <Option>Access 2</Option>
+              <Option>Access 3</Option>
+            </Select>
+          </Form.Item>
           <Form.Item>
             <Button
               type="primary"

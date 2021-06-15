@@ -1,17 +1,38 @@
-/* .uppy-Root {
-   position: relative;
-   height: 100%;
+.uppy-Dashboard-browse {
+   display: block;
    width: 100%;
+   max-width: 320px;
+   margin: 20px auto;
+   background-color: white;
+   color: var(--primary);
+   height: 50px;
+   text-align: center;
+   border: none;
+   cursor: pointer;
+   border-radius: 3px;
+   font-size: 0;
+   position: relative;
+   overflow: hidden;
 
-   .uppy-Dashboard {
-      position: relative;
-      height: 100%;
-      width: 100%;
+   &::after {
+      content: "Choose File";
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 2;
+      background-color:var(--primary);
+      font-size: 20px;
    }
 
-   .uppy-Dashboard-inner {
-      position: relative;
-      height: 100% !important;
-      width: 100% !important;
+   &:hover {
+      &::after {
+         background-color: #1890ff;
+      }
    }
-} */
+}

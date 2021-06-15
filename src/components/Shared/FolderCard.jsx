@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Button, Card, Dropdown, Menu } from "antd";
+import { Button, Card, Dropdown, Menu, Tooltip } from "antd";
 import {   EditOutlined, DeleteOutlined,   LinkOutlined,
    FolderFilled,   EllipsisOutlined,   DeleteFilled} from "@ant-design/icons";
 import {deleteFile_Folder , GetFolders} from '../API';
@@ -20,7 +20,7 @@ const FolderCard = (props) => {
     if (flag == false) return;
       if( folder in state.folderList   )
       deleteFile_Folder(state , dispatch ,id , folder , true  ).then((res)=>{ showAllvideos()});
-      else 
+      else
       alert("this is not a folder to delete");
       showAllvideos();
    }
@@ -34,31 +34,47 @@ const FolderCard = (props) => {
    );
 
    return (
-      <Card
-         bordered={true}
-         className="cardVideo cardFolder"
-      >
-         <div className="videoCardBlock folderCardBlock">
-            <Button type="default" htmlType="button" className="folderBtn" onClick={props.folderOnClick}>
+     <Card
+       bordered={true}
+       className="cardVideo cardFolder full-width"
+       actions={[
+           <Tooltip title="Click to delete video">
+             <DeleteOutlined
+               key="delete"
+               title={"click to delete object"}
+             />
+           </Tooltip>,
+           <Tooltip title="Click to edit Metadata">
+             <EditOutlined
+               key="edit"
+             />
+           </Tooltip>
+          ]}
+     >
+       <div className="videoCardBlock folderCardBlock">
+         <Button
+           type="default"
+           htmlType="button"
+           className="folderBtn"
+           onClick={props.folderOnClick}
+         >
+           <FolderFilled className="folderIcon" />
 
-               <FolderFilled className="folderIcon" />
-
-               <div className="videoCardInfoBlock">
-                  <div className="videoTitle folderTitle">
-                     {props.folderName}
-                  </div>
-                  <div className="publishedDate folderInfo">{props.videosCount} Videos</div>
-               </div>
-            </Button>
-         </div>
-         {/*<Dropdown overlay={menu} trigger={['click']}>
+           <div className="videoCardInfoBlock">
+             <div className="videoTitle folderTitle">{props.folderName}</div>
+             <div className="publishedDate folderInfo">
+               {props.videosCount} Videos
+             </div>
+           </div>
+         </Button>
+       </div>
+       {/* <Dropdown overlay={menu} trigger={['click']}>
             <Button type="link" className="ant-dropdown-link floatingFolderOptions" onClick={e => e.preventDefault()}>
                <EllipsisOutlined className="folderDropDownIcon" />
             </Button>
-         </Dropdown>*/}
-         {/* <Button type="link" className="floatingFolderOptions"><EllipsisOutlined className="folderDropDownIcon" /></Button> */}
-
-      </Card>
+         </Dropdown> */}
+       {/* <Button type="link" className="floatingFolderOptions"><EllipsisOutlined className="folderDropDownIcon" /></Button> */}
+     </Card>
    );
 };
 

@@ -16,7 +16,7 @@ import {
   FolderOutlined,
   CloudUploadOutlined,
   VideoCameraAddOutlined,
-  SearchOutlined
+  SearchOutlined,
 } from "@ant-design/icons";
 import {
   PAGE,
@@ -32,7 +32,7 @@ import {
   url,
   GetFiles,
   CreateNewFolder,
-  GetUserdetails
+  GetUserdetails,
 } from "../API/index";
 
 import { Context } from "../../context";
@@ -40,7 +40,7 @@ import { Context } from "../../context";
 const location = window.location;
 
 const SideNav = ({ updateTab, openUploadVideo }) => {
-  const [selectedKeys, setSelectedKeys] = useState(["videos"]);
+  const [selectedKeys, setSelectedKeys] = useState(["p-dashboard"]);
   const [errMsg, setErrMsg] = useState(null);
   /* const [api, contextHolder] = notification.useNotification(); */
   const [fsrch, setFsrch] = useState("");
@@ -51,40 +51,56 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
 
   const loadPage = (name) => {
     dispatch({ type: PAGE, payload: { page: name } });
+    setSelectedKeys([name]);
   };
 
-  const archive  = JSON.parse(localStorage.getItem("archive"));
+  const archive = JSON.parse(localStorage.getItem("archive"));
 
-  useEffect(() => {
+
+  /* useEffect(() => {
     let path = location.pathname;
     console.log(location);
-    GetUserdetails(state,dispatch,state.userId).then( res => {
-      if(path.replace("/","") === "accounts"){
-      if(   state.userObj !== null &&
+    GetUserdetails(state, dispatch, state.userId)
+      .then((res) => {
+        if (path.replace("/", "") === "accounts") {
+          if (
+            state.userObj !== null &&
             state.userObj !== undefined &&
-          (state.userObj.roles === "super_admin" || state.userObj.roles === "reseller") )
-           loadPage("accounts");else loadPage("videos");}
-    else
-      loadPage("videos")}).catch(err=> loadPage("videos"));
-  }, []);
+            (state.userObj.roles === "super_admin" ||
+              state.userObj.roles === "reseller")
+          )
+            loadPage("accounts");
+          else loadPage("videos");
+        } else loadPage("videos");
+      })
+      .catch((err) => loadPage("videos"));
+  }, []); */
 
-  const switchToSelf = (state,dispatch)=>{
-    if(state.archiveAccount !== null){
-      localStorage.setItem("userId",state.archiveAccount.userId);
-      localStorage.setItem("token",state.archiveAccount.token);
-      localStorage.setItem("archive",null);
-      dispatch({type:"ARCHIVE_ACCOUNT", payload : {archiveAccount :null }});
-      dispatch({type:"LOGIN_SUCCESS", payload:{  token:state.archiveAccount.token,userId : state.archiveAccount.userId,page:"videos" } });
-      GetUserdetails(state,dispatch, state.userId);
+  const switchToSelf = (state, dispatch) => {
+    if (state.archiveAccount !== null) {
+      localStorage.setItem("userId", state.archiveAccount.userId);
+      localStorage.setItem("token", state.archiveAccount.token);
+      localStorage.setItem("archive", null);
+      dispatch({ type: "ARCHIVE_ACCOUNT", payload: { archiveAccount: null } });
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: {
+          token: state.archiveAccount.token,
+          userId: state.archiveAccount.userId,
+          page: "videos",
+        },
+      });
+      GetUserdetails(state, dispatch, state.userId);
       window.location.reload(false);
     }
-  }
+  };
 
   return (
     <>
       <Sider width={200} className="site-layout-background">
         <Menu
           mode="inline"
+          //defaultOpenKeys={["products-menu"]}
           defaultOpenKeys={["products-menu"]}
           selectedKeys={selectedKeys}
           onSelect={(info) => setSelectedKeys(info.selectedKeys)}

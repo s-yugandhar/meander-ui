@@ -61,6 +61,7 @@ import axios from "axios";
 import { PlayerPage } from "../Player";
 import TopHeader from "../TopHeader";
 import PDashboard from "../P-Dashboard";
+import UppyUpload from "../UppyUpload";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -330,7 +331,7 @@ const AdminModule = (props) => {
               mask={false}
               className="uploadVideoDrawer"
             >
-              <div className="uploadSelectfolderBlock">
+             {/*  <div className="uploadSelectfolderBlock">
                 <Select
                   size="medium"
                   style={{ width: "60%" }}
@@ -374,6 +375,8 @@ const AdminModule = (props) => {
                   inline={true}
                 />
               </div>
+            */}
+            <UppyUpload />
             </Drawer>
           ) : null}
 

@@ -100,7 +100,7 @@ const Login = (props) => {
         localStorage.setItem("userId",resp.data.id ? resp.data.id : null);
         localStorage.setItem("token",resp.data.access_token ? resp.data.access_token : null)
         dispatch({type:"FOLDER_NAME",payload:{ folderName : "" }});
-        window.location.reload(false);
+        //window.location.reload(false);
       }
   }
 

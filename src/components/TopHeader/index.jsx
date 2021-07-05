@@ -130,7 +130,7 @@ const TopHeader = (props) => {
       payload: { token: sharedtoken, userId: sharedid, page: "videos" },
     });
     GetUserdetails(state, dispatch, state.userId);
-    window.location.reload();
+    //window.location.reload();
   };
 
   const switchToFriend = (state, dispatch, sharedid, sharedtoken) => {
@@ -154,7 +154,7 @@ const TopHeader = (props) => {
       payload: { token: sharedtoken, userId: sharedid, page: "videos" },
     });
     GetUserdetails(state, dispatch, state.userId);
-    window.location.reload();
+    //window.location.reload();
   };
 
   const switchToFSelf = (state, dispatch, friend) => {
@@ -170,9 +170,7 @@ const TopHeader = (props) => {
           page: "videos",
         },
       });
-      GetUserdetails(state, dispatch, state.userId).then((res) =>
-        window.location.reload()
-      );
+      GetUserdetails(state, dispatch, state.userId);
     }
   };
 
@@ -190,9 +188,7 @@ const TopHeader = (props) => {
           page: "videos",
         },
       });
-      GetUserdetails(state, dispatch, state.userId).then((res) =>
-        window.location.reload()
-      );
+      GetUserdetails(state, dispatch, state.userId);
     }
   };
 
@@ -266,7 +262,7 @@ const TopHeader = (props) => {
     dispatch({ type: "FILE_LIST", payload: { fileList: [] } });
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     dispatch({ type: "ARCHIVE_ACCOUNT", payload: { archiveAccount: null } });
-    //window.location.reload();
+    ////window.location.reload();
     dispatch({
       type: "LOGOUT_SUCCESS",
     });

@@ -7,9 +7,10 @@ import {  FolderAddOutlined,  CheckCircleOutlined,
    ExclamationCircleOutlined, FolderOutlined,} from "@ant-design/icons";
 import { Content } from 'antd/lib/layout/layout';
 
-export const url = "https://meander.video";
-//export const url = "http://127.0.0.1:8002";
+//export const url = "https://meander.video";
+export const url = "http://127.0.0.1:8002";
 export const cdn_url = "https://cdns.meander.video/";
+
 
 const getParentAssingnedRole = async (child_id) => {
    const arcAcc = JSON.parse(localStorage.getItem("archive"));
@@ -169,7 +170,7 @@ export const deleteFile_Folder = async (state,dispatch, userId,objectName , recu
 }
 
 export const dbAddObj=async(state,dispatch, obj)=>{
-   const getFiles = await axios.post(url + `/users/${state.userId}/items/` , JSON.stringify(obj)    , {
+   const getFiles = await axios.post(url + `/videos` , JSON.stringify(obj)    , {
       headers: {
          accept: 'application/json',  Authorization : "bearer "+state.token,
       }

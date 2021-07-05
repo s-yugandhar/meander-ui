@@ -53,6 +53,7 @@ import {
 import EditVideo from "../EditVideo";
 import ManageVideos from "../ManageVideos";
 import ManageUsers from "../ManageUsers";
+import ManageRoles from "../ManageRoles";
 import ShareAccess from "../ShareAccess";
 import impLogo from "../../assets/images/Meander_Logo.svg";
 import Settings from "../Settings";
@@ -166,12 +167,7 @@ const AdminModule = (props) => {
     }
   }, [state.editVideo]);
 
-  useEffect(() => {
-    if (state.folderCreated !== null && state.folderCreated !== "") {
-      setUploadVideo(true);
-    }
-  }, [state.folderCreated]);
-
+  
   const closeUploadVideo = () => {
     uppy.reset();
     setUploadVideo(false);
@@ -183,7 +179,7 @@ const AdminModule = (props) => {
     dispatch({ type: "FOLDER_LIST", payload: { folderList: [] } });
     dispatch({ type: "FILE_LIST", payload: { fileList: [] } });
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
-    //window.location.reload();
+    ////window.location.reload();
     dispatch({
       type: "LOGOUT_SUCCESS",
     });
@@ -219,6 +215,7 @@ const AdminModule = (props) => {
     "profile": <MyProfile />,
     "edit-video": <EditVideo />,
     "manage-videos": <ManageVideos />,
+    "manage-roles": <ManageRoles />,
     "accounts": <ManageUsers />,
     "share-access": <ShareAccess />,
     "reseller-settings": <Settings />,

@@ -66,6 +66,8 @@ const UppyUpload = (props) => {
      }).use(AwsS3Multipart, {
        limit: 1,
        companionUrl: url,
+       Headers : { "uppy-auth-token" : "bearer "+token , "Authorization" : "bearer "+token },
+       companionHeaders:{ "uppy-auth-token" : "bearer "+token , "Authorization" : "bearer "+token },
        getChunkSize(file) {
          var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
          return file.size < 5 * 1024 * 1024
@@ -134,7 +136,7 @@ const UppyUpload = (props) => {
      if (stateEdit !== false) {
        setStateEdit(false);
        closeUploadVideo();
-       dispatch({ type: "PAGE", payload: { page: "edit-video" } });
+       //dispatch({ type: "PAGE", payload: { page: "edit-video" } });
      }
    }, [state.editVideo]);
 

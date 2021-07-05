@@ -91,7 +91,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
         },
       });
       GetUserdetails(state, dispatch, state.userId);
-      window.location.reload(false);
+      //window.location.reload(false);
     }
   };
 
@@ -122,6 +122,9 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 {/*<Menu.Item key="customers">Customers</Menu.Item>*/}
                 <Menu.Item key="listu" onClick={() => loadPage("accounts")}>
                   Accounts
+                </Menu.Item>
+                <Menu.Item key="listRoles" onClick={() => loadPage("manage-roles")}>
+                  Manage Roles
                 </Menu.Item>
               </SubMenu>
               <Divider style={{ marginTop: "5px", marginBottom: "5px" }} />

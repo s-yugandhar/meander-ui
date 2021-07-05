@@ -414,6 +414,37 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                 </Row>
               ) : tabActive === "videos" ? (
                 <>
+                <Row>  <Select
+           size="medium"
+           style={{  maxWidth: "360px" }}
+           placeholder="search folder"
+           optionFilterProp="children"
+           showSearch={true}
+           value={state.folderName === "" ? "default" : state.folderName}
+           onChange={(value) => {
+             dispatch({
+               type: FOLDER_NAME,
+               payload: { folderName: value },
+             });
+             if (state.folderName !== "")
+               GetFiles(state, dispatch, state.userId, state.folderName);
+           }}
+         >
+           {state.dbfolderList !== undefined && state.dbfolderList !== null
+             ? state.dbfolderList.map((obj, ind) => {
+                 return obj.foldertype === "folder" ? (
+                   <>
+                     {" "}
+                     <Option key={obj.id} value={obj.id}>
+                       {" "}
+                       {obj.foldername}
+                       {"   "}{" "}
+                     </Option>{" "}
+                   </>
+                 ) : null;
+               })
+             : null}
+         </Select></Row>
                   <Row gutter={15} className="py-2">
                     {state.folderName === "" &&
                       state.videoList.map((obj, index) => {

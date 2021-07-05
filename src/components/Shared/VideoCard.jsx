@@ -76,7 +76,7 @@ const VideoCard = (props) => {
   };
 
   useEffect(() => {
-    callServedLinks(false);
+    //callServedLinks(false);
   }, []);
 
   function getMp4Url(props, type) {

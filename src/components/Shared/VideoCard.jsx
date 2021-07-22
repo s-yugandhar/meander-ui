@@ -26,6 +26,7 @@ import {
   EllipsisOutlined,
   InfoCircleOutlined,
   ArrowDownOutlined,
+  CloudUploadOutlined
 } from "@ant-design/icons";
 import { deleteFile_Folder } from "../API";
 import ImageLoad from "../Shared/ImageLoader";
@@ -51,6 +52,7 @@ import "../../assets/styles/videoCard.scss";
 import mp3img from "../../assets/mp3img.png";
 import logo from "../../assets/images/meander-1920x1080.png";
 import { icons } from "antd/lib/image/PreviewGroup";
+import UppyUpload from "../UppyUpload/index.jsx"
 
 const VideoCard = (props) => {
   const { state, dispatch } = useContext(Context);
@@ -226,6 +228,70 @@ const VideoCard = (props) => {
     </Menu>
   );
 
+const actionssuccess =  [
+  props.fileObject.userRole !== "viewer" &&
+  props.fileObject.userRole !== "user" ? (
+    <Tooltip title="Click to delete video">
+      <DeleteOutlined
+        key="delete"
+        title={"click to delete object"}
+        onClick={(e) =>
+          deleteFile(state, dispatch, props.userId, props.fileObject)
+        }
+      />
+    </Tooltip>
+  ) : null,
+  props.fileObject.userRole !== "viewer" ? (
+    <Tooltip title="Click to edit Metadata">
+      <EditOutlined
+        key="edit"
+        onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
+      />
+    </Tooltip>
+  ) : null,
+  <Tooltip title="copy player link">
+    <LinkOutlined
+      key="playnotinmenu"
+      onClick={(e) => handleMenuClick({ key: "playnotinmenu" })}
+    />
+  </Tooltip>,
+  <Popover
+    content={props.fileObject.itemtype.includes("audio") ? null : null}
+    title={null}
+  >
+    <Button
+      htmlType="a"
+      key="link"
+      onClick={(e) => {
+        callServedLinks(true);
+        setCodesModal(true);
+      }}
+      aria-hidden={true}
+      style={{ borderColor: "white", padding: 0 }}
+    >
+      <Tooltip title="Copy links to video">
+        <EllipsisOutlined style={{ fontSize: "24px" }} />
+      </Tooltip>
+    </Button>
+  </Popover>,
+];
+
+const triggerUppyUpload=(state,dispatch,id) =>{
+
+
+}
+
+const actionPending = [ 
+  <CloudUploadOutlined
+        key="upload"
+        title={"Continue Uploading this file from file system"}
+        onClick={(e) =>  setCodesModal(true)    }
+      />  
+];
+
+
+
+
   return (
     <Card
       bordered={true}
@@ -266,53 +332,7 @@ const VideoCard = (props) => {
       }
       headStyle={{ height: "25%" }}
       bodyStyle={{ height: "55%" }} */
-      actions={[
-        props.fileObject.userRole !== "viewer" &&
-        props.fileObject.userRole !== "user" ? (
-          <Tooltip title="Click to delete video">
-            <DeleteOutlined
-              key="delete"
-              title={"click to delete object"}
-              onClick={(e) =>
-                deleteFile(state, dispatch, props.userId, props.fileObject)
-              }
-            />
-          </Tooltip>
-        ) : null,
-        props.fileObject.userRole !== "viewer" ? (
-          <Tooltip title="Click to edit Metadata">
-            <EditOutlined
-              key="edit"
-              onClick={(e) => editVideoFunc(state, dispatch, props, url, false)}
-            />
-          </Tooltip>
-        ) : null,
-        <Tooltip title="copy player link">
-          <LinkOutlined
-            key="playnotinmenu"
-            onClick={(e) => handleMenuClick({ key: "playnotinmenu" })}
-          />
-        </Tooltip>,
-        <Popover
-          content={props.fileObject.itemtype.includes("audio") ? null : null}
-          title={null}
-        >
-          <Button
-            htmlType="a"
-            key="link"
-            onClick={(e) => {
-              callServedLinks(true);
-              setCodesModal(true);
-            }}
-            aria-hidden={true}
-            style={{ borderColor: "white", padding: 0 }}
-          >
-            <Tooltip title="Copy links to video">
-              <EllipsisOutlined style={{ fontSize: "24px" }} />
-            </Tooltip>
-          </Button>
-        </Popover>,
-      ]}
+      actions={ props.fileObject.upload_state === "complete" ? actionssuccess : actionPending  }
       className="cardVideo full-width"
     >
       <div className="videoCardBlock full-width" id={props.fileObject.id}>
@@ -338,7 +358,7 @@ const VideoCard = (props) => {
           </Button>
         </div>
         <div className="video-content full-width">
-          <Text ellipsis={true} className="video-title full-width">{props.videoTitle}</Text>
+          <Text ellipsis={true} className="video-title full-width" title={props.videoTitle}>{props.videoTitle}</Text>
           <Text className="video-date full-width">
             {new Date(
               props.fileObject.updatetime === "-1" ||
@@ -364,7 +384,9 @@ const VideoCard = (props) => {
         closable={true}
         footer={null}
       >
-        <Row>
+   { props.fileObject.upload_state != "complete"  ? <>
+   <UppyUpload  uploadId={props.fileObject.id} ></UppyUpload> 
+   </>:<>   <Row>
           <Col
             span={24}
             style={{
@@ -407,7 +429,7 @@ const VideoCard = (props) => {
           >
             {code}
           </Col>
-        </Row>
+        </Row></>}
       </Modal>
     </Card>
   );

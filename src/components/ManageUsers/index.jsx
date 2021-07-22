@@ -16,9 +16,25 @@ const ManageUsers = () => {
   const [listUsers , setListUsers] = useState([]);
   const [editUser , setEditUser] = useState(null);
   const [createUser,setCreateUser] = useState(null);
+  const [childRoles,setChildRoles] = useState([]);
 
   const {Option} = Select;
   const {form} = Form.useForm();
+
+  
+ const GetChildRoles =  async (state,dispatch )=>{
+  const tempFolders = await axios.get(url + `/roles/one`, {
+     headers: {
+        accept: 'application/json', Authorization : "bearer "+state.token,
+           }
+  }).then(res => {
+      if("child_roles" in res.data)
+         setChildRoles(res.data.child_roles);
+     return res.data;   })
+  console.log(" userdata in get ", tempFolders);
+  return tempFolders;
+}
+
 
  const GetAllUserdetails= async (state,dispatch ,userId)=>{
     if (userId === undefined )
@@ -113,6 +129,7 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
 
 
  useEffect(()=>{
+   GetChildRoles(state,dispatch);
   GetAllUserdetails(state,dispatch,state.userId);
  },[]);
 
@@ -307,11 +324,10 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
               >
             <Select  key={editUser.id+"ro"} value={editUser.roles}
               onChange={(value)=>{ setEditUser({ ...editUser, roles: value}); console.log(editUser)} }     >
-              { state.userObj.roles === "super_admin" ?
-              <Option key="reseller" value="reseller">reseller</Option>:null}
-              <Option key="admin" value="admin">admin</Option>
-              <Option key="user" value="user">user</Option>
-              <Option key="viewer" value="viewer">viewer</Option>
+              { childRoles.map((ob,index) =>
+                  (<Option key={ob} value={ob}>{ob}</Option>)
+              ) }
+              
               </Select>   </Form.Item> </> }
               <Form.Item>
                 <Button type="primary" htmlType="submit" size="large">

@@ -20,7 +20,10 @@ import Uppy from "@uppy/core";
 import "uppy/dist/uppy.min.css";
 import "@uppy/core/dist/style.css";
 import "@uppy/drag-drop/dist/style.css";
+import '@uppy/webcam/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
+import Webcam from "@uppy/webcam";
+import ScreenCapture from "@uppy/screen-capture";
 import { Dashboard, useUppy } from "@uppy/react";
 import { Context } from "../../context";
 import "./uppyUpload.scss";
@@ -56,6 +59,7 @@ const UppyUpload = (props) => {
 
    const localUserId = localStorage.getItem("userId");
    const token = localStorage.getItem("token");
+   const uploadIdToContinueUpload = props.uploadId;
 
    const uppy = useUppy(() => {
      return new Uppy({
@@ -63,9 +67,23 @@ const UppyUpload = (props) => {
        autoProceed: false,
        debug: true,
        restrictions: { allowedFileTypes: [videomime, audiomime] },
-     }).use(AwsS3Multipart, {
+     }).use(Webcam, {
+      onBeforeSnapshot: () => Promise.resolve(),
+      countdown: false,
+      modes: [    'video-audio',     'video-only',       'audio-only',      'picture'    ],
+      mirror: true,
+      videoConstraints: {        facingMode: 'user',
+        width: { min: 720, ideal: 1280, max: 1920 },
+        height: { min: 480, ideal: 800, max: 1080 },
+      },
+      showRecordingLength: true,
+      preferredVideoMimeType: null,
+      preferredImageMimeType: null,
+      showVideoSourceDropdown : true,
+      locale: {}
+    }).use(ScreenCapture,{id:'MyScreenCapture'}).use(AwsS3Multipart, {
        limit: 1,
-       companionUrl: url,
+       companionUrl: url+"/swift/",
        Headers : { "uppy-auth-token" : "bearer "+token , "Authorization" : "bearer "+token },
        companionHeaders:{ "uppy-auth-token" : "bearer "+token , "Authorization" : "bearer "+token },
        getChunkSize(file) {
@@ -127,7 +145,7 @@ const UppyUpload = (props) => {
 
    useEffect(() => {
      uppy.on("complete", (result) => {
-       completeEvent(result);
+       //completeEvent(result);
      });
      return () => uppy.off("complete");
    }, [uppy]);
@@ -153,17 +171,19 @@ const UppyUpload = (props) => {
           : undefined;
       uppy.setOptions({
         onBeforeFileAdded: (currentFile, files) => {
-          let time = Date.now();
-          let uuid = state.userId + String(time);
-          const modifiedFile = {
-            ...currentFile,
+          var time = Date.now();     var uuid =  String(time);
+          var chunks =   Math.ceil( currentFile.data.size / (5*1024*1024));
+          if(dispName === undefined || dispName === null)
+            uppy.info("Please select a folder");
+          const modifiedFile = {        ...currentFile,
             name: uuid + "." + currentFile.name.split(".")[1],
-            meta: {
-              title: currentFile.name,
-              description: currentFile.name,
-              time: time,
-              uuidname: uuid,
-            },
+            size : currentFile.data.size ,  type : currentFile.type ,
+            meta : { filename :uuid + "." +currentFile.name.split(".")[1],     userId : state.userId , 
+            foldername : dispName === undefined || dispName === null ? "default" : dispName.folderName,
+            title : currentFile.name , name : currentFile.name , total_size : currentFile.data.size,
+            type : currentFile.type , time : String(time) , total_chunks :  chunks-1,
+            chunk_size : currentFile.data.size < 5*1024*1024 ?   5*1024*1024 :  Math.ceil(currentFile.data.size /(chunks-1)) ,
+            uploadIdToContinue : uploadIdToContinueUpload }
           };
           return modifiedFile;
         },
@@ -222,6 +242,7 @@ const UppyUpload = (props) => {
        <div className="uploadFileUppyBlock">
          <Dashboard
            uppy={uppy}
+           plugins={['Webcam','MyScreenCapture' ]}
            showProgressDetails={true}
            proudlyDisplayPoweredByUppy={false}
            showRemoveButtonAfterComplete={true}

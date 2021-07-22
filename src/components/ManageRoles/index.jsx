@@ -19,7 +19,7 @@ const ManageRoles = () => {
   const [editRole , setEditRole] = useState(null);
   const [createrole,setCreaterole] = useState(null);
 
-  const scopes = ['Createrole', 'Editrole', 'Deleterole', 'Readrole', 'Listrole', 'CreateAccount', 'EditAccount', 'DeleteAccount',
+  const scopes = ['CreateUser', 'EditUser', 'DeleteUser', 'ReadUser', 'ListUser', 'CreateAccount', 'EditAccount', 'DeleteAccount',
    'ReadAccount', 'ListAccount', 'ReadItem', 'EditItem', 'UploadItem', 'DeleteItem', 'ShareItem', 'EmbedItem', 'DownloadItem', 
    'ListItem', 'ReadChannel', 'EditChannel', 'CreateChannel', 'DeleteChannel', 'ListChannel', 'ReadFolder', 'EditFolder', 'CreateFolder', 
    'DeleteFolder', 'ListFolder', 'ReadPlaylist', 'EditPlaylist', 'CreatePlaylist', 'DeletePlaylist', 'ListPlaylist', 'ReadSeries', 
@@ -161,7 +161,8 @@ const roleProps = {
     {
       title: "description",
       dataIndex: "description",
-      key: "description"
+      key: "description",
+      render:(e,record)=>( <Input.TextArea value={record.description} readOnly></Input.TextArea>   ),
     },
     {
       title: <Tooltip title="Make role Inactive, Edit role, Browse as role">
@@ -219,13 +220,13 @@ const roleProps = {
         </Row>
         <Row align="middle" >
           <Col span={24}>
-            <Table style={{width: "100vw"}}
+            <Table 
             dataSource={tableData} columns={tableColmnsTitle}
             pagination={{ defaultPageSize: 50  }}
             expandable={{
               expandedRowRender: record => <>
-                   {"split" in record.child_roles ?"CHILD ROLES : " + record.child_roles.split(",").map(ob => (<Tag>{ob}</Tag>) ) : null } 
-                   { "split" in record.scope ? "SCOPES : " + record.scope.split(",").map(ob => (<Tag>{ob}</Tag>) )  : null }
+                   <Col span={24}>CHILD ROLES: { record.child_roles ? record.child_roles.map(ob => (<Tag>{ob}</Tag>) ) : null } </Col>
+                   <Col span={24}>SCOPES: {  record.scope ?  record.scope.map(ob => (<Tag>{ob}</Tag>) )  : null }</Col>
                 </>
               ,
               rowExpandable : record => true

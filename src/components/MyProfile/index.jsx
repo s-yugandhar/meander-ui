@@ -1,7 +1,7 @@
 import React, { useState , useContext, useEffect } from "react";
 import "./myProfile.scss";
 import {
-   Layout, Row, Col,Card , } from "antd";
+   Layout, Row, Col,Card    } from "antd";
 import {Context} from '../../context';
 import {USER_OBJ} from '../../reducer/types';
 import { GetUserdetails } from '../API/index';
@@ -13,15 +13,9 @@ import MyPlans from "../MyPlans";
 
 
 const MyProfile = () => {
-   const [requiredMark, setRequiredMarkType] = useState("optional");
    const { Header, Footer, Sider, Content } = Layout;
     const [tabnow,setTabNow] = useState("settings");
-
     const {state,dispatch} = useContext(Context);
-
-   const onRequiredTypeChange = ({ requiredMark }) => {
-      setRequiredMarkType(requiredMark);
-   };
 
    useEffect(()=>{
 
@@ -37,7 +31,6 @@ const MyProfile = () => {
     //{    key: 'friends',   tab: 'Member of',  },
     //{    key: 'project',   tab: 'project'  },
   ];
-
   const contentListNoTitle = {
     general : <><Row> <Col>   <h3 className="page-title">My Profile</h3> </Col>
   </Row>{ state.userObj !== undefined ?

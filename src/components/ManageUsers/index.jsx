@@ -30,7 +30,9 @@ const ManageUsers = () => {
   }).then(res => {
       if("child_roles" in res.data)
          setChildRoles(res.data.child_roles);
-     return res.data;   })
+     return res.data;   }).catch(err => {
+      message.open("Error in fetching child roles");
+      setChildRoles([])}  );
   console.log(" userdata in get ", tempFolders);
   return tempFolders;
 }
@@ -87,7 +89,7 @@ const writeRecord= async (state,dispatch ,obj )=>{
 }
 
 const initWriteRecord = ()=>{
-  let dummy = {'username' : '','email':'','password':'','domain_name':window.location.hostname};
+  let dummy = {'username' : '','email':'','password':'','domain_name':window.location.hostname,'roles':"viewer" };
   setCreateUser(true);  setEditUser(dummy);
 }
 
@@ -246,9 +248,6 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
                    <Tag>{"Videos : "+record.items.length}  </Tag>
                    <Tag>{"Storage : "+ Number(record.originsize/(1024*1024)).toFixed(2) } </Tag>
                    <Tag>{"Bandwidth : "+ Number((Number(record.originserved) +Number(record.bridgeserved))/(1024*1024)).toFixed(2) }</Tag>
-                   <Tooltip title={`${record.email}'s as part of other accounts` }><Tag>{"Other roles : "}{record.access !== null ?<Tag> {"View- "+record.access.viewer.length} </Tag>: null} 
-                   {record.access !== null ?<Tag> {"Edit- "+record.access.user.length} </Tag>: null} 
-                   {record.access !== null ?<Tag> {"Admin- "+record.access.admin.length} </Tag>: null} </Tag></Tooltip>
                 </>
               ,
               rowExpandable : record => true
@@ -287,21 +286,14 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
               >
             <Input  type={"email"} key={editUser.id+"em"}  ></Input>
               </Form.Item>
-              { createUser ?
-                <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: 'password is required',
-                  }, {
+              { createUser ? 
+                <Form.Item    label="Password"       name="password" hidden="true"
+                rules={[  { required: false,    message: 'password is required',    }, {
                     pattern: /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
                     message: 'Please enter minimum 8 letter password, with at least a symbol, upper and lower case letters and a number ',
                   }    ]}
-              >
-                <Input.Password name="password" id="password" />
-              </Form.Item>      :
+              > <Input.Password name="password" id="password" />
+                </Form.Item>  :
               <><Form.Item
                 label="Mobile"
                 name="phone"
@@ -312,7 +304,7 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
                 ]}
               >
             <Input  type={"text"} key={editUser.id+"ph"}  ></Input>
-              </Form.Item>
+              </Form.Item> </> }
               <Form.Item
                 label="Role"
                 name="roles"
@@ -328,7 +320,7 @@ const switchToProfile = (state,dispatch , sharedid , sharedtoken)=>{
                   (<Option key={ob} value={ob}>{ob}</Option>)
               ) }
               
-              </Select>   </Form.Item> </> }
+              </Select>   </Form.Item> 
               <Form.Item>
                 <Button type="primary" htmlType="submit" size="large">
                   {createUser ?"Create" : "Update"}

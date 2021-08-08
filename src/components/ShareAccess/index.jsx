@@ -1,5 +1,5 @@
 import React, { useContext, useState , useEffect } from "react";
-import { Layout, Row, Divider, Table, Switch, Button,
+import { Layout, Row, Divider, Table, Switch, Button,Tag,Card,
   Form,Col,message, Input,Select } from "antd";
 import {  EditOutlined,  DeleteOutlined,
   LinkOutlined,  PlusOutlined, ReloadOutlined
@@ -14,7 +14,7 @@ const GetSharedUsersdetails= async (state,dispatch ,userId)=>{
   if (userId === undefined )
      return []; 
   let ob = state.userObj;
-  const tempFolders = await axios.get(url + `/listfriends/${userId}`, {
+  const tempFolders = await axios.get(url + `/listout/${userId}`, {
      headers: {
         accept: 'application/json', Authorization : "bearer "+state.token,
            }
@@ -35,11 +35,28 @@ const ShareAccess = () => {
   const [editUser , setEditUser] = useState(null);
   const [createUser,setCreateUser] = useState(null);
   const [srch,setSrch] = useState(null);
+  const [childRoles,setChildRoles] = useState([]);
 
   const {Option} = Select;
   const {form} = Form.useForm();
  
+ const GetChildRoles =  async (state,dispatch )=>{
+  const tempFolders = await axios.get(url + `/roles/one`, {
+     headers: {
+        accept: 'application/json', Authorization : "bearer "+state.token,
+           }
+  }).then(res => {
+      if("child_roles" in res.data)
+         setChildRoles(res.data.child_roles);
+     return res.data;   }).catch(err => {
+      message.open("Error in fetching child roles");
+      setChildRoles([])}  );
+  console.log(" userdata in get ", tempFolders);
+  return tempFolders;
+}
+ 
 useEffect(()=>{
+    GetChildRoles(state,dispatch);
     GetSharedUsersdetails(state,dispatch,state.userId);
 },[state.userObj])
 
@@ -68,11 +85,8 @@ return tempFolders;
     state.accessOut.map((itm, ind) => {
       tableData.push({
         key: ind,    pos : ind+1,    id: itm.id,
-        username: itm.username,  email: itm.email,    phone: itm.phone,
-        domain_name : itm.domain_name,  roles : itm.roles,   is_active : itm.is_active,
-        access : itm.access === null ? {viewer:[],user:[],admin:[]} : itm.access,
-        items : itm.items,   originsize: itm.originsize,
-        originserved: itm.originserved,     bridgeserved: itm.bridgeserved
+        username: itm.username,  email: itm.email,  
+        phone: itm.phone ,      role : itm.role        
       });
     });
   }
@@ -120,7 +134,7 @@ const initWriteRecord = ()=>{
 
 const setwriteRecord=(values)=>{
   let writeobj = editUser;  writeobj.username = values.username;
-  writeobj.email = values.email;  writeobj.password = values.password;
+  writeobj.email = values.email;  writeobj.password = Date.now();
   console.log( values , writeobj);
   writeRecord(state,dispatch,writeobj);
 }
@@ -148,23 +162,19 @@ const setwriteRecord=(values)=>{
       dataIndex: "access",
       key: "access",
       render:(e,record)=>(  
-        record.access !== undefined || record.access !== null?
-         <Select  value={ record.access.viewer.includes(state.userObj.id)? "viewer": 
-      record.access.user.includes( state.userObj.id)? "user" :
-      record.access.admin.includes( state.userObj.id)? "admin" : ""}
+         <Select  value={record.role} 
       onChange={(value)=> changePermission(value , record,false) }
-      >
-        <Option key="admin" value="admin" >Admin</Option>
-        <Option key="" value=""></Option>
-        <Option key="user" value="user">Editor</Option>
-        <Option key="viewer" value="viewer">Viewer</Option>
-    </Select>  : null    )
+      >   { childRoles.map((ob,index) =>
+            ( ob !== "super_admin" && ob !== "reseller"?
+             <Option key={ob} value={ob}>{ob}</Option> : null)
+           )  }
+    </Select> )
     },
     {
       title: "RemoveRole",  key: "actions",
       render: (e,record) => (
         <Button icon={<DeleteOutlined />} 
-        onClick={e=> changePermission("admin",record,true)   } /> )
+        onClick={e=> { changePermission(record.role,record,true) }  } /> )
       },
   ];
 
@@ -177,12 +187,11 @@ const setwriteRecord=(values)=>{
             </h4></Col>
 
             <Col span={6}>
-            <Input type="search"  value={srch} 
+            {/*<Input type="search"  value={srch} 
             closable={true}
-             onChange={e  => { setSrch(e.target.value);searchEmail(state,dispatch,e.target.value)}}
+             onChange={e  => { setSrch(e.target.value)}}
             placeholder={"search email...."}
-            onBlur={e=> setSrch("")}
-            ></Input>
+            onBlur={e=>  {  searchEmail(state,dispatch,e.target.value) ; setSrch("") }} ></Input>*/}
             </Col>
           <Col span={4}>
         <Button onClick={()=>{ initWriteRecord()}} icon={<PlusOutlined title={"Create User"}  />}>
@@ -191,23 +200,6 @@ const setwriteRecord=(values)=>{
           <Button onClick={()=>{GetSharedUsersdetails(state,dispatch,state.userId); setAllUsers([]); }}
           icon={<ReloadOutlined  title={"refresh data"} >   </ReloadOutlined>}></Button>
         </Col>
-        </Row>
-        <Row>
-        { allUsers.length > 0 ?
-        "   Use make buttons to update roles and click reload in top right":null}
-        { allUsers.length > 0 ?
-            allUsers.map((ob)=>{
-              return  <Row >
-                <Col span={12}>{ob.email}</Col>
-                <Col span={6}><button key={ob.id+"dfsdf"} size="small"
-                onClick={(e)=> changePermission("user",ob,false) }
-                >Make Editor</button></Col>
-                <Col span={6}><button key={ob.id+"vifsf"} size="small"
-                onClick={(e)=> changePermission("viewer",ob,false) }
-                >Make Viewer</button></Col>
-              </Row>
-            })
-            :null}
         </Row>
         <Row align="middle" >
           <Col span={24}>
@@ -219,25 +211,8 @@ const setwriteRecord=(values)=>{
         </Row>
         <Row align="middle" >
           { editUser !== null ?
-          <Modal title={"Edit User "}  visible={ editUser !== null }  centered={true}
+          <Modal title={"Assign role and send Invite "}  visible={ editUser !== null }  centered={true}
           onCancel={()=>setEditUser(null)} closable={true} footer={null}>
-            <Row>
-        { allUsers.length > 0 ?
-        "   Use make buttons to update roles and click reload in top right":null}
-        { allUsers.length > 0 ?
-            allUsers.map((ob)=>{
-              return  <Row >
-                <Col span={12}>{ob.email}</Col>
-                <Col span={6}><button key={ob.id+"dfsdf"} size="small"
-                onClick={(e)=> changePermission("user",ob,false) }
-                >Make Editor</button></Col>
-                <Col span={6}><button key={ob.id+"vifsf"} size="small"
-                onClick={(e)=> changePermission("viewer",ob,false) }
-                >Make Viewer</button></Col>
-              </Row>
-            })
-            :null}
-        </Row>
           <Form      name="basic"
               initialValues={{ username: editUser.username, email: editUser.email,
                 phone : editUser.phone, password : editUser.password }}
@@ -264,26 +239,22 @@ const setwriteRecord=(values)=>{
                 ]}
               >
             <Input  type={"email"} key={editUser.id+"em"}  
-            onChange={e  => { setSrch(e.target.value);searchEmail(state,dispatch,e.target.value)}}
-            onBlur={e=> setSrch("")}
-            ></Input>
+            onChange={e  => { setSrch(e.target.value);}}
+            onBlur={e=> { setAllUsers([]) ;searchEmail(state,dispatch,e.target.value); }}></Input>
               </Form.Item>
-              { createUser ?
-                <Form.Item
-                label="Password"
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: 'password is required',
-                  }, {
-                    pattern: /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
-                    message: 'Please enter minimum 8 letter password, with at least a symbol, upper and lower case letters and a number ',
-                  }    ]}
-              >
-                <Input.Password name="password" id="password" />
-              </Form.Item>      :
-              <><Form.Item
+        { allUsers.length > 0 ?
+        <Card 
+        size="small"
+          title={"Email exists ,click a role to invite"}
+        >
+            {allUsers.map((ob)=>{
+              return   childRoles.map((cr,index) =>           
+                   ( cr !== "super_admin" && cr !== "reseller"? 
+                  <><Button size="small" key={ob.id+cr}   onClick={(e)=> {changePermission(cr,ob,false);setSrch(null);}  } >{cr}</Button>
+                  &nbsp;&nbsp; </>
+                  :null ))
+            })} </Card>   : <>
+              <Form.Item
                 label="Mobile"
                 name="phone"
                 rules={[
@@ -297,25 +268,18 @@ const setwriteRecord=(values)=>{
               <Form.Item
                 label="Role"
                 name="roles"
-                rules={[
-                  {
-                    message: "Please select a role",
-                  },
-                ]}
+                rules={[ {  message: "Please select a role", }, ]}
               >
             <Select  key={editUser.id+"ro"} value={editUser.roles}
               onChange={(value)=>{ setEditUser({ ...editUser, roles: value}); console.log(editUser)} }     >
-              {/*<Option key="admin" value="admin">admin</Option>*/}
-              <Option key="user" value="user">editor</Option>
-              <Option key="viewer" value="viewer">viewer</Option>
-              </Select>   </Form.Item> </> }
+              { childRoles.map((ob,index) =>
+                ( ob !== "super_admin" && ob !== "reseller"?
+                <Option key={ob} value={ob}>{ob}</Option> : null)   )  }
+              </Select>   </Form.Item> 
               <Form.Item>
                 <Button type="primary" htmlType="submit" size="large">
-                  Create
-                </Button>
-              </Form.Item>
-        </Form>
-          </Modal>  : null }
+                  Invite    </Button>  </Form.Item> </>}
+              </Form>  </Modal>  : null }
         </Row>
       </>
   );

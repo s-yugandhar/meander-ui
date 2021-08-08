@@ -7,11 +7,11 @@ import { CreateNewFolder } from './components/API';
 import { Context } from "./context";
 
 const Login = (props) => {
-
   const { Header, Footer, Content } = Layout;
   const { Title, Text } = Typography;
   const [signup, setSignup] = useState(false);
   const [commonError, setCommonError] = useState("");
+  const [inviteLink,setInviteLink] = useState(false);
 
   // Context
   const { state, dispatch } = useContext(Context);
@@ -26,6 +26,36 @@ const Login = (props) => {
     },
   };
 
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const setPasswordReq = (values) => {
+    console.log(values);
+    const loginBody = JSON.stringify({
+      otp: values.otp,
+      email: values.email,
+      password: values.password,
+      repassword: values.repassword,
+      token: urlSearchParams.get('token')
+    });
+
+    const signupHeader = {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      }
+    }
+
+    axios
+      .post(url + "/setpassword", loginBody, signupHeader)
+      .then((signupRes) => {
+        console.log('Signup Res - ', signupRes);
+        setCommonError(signupRes);
+      })
+      .catch((err) => {
+        console.log("Login Error - ", err);
+        setTimeout(() => {
+        }, 5000);
+      });
+  };
 
   const setSignedIn = (values) => {
     console.log(values);
@@ -105,10 +135,120 @@ const Login = (props) => {
   }
 
   useEffect(() => {
-    console.log('login page context - ', state);
-  })
+    //console.log('login page context - ', state);
+    const pathname = window.location.pathname;
+    console.log(pathname);
+    if(pathname.includes("email_link") ){
+      const action = urlSearchParams.get('action');
+      if( action in ['forgot','signup']){
+      setInviteLink(pathname);}
+      else {
+        setInviteLink(pathname);
+         setPasswordReq( {otp : 123456 , email : 'email@email.com' , password : 'password', repassword :'password'} ); }
+    }
+      
+  },[])
 
-  if (signup) {
+  if(inviteLink){
+    return(
+      <Layout style={{ minHeight: "100vh" }}>
+        <Content
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#eeeeee",
+          }}
+        > <Row>
+            <Title level={3}>Password Form</Title>
+          </Row>
+          <div style={{ width: "460px" }}>
+    <Form   name="basic"
+    initialValues={{
+      email: "",
+      password: "",
+      repassword: "",
+      otp:""       }}
+    onFinish={setPasswordReq}
+    layout="vertical"
+  >
+    <Form.Item
+      label="Email"
+      name="email"
+      rules={[
+        {
+          type: "email",
+          required: true,
+          message: "Please enter your email!",
+        },
+      ]}
+    >
+      <Input
+      />
+    </Form.Item>
+    <Form.Item
+      label="Enter Otp"
+      name="otp"
+      rules={[
+        {
+          required: true,
+          message: "Please enter your 6-digit otp",
+        }
+      ]}
+    >
+      <Input />
+    </Form.Item>
+    <Form.Item 
+      label="Password"
+      name="password"
+      rules={[
+        {
+          required: true,
+          message: "Please enter your password!",
+        },
+        {
+          pattern: /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+          message: 'Please enter minimum 8 letter password, with at least a symbol, upper and lower case letters and a number ',
+        }
+      ]}
+    >
+      <Input.Password />
+    </Form.Item>
+    <Form.Item
+      label="Re-enter Password"
+      name="repassword"
+      rules={[
+        {
+          required: true,
+          message: "Please enter your password!",
+        },
+        {
+          pattern: /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+          message: 'Please enter minimum 8 letter password, with at least a symbol, upper and lower case letters and a number ',
+        }
+      ]}
+    >
+      <Input.Password />
+    </Form.Item>
+
+    <Form.Item style={{ textAlign: "center" }}>
+      <Button
+        type="primary"
+        htmlType="submit"
+        size="large"
+        style={{ paddingLeft: "25px", paddingRight: "25px" }}
+      >
+        Submit
+      </Button>
+    </Form.Item>
+  </Form>
+        </div>
+        </Content>
+      </Layout>
+    )  }
+ else if (signup && inviteLink === false) {
     return (
       <Layout style={{ minHeight: "100vh" }}>
         <Content
@@ -159,7 +299,7 @@ const Login = (props) => {
                 rules={[
                   {
                     required: true,
-                    message: 'Channel ID is required',
+                    message: 'password is required',
                   }, {
                     pattern: /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
                     message: 'Please enter minimum 8 letter password, with at least a symbol, upper and lower case letters and a number ',

@@ -191,7 +191,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             <Menu.Item
               key="p-live-streaming"
               onClick={() => {
-                loadPage("forbidden");
+                loadPage("mediaApiRecord");
               }}
             >
               Live Streaming

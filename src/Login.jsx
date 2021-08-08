@@ -12,6 +12,7 @@ const Login = (props) => {
   const [signup, setSignup] = useState(false);
   const [commonError, setCommonError] = useState("");
   const [inviteLink,setInviteLink] = useState(false);
+  const [action,setAction] = useState(false);
 
   // Context
   const { state, dispatch } = useContext(Context);
@@ -48,7 +49,7 @@ const Login = (props) => {
       .post(url + "/setpassword", loginBody, signupHeader)
       .then((signupRes) => {
         console.log('Signup Res - ', signupRes);
-        setCommonError(signupRes);
+        setCommonError(signupRes.data);
       })
       .catch((err) => {
         console.log("Login Error - ", err);
@@ -138,11 +139,13 @@ const Login = (props) => {
     //console.log('login page context - ', state);
     const pathname = window.location.pathname;
     console.log(pathname);
+    setAction(false);
     if(pathname.includes("email_link") ){
-      const action = urlSearchParams.get('action');
-      if( action in ['forgot','signup']){
+      const temp = urlSearchParams.get('action');
+      setAction(temp);
+      if( temp === 'forgot' || temp ==='signup'){
       setInviteLink(pathname);}
-      else {
+      if( temp === 'invite' || temp ==='verifyemail'){
         setInviteLink(pathname);
          setPasswordReq( {otp : 123456 , email : 'email@email.com' , password : 'password', repassword :'password'} ); }
     }
@@ -161,11 +164,17 @@ const Login = (props) => {
             justifyContent: "center",
             backgroundColor: "#eeeeee",
           }}
-        > <Row>
-            <Title level={3}>Password Form</Title>
-          </Row>
-          <div style={{ width: "460px" }}>
-    <Form   name="basic"
+        >
+          
+          
+            <h3>{"Email Actions Page for signup,forgot,invite or verifyemail"}</h3><br/>
+            <h3>{"Please wait until you see a message or a form in this page"}</h3><br/>
+          
+          <h3>{ commonError}</h3>   
+          <div style={{ width: "460px" }}
+          >
+    { action === 'forgot' || action === 'signup' ?
+      <Form   name="basic"
     initialValues={{
       email: "",
       password: "",
@@ -243,7 +252,9 @@ const Login = (props) => {
         Submit
       </Button>
     </Form.Item>
-  </Form>
+  </Form> :
+  <p>{""}</p>
+  }
         </div>
         </Content>
       </Layout>

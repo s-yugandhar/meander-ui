@@ -46,7 +46,7 @@ const App = (props) => {
 
   
   useEffect((prev) => {
-   // console.log('App page state - ', state , Logo,HeaderBG );
+   // console.log('App page state - ', state , Logo,HeaderBG );      
     state.userId ?
       setSignedIn(true) : setSignedIn(false);
   }, []);

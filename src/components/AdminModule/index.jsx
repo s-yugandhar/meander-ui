@@ -82,6 +82,12 @@ const AdminModule = (props) => {
   const localUserId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
 
+  useEffect(()=>{
+    if( window.location.pathname.includes("email_link"))
+    dispatch({ type: "PAGE", payload: { page: "login" } });
+  },[])
+
+
   function updateFiles(id, folderName) {
     //if( state.folderName === "")
     //dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );

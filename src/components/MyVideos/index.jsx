@@ -399,7 +399,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                             className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
                           >
                             <FolderCard
-                              folderName={folder.folderName}
+                              folderName={folder.foldername}
                               userId={state.userId}
                               videosCount={0}
                               folderOnClick={() => innerFolder(folder)}

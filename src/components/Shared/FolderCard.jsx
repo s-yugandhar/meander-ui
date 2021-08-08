@@ -63,7 +63,7 @@ const FolderCard = (props) => {
            <div className="videoCardInfoBlock">
              <div className="videoTitle folderTitle">{props.folderName}</div>
              <div className="publishedDate folderInfo">
-               {props.videosCount} Videos
+               {props.videosCount} {props.folderName}
              </div>
            </div>
          </Button>

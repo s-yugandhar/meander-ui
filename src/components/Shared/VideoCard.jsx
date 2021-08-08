@@ -344,7 +344,7 @@ const actionPending = [
           {/*<VideoCameraOutlined className="videoIconLoading" />*/}
           {
             <ImageLoad
-              src={links === null ? null : links["img_url"]}
+              src={props.fileObject.thumbnail === null ? null : props.fileObject.thumbnail}
               placeholder={logo}
               alt={props.fileObject.title + " " + props.fileObject.description}
             />

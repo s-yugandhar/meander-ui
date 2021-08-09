@@ -84,8 +84,8 @@ const UppyUpload = (props) => {
     }).use(ScreenCapture,{id:'MyScreenCapture'}).use(AwsS3Multipart, {
        limit: 1,
        companionUrl: url+"/swift/",
-       Headers : { "uppy-auth-token" : "bearer "+token , "Authorization" : "bearer "+token },
-       companionHeaders:{ "uppy-auth-token" : "bearer "+token , "Authorization" : "bearer "+token },
+       Headers : { "uppy-auth-token" : "bearer "+token  },
+       companionHeaders:{ "uppy-auth-token" : "bearer "+token  },
        getChunkSize(file) {
          var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
          return file.size < 5 * 1024 * 1024
@@ -95,6 +95,7 @@ const UppyUpload = (props) => {
      });
    });
 
+   //, "Authorization" : "bearer "+token
    const completeEvent = (result) => {
      console.log(result, "inside uppy complete event");
      let succes = result.successful;

@@ -9,7 +9,6 @@ import {
 } from "@ant-design/icons";
 // custom imports
 import { Context } from "../../context";
-import ColorPicker from "../Settings/color-picker"
 import axios from "axios";
 import { url } from "../API/index";
 
@@ -238,7 +237,7 @@ const Settings = () => {
                 </Col>
                 <Col span={12} xs={12} md={16} lg={10}>
                   <Form.Item className="editFormItem" name="headerbgcolor">
-                    <ColorPicker value={ colorcode}
+                    <Input value={ colorcode}
                     onChange ={e =>  setColorCode(e.target.value)   }/>
                   </Form.Item>
                 </Col>

@@ -37,10 +37,10 @@ import {
   SortDescendingOutlined,
   FolderAddOutlined,
   CloudUploadOutlined,
-  RightOutlined
+  RightOutlined,
 } from "@ant-design/icons";
 import VideoCard from "../Shared/VideoCard";
-import "../MyVideos/MyVideos.scss";
+import "./MyAudio.scss";
 import Loading from "../Loading";
 import { FILE_LIST, FOLDER_NAME } from "../../reducer/types";
 import {
@@ -58,7 +58,7 @@ import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
 import UppyUpload from "../UppyUpload";
 
-const MyVideos = ({ updateTab, openUploadVideo }) => {
+const MyAudios = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
   const { SubMenu } = Menu;
   const { Search } = Input;
@@ -374,11 +374,16 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                           Folders
                         </Button>
                       </Col>
-                      <Col style={{ fontSize: "13px", color: '#888' }}>
+                      <Col style={{ fontSize: "13px", color: "#888" }}>
                         <RightOutlined color="#888" />
                       </Col>
                       <Col
-                        style={{ paddingLeft: "10px", paddingRight: "10px", fontSize: "16px", fontWeight: "600" }}
+                        style={{
+                          paddingLeft: "10px",
+                          paddingRight: "10px",
+                          fontSize: "16px",
+                          fontWeight: "600",
+                        }}
                       >
                         Folder Name
                       </Col>
@@ -683,4 +688,4 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   );
 };
 
-export default MyVideos;
+export default MyAudios;

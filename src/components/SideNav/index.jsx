@@ -123,7 +123,10 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
                 <Menu.Item key="listu" onClick={() => loadPage("accounts")}>
                   Accounts
                 </Menu.Item>
-                <Menu.Item key="listRoles" onClick={() => loadPage("manage-roles")}>
+                <Menu.Item
+                  key="listRoles"
+                  onClick={() => loadPage("manage-roles")}
+                >
                   Manage Roles
                 </Menu.Item>
               </SubMenu>
@@ -151,7 +154,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             <Menu.Item
               key="p-audio"
               onClick={() => {
-                loadPage("forbidden");
+                loadPage("audios");
               }}
             >
               Audio
@@ -159,7 +162,7 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             <Menu.Item
               key="p-images"
               onClick={() => {
-                loadPage("forbidden");
+                loadPage("images");
               }}
             >
               Images
@@ -227,6 +230,14 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
               }}
             >
               My Account
+            </Menu.Item>
+            <Menu.Item
+              key="billing"
+              onClick={() => {
+                loadPage("billing");
+              }}
+            >
+              My Billing
             </Menu.Item>
             <Menu.Item
               key="p-settings"

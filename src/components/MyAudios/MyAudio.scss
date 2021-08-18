@@ -1,0 +1,17 @@
+.eachVideo {
+   padding: 5px;
+}
+
+.foldersLinksList {
+   .fodlerLinkItem {
+      color: #888;
+
+      &.active {
+         color: #1890ff;
+      }
+   }
+
+   .fodlerLink {
+      color: #1890ff;
+   }
+}

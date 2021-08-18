@@ -63,6 +63,9 @@ import { PlayerPage } from "../Player";
 import TopHeader from "../TopHeader";
 import PDashboard from "../P-Dashboard";
 import UppyUpload from "../UppyUpload";
+import MyBilling from "../MyBilling";
+import MyAudios from "../MyAudios";
+import MyImages from "../MyImages";
 
 const AdminModule = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -173,7 +176,7 @@ const AdminModule = (props) => {
     }
   }, [state.editVideo]);
 
-  
+
   const closeUploadVideo = () => {
     uppy.reset();
     setUploadVideo(false);
@@ -210,26 +213,29 @@ const AdminModule = (props) => {
 
   const page = {
     "p-dashboard": <PDashboard />,
-    "videos": (
+    videos: (
       <MyVideos
         openUploadVideo={() => {
           setUploadVideo(true);
         }}
       />
     ),
+    audios: <MyAudios />,
+    images: <MyImages />,
     "add-video": <AddVideo />,
-    "profile": <MyProfile />,
+    billing: <MyBilling />,
+    profile: <MyProfile />,
     "edit-video": <EditVideo />,
     "manage-videos": <ManageVideos />,
     "manage-roles": <ManageRoles />,
-    "accounts": <ManageUsers />,
+    accounts: <ManageUsers />,
     "share-access": <ShareAccess />,
     "reseller-settings": <Settings />,
-    "usage": <ResellerReports />,
-    "player": <PlayerPage />,
-    "login": <Login />,
-    "appplans": <Plans />,
-    "forbidden": (
+    usage: <ResellerReports />,
+    player: <PlayerPage />,
+    login: <Login />,
+    appplans: <Plans />,
+    forbidden: (
       <>
         <div>
           {" "}

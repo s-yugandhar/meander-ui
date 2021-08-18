@@ -92,7 +92,7 @@ const VideoCard = (props) => {
 
   const onSideNavFolderClick = (folderName) => {
     dispatch({ type: PAGE, payload: { page: "videos" } });
-    dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
+    //dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
     GetFiles(state, dispatch, state.userId, folderName).then((res) => {
       console.log("My Videos Files in sidenav - ", res);
       dispatch({ type: FILE_LIST, payload: { fileList: res } });
@@ -114,9 +114,9 @@ const VideoCard = (props) => {
         file.itempath.split("/")[1] + "/" + file.itempath.split("/")[2],
         false
       ).then((res) => {
-        state.folderName === ""
+        state.folder.id === ""
           ? showAllvideos()
-          : onSideNavFolderClick(state.folderName);
+          : onSideNavFolderClick(state.folder.id);
       });
     else alert("this is not a file to delete");
   }

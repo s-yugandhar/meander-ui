@@ -53,6 +53,7 @@ const UppyUpload = (props) => {
    const { Option } = Select;
    const videomime = "video/*";
    const audiomime = "audio/*";
+   const imagemime = "image/*";
    const [uploadVideo, setUploadVideo] = useState(false);
    const [stateEdit, setStateEdit] = useState(false);
    const { state, dispatch } = useContext(Context);
@@ -66,7 +67,7 @@ const UppyUpload = (props) => {
        allowMultipleUploads: false,
        autoProceed: false,
        debug: true,
-       restrictions: { allowedFileTypes: [videomime, audiomime] },
+       restrictions: { allowedFileTypes: [videomime, audiomime , imagemime] },
      }).use(Webcam, {
       onBeforeSnapshot: () => Promise.resolve(),
       countdown: false,
@@ -87,10 +88,10 @@ const UppyUpload = (props) => {
        Headers : { "uppy-auth-token" : "bearer "+token  },
        companionHeaders:{ "uppy-auth-token" : "bearer "+token  },
        getChunkSize(file) {
-         var chunks = Math.ceil(file.size / (5 * 1024 * 1024));
-         return file.size < 5 * 1024 * 1024
-           ? 5 * 1024 * 1024
-           : Math.ceil(file.size / (chunks - 1));
+         var minChunkSize  = file.size/500;
+          minChunkSize = minChunkSize < 9 * 1024 * 1024 ? 9 * 1024 * 1024 : minChunkSize ;
+         var chunks = Math.ceil(file.size / (minChunkSize));
+         return file.size < minChunkSize  ? minChunkSize  : Math.ceil(file.size / (chunks - 1));
        },
      });
    });
@@ -168,7 +169,7 @@ const UppyUpload = (props) => {
     useEffect(() => {
       const dispName =
         state.dbfolderList !== undefined && state.dbfolderList !== null
-          ? state.dbfolderList.find((ob) => ob.id === state.folderName)
+          ? state.dbfolderList.find((ob) => ob.id === state.folder.id)
           : undefined;
       uppy.setOptions({
         onBeforeFileAdded: (currentFile, files) => {
@@ -200,9 +201,9 @@ const UppyUpload = (props) => {
       });
       uppy.setMeta({
         userId: state.userId,
-        foldername: state.folderName === "" ? "default" : state.folderName,
+        foldername: state.folder.id === "" ? "default" : state.folder.id,
       });
-    }, [state.folderName, localUserId]);
+    }, [state.folder.id, localUserId]);
 
 
    return (
@@ -214,14 +215,14 @@ const UppyUpload = (props) => {
            placeholder="search folder"
            optionFilterProp="children"
            showSearch={true}
-           value={state.folderName === "" ? "default" : state.folderName}
+           value={state.folder.foldername === "" ? "default" : state.folder.foldername}
            onChange={(value) => {
              dispatch({
                type: FOLDER_NAME,
-               payload: { folderName: value },
+               payload: { folder : value },
              });
-             if (state.folderName !== "")
-               GetFiles(state, dispatch, state.userId, state.folderName);
+             if (state.folder.id !== "")
+               GetFiles(state, dispatch, state.userId, state.folder.foldername);
            }}
          >
            {state.dbfolderList !== undefined && state.dbfolderList !== null
@@ -229,7 +230,7 @@ const UppyUpload = (props) => {
                  return obj.foldertype === "folder" ? (
                    <>
                      {" "}
-                     <Option key={obj.id} value={obj.id}>
+                     <Option key={obj.id} value={obj}>
                        {" "}
                        {obj.foldername}
                        {"   "}{" "}

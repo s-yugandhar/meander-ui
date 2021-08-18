@@ -18,14 +18,7 @@ import {
   VideoCameraAddOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import {
-  PAGE,
-  FOLDER_CREATED,
-  FILE_UPLOADED,
-  FOLDER_NAME,
-  FILE_LIST,
-  FOLDER_LIST,
-} from "../../reducer/types";
+import { PAGE} from "../../reducer/types";
 import {
   dbGetObjByPath,
   GetFolders,

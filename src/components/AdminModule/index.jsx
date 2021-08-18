@@ -92,10 +92,10 @@ const AdminModule = (props) => {
 
 
   function updateFiles(id, folderName) {
-    //if( state.folderName === "")
+    //if( state.folder.id === "")
     //dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/" , true  );
     //else
-    //dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/"+state.folderName+"/" , true  );
+    //dbGetObjByPath(state,dispatch,"bucket-"+state.userId+"/"+state.folder.id+"/" , true  );
   }
 
   const uppy = useUppy(() => {
@@ -252,9 +252,9 @@ const AdminModule = (props) => {
     localUserId ? setLogedIn(true) : setLogedIn(false);
     //Dashboard( { locale :{ strings : { dropHere : "hint"} }        } )
 
-    const dispName = state.dbfolderList !== undefined && state.dbfolderList !== null
+    const dispName = state.dbfolderList && state.folder
     ?state.dbfolderList.find(
-      (ob) => ob.id === state.folderName
+      (ob) => ob.id === state.folder.id
     ) : undefined;
     uppy.setOptions({
       onBeforeFileAdded: (currentFile, files) => {
@@ -284,9 +284,9 @@ const AdminModule = (props) => {
     });
     uppy.setMeta({
       userId: state.userId,
-      foldername: state.folderName === "" ? "default" : state.folderName,
+      foldername: state.folder ?  state.folder.id : "default",
     });
-  }, [state.folderName, localUserId]);
+  }, [state.folder , localUserId]);
 
   const switchToSelf = (state, dispatch) => {
     if (state.archiveAccount !== null) {
@@ -347,14 +347,14 @@ const AdminModule = (props) => {
                   placeholder="search folder"
                   optionFilterProp="children"
                   showSearch={true}
-                  value={state.folderName === "" ? "default" : state.folderName}
+                  value={state.folder.id === "" ? "default" : state.folder.id}
                   onChange={(value) => {
                     dispatch({
                       type: FOLDER_NAME,
                       payload: { folderName: value },
                     });
-                    if (state.folderName !== "")
-                      GetFiles(state, dispatch, state.userId, state.folderName);
+                    if (state.folder.id !== "")
+                      GetFiles(state, dispatch, state.userId, state.folder.id);
                   }}
                 >
                   { state.dbfolderList !== undefined && state.dbfolderList !== null

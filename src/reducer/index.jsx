@@ -99,7 +99,7 @@ export const reducer = (state = initialState, action) => {
       case FOLDER_NAME:
          return {
             ...state,
-            folderName: action.payload.folderName
+            folder : action.payload.folder 
          }
 
       case FOLDER_LIST:

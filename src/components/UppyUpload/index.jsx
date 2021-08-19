@@ -1,21 +1,5 @@
 import React, { useContext,useState, useEffect } from 'react';
-
-import {
-  Layout,
-  Menu,
-  Dropdown,
-  Avatar,
-  Row,
-  Col,
-  Input,
-  Select,
-  Typography,
-  Drawer,
-  Button,
-  message,
-  notification,
-  Divider,
-} from "antd";
+import {  Select } from "antd";
 import Uppy from "@uppy/core";
 import "uppy/dist/uppy.min.css";
 import "@uppy/core/dist/style.css";
@@ -24,7 +8,7 @@ import '@uppy/webcam/dist/style.css'
 import AwsS3Multipart from "@uppy/aws-s3-multipart";
 import Webcam from "@uppy/webcam";
 import ScreenCapture from "@uppy/screen-capture";
-import { Dashboard, useUppy } from "@uppy/react";
+import { Dashboard, useUppy, DragDrop } from "@uppy/react";
 import { Context } from "../../context";
 import "./uppyUpload.scss";
 
@@ -169,7 +153,7 @@ const UppyUpload = (props) => {
     useEffect(() => {
       const dispName =
         state.dbfolderList !== undefined && state.dbfolderList !== null
-          ? state.dbfolderList.find((ob) => ob.id === state.folder.id)
+          ? state.dbfolderList.find((ob) => ob.id === state.folder ? state.folder.id : null)
           : undefined;
       uppy.setOptions({
         onBeforeFileAdded: (currentFile, files) => {
@@ -201,9 +185,9 @@ const UppyUpload = (props) => {
       });
       uppy.setMeta({
         userId: state.userId,
-        foldername: state.folder.id === "" ? "default" : state.folder.id,
+        foldername: state.folder ?  state.folder.id : "default",
       });
-    }, [state.folder.id, localUserId]);
+    }, [state.folder, localUserId]);
 
 
    return (
@@ -215,13 +199,13 @@ const UppyUpload = (props) => {
            placeholder="search folder"
            optionFilterProp="children"
            showSearch={true}
-           value={state.folder.foldername === "" ? "default" : state.folder.foldername}
+           value={state.folder ?  state.folder.foldername : "default"}
            onChange={(value) => {
              dispatch({
                type: FOLDER_NAME,
                payload: { folder : value },
              });
-             if (state.folder.id !== "")
+             if (state.folder)
                GetFiles(state, dispatch, state.userId, state.folder.foldername);
            }}
          >
@@ -241,10 +225,24 @@ const UppyUpload = (props) => {
              : null}
          </Select>{" "}
        </div>
-       <div className="uploadFileUppyBlock">
+       <div className="uploadFileUppyBlock" >
+       {/* <DragDrop   width="80%"   height="80%"
+          note="Images up to 200×200px"
+          // assuming `this.uppy` contains an Uppy instance:
+          uppy={uppy}
+          locale={{    strings: {
+            // Text to show on the droppable area.
+            // `%{browse}` is replaced with a link that opens the system file selection dialog.
+            dropHereOr: 'Drop here or %{browse}',
+            // Used as the label for the link that opens the system file selection dialog.
+            browse: 'browse',
+            },
+          }}
+        />  */}    
+         
          <Dashboard
            uppy={uppy}
-           plugins={['Webcam','MyScreenCapture' ]}
+           plugins={[]}
            showProgressDetails={true}
            proudlyDisplayPoweredByUppy={false}
            showRemoveButtonAfterComplete={true}

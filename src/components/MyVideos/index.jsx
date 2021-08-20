@@ -379,7 +379,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       <Col span="4" className="">
                         <Select
                           defaultValue="dateModified"
-                          style={{ width: "100%" }}
+                          style={{ width: "100%", fontSize: "13px"}}
                           onChange=""
                         >
                           <Option value="dateModified">Date Modified</Option>
@@ -401,7 +401,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       ></Divider>
                     </Row>
                   </Col>
-                  <Col>
+                  <Col span="24">
                     <Row gutter={15}>
                       { folderActive && state.dbfolderList.map((folder, index) => {
                         return folder.foldertype === "folder" ? (
@@ -539,7 +539,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                                   userId={state.userId}
                                 />
                               </Col>
-                            ) : null                          
+                            ) : null
                           })
                         : ""
                     }

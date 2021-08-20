@@ -5,7 +5,7 @@
    margin: 20px auto;
    background-color: white;
    color: var(--primary);
-   height: 50px;
+   height: 60px;
    text-align: center;
    border: none;
    cursor: pointer;
@@ -33,6 +33,45 @@
    &:hover {
       &::after {
          background-color: #1890ff;
+      }
+   }
+}
+
+
+[data-uppy-drag-drop-supported=true] .uppy-Dashboard-AddFiles {
+  border: none;
+}
+
+.uppy-Dashboard-inner {
+  border: none;
+}
+
+
+.meander-upload {
+
+   .uppy-Dashboard-AddFiles {
+      justify-content: flex-start;
+   }
+
+   .uppy-Dashboard-AddFiles-title {
+      padding-top: 200px;
+      position: relative;
+
+      &::before {
+         content: "";
+         position: absolute;
+         left: 50%;
+         top: 60px;
+         background-image: url(../../assets/images/cloud_upload.svg);
+         background-repeat: no-repeat;
+         background-position: top center;
+         background-size: 100px;
+         width: 100px;
+         height: 100px;
+         margin-left: -50px;
+         display: block;
+         opacity: 0.3;
+
       }
    }
 }

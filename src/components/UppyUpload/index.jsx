@@ -151,7 +151,7 @@ const UppyUpload = (props) => {
    }, [state.folderCreated]);
 
     useEffect(() => {
-      
+
       const dashboard_plugin = uppy.getPlugin('Dashboard')
 
       if(dashboard_plugin)
@@ -165,7 +165,7 @@ const UppyUpload = (props) => {
           const modifiedFile = {        ...currentFile,
             name: uuid + "." + currentFile.name.split(".")[1],
             size : currentFile.data.size ,  type : currentFile.type ,
-            meta : { filename :uuid + "." +currentFile.name.split(".")[1],     userId : state.userId , 
+            meta : { filename :uuid + "." +currentFile.name.split(".")[1],     userId : state.userId ,
             foldername : state.folder ?  state.folder.foldername : "",
             title : currentFile.name , name : currentFile.name , total_size : currentFile.data.size,
             type : currentFile.type , time : String(time) , total_chunks :  chunks-1,
@@ -192,7 +192,7 @@ const UppyUpload = (props) => {
 
 
    return (
-     <>
+     <div className="meander-upload">
        <div className="uploadSelectfolderBlock">
          <Select
            size="medium"
@@ -238,7 +238,7 @@ const UppyUpload = (props) => {
             browse: 'browse',
             },
           }}
-        />  */}    
+        />  */}
          <Dashboard
            uppy={uppy}
            plugins={[]}
@@ -249,9 +249,9 @@ const UppyUpload = (props) => {
            fileManagerSelectionType={"files"}
            inline={true}
             width="100%"
-         />  
+         />
        </div>
-     </>
+     </div>
 
    )
 

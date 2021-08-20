@@ -151,21 +151,22 @@ const UppyUpload = (props) => {
    }, [state.folderCreated]);
 
     useEffect(() => {
-      const dispName =
-        state.dbfolderList !== undefined && state.dbfolderList !== null
-          ? state.dbfolderList.find((ob) => ob.id === state.folder ? state.folder.id : null)
-          : undefined;
+      
+      const dashboard_plugin = uppy.getPlugin('Dashboard')
+
+      if(dashboard_plugin)
+          dashboard_plugin.setOptions({  hideUploadButton : state.folder ? false : true });
       uppy.setOptions({
         onBeforeFileAdded: (currentFile, files) => {
           var time = Date.now();     var uuid =  String(time);
           var chunks =   Math.ceil( currentFile.data.size / (5*1024*1024));
-          if(dispName === undefined || dispName === null)
-            uppy.info("Please select a folder");
+          if (state.folder === null || state.folder === undefined )
+            uppy.info("Please select a folder to enable upload button");
           const modifiedFile = {        ...currentFile,
             name: uuid + "." + currentFile.name.split(".")[1],
             size : currentFile.data.size ,  type : currentFile.type ,
             meta : { filename :uuid + "." +currentFile.name.split(".")[1],     userId : state.userId , 
-            foldername : dispName === undefined || dispName === null ? "default" : dispName.folderName,
+            foldername : state.folder ?  state.folder.foldername : "",
             title : currentFile.name , name : currentFile.name , total_size : currentFile.data.size,
             type : currentFile.type , time : String(time) , total_chunks :  chunks-1,
             chunk_size : currentFile.data.size < 5*1024*1024 ?   5*1024*1024 :  Math.ceil(currentFile.data.size /(chunks-1)) ,
@@ -176,16 +177,16 @@ const UppyUpload = (props) => {
         locale: {
           strings: {
             dropPaste:
-              dispName === undefined || dispName === null
-                ? `Drag & Drop or %{browse}`
-                : `Drag & Drop or %{browse} to upload files to : ` +
-                  dispName.foldername,
+              state.folder
+                ?  `Folder : ` +
+                  state.folder.foldername + `  Drag & Drop to upload files to or %{browse}`:
+                   ` Select a folder, Drag & Drop or %{browse}`,
           },
         },
       });
       uppy.setMeta({
         userId: state.userId,
-        foldername: state.folder ?  state.folder.id : "default",
+        foldername: state.folder ?  state.folder.id : "",
       });
     }, [state.folder, localUserId]);
 
@@ -203,7 +204,7 @@ const UppyUpload = (props) => {
            onChange={(value) => {
              dispatch({
                type: FOLDER_NAME,
-               payload: { folder : value },
+               payload: { folder : JSON.parse(value) },
              });
              if (state.folder)
                GetFiles(state, dispatch, state.userId, state.folder.foldername);
@@ -214,7 +215,7 @@ const UppyUpload = (props) => {
                  return obj.foldertype === "folder" ? (
                    <>
                      {" "}
-                     <Option key={obj.id} value={obj}>
+                     <Option key={obj.id} value={JSON.stringify(obj) } >
                        {" "}
                        {obj.foldername}
                        {"   "}{" "}
@@ -230,8 +231,7 @@ const UppyUpload = (props) => {
           note="Images up to 200×200px"
           // assuming `this.uppy` contains an Uppy instance:
           uppy={uppy}
-          locale={{    strings: {
-            // Text to show on the droppable area.
+          locale={{    strings: {          // Text to show on the droppable area.
             // `%{browse}` is replaced with a link that opens the system file selection dialog.
             dropHereOr: 'Drop here or %{browse}',
             // Used as the label for the link that opens the system file selection dialog.
@@ -239,7 +239,6 @@ const UppyUpload = (props) => {
             },
           }}
         />  */}    
-         
          <Dashboard
            uppy={uppy}
            plugins={[]}
@@ -250,7 +249,7 @@ const UppyUpload = (props) => {
            fileManagerSelectionType={"files"}
            inline={true}
             width="100%"
-         />
+         />  
        </div>
      </>
 

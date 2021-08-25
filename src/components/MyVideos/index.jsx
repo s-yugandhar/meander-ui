@@ -57,6 +57,7 @@ import {
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
 import UppyUpload from "../UppyUpload";
+import { Recording } from "../MsrRecording/index.jsx";
 
 const MyVideos = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -77,6 +78,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   const [sortState, setSortState] = useState(null);
   const [nfApi, setNFApi] = useState(false);
   const [folderActive,setFolderActive] = useState(true);
+  const [screenRec,setScreenRec] = useState(false);
   const { Column } = Table;
 
   const [tabActive, setTabActive] = useState("videos");
@@ -547,14 +549,20 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                 </>
               ) : tabActive === "upload" ? (
                 <Col span="24">
-                  <Row className="py-2">
-                    <Col span="24" className="uploadVideoTitle">
-                      Upload Video
+                  <Row className="py-1">
+                    <Col span="12" className="uploadVideoTitle" style={{textAlign:"right"}} onClick={e=>{ setScreenRec(false);   }}>
+                      Upload Video  
+                    </Col>
+                    <Col span="10" className="uploadVideoTitle" style={{textAlign:"left"}} onClick={e=>{setScreenRec(true) }}>
+                        |  Screen Recording
                     </Col>
                   </Row>
-                  <Row className="py-2 bg-white">
+                  <Row className="py-1 bg-white">
                     <Col span="16" push="4">
-                      <UppyUpload />
+                    { screenRec ? 
+                      <Recording />
+                    :
+                      <UppyUpload  mimeType="video"  />}
                     </Col>
                   </Row>
                 </Col>

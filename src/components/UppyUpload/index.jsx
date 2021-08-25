@@ -1,5 +1,5 @@
 import React, { useContext,useState, useEffect } from 'react';
-import {  Select } from "antd";
+import {  Button, Select } from "antd";
 import Uppy from "@uppy/core";
 import "uppy/dist/uppy.min.css";
 import "@uppy/core/dist/style.css";
@@ -45,13 +45,14 @@ const UppyUpload = (props) => {
    const localUserId = localStorage.getItem("userId");
    const token = localStorage.getItem("token");
    const uploadIdToContinueUpload = props.uploadId;
+   const uploadMime = props.mimeType === "audio" ? [ audiomime] : [ videomime] ;
 
    const uppy = useUppy(() => {
      return new Uppy({
        allowMultipleUploads: false,
        autoProceed: false,
        debug: true,
-       restrictions: { allowedFileTypes: [videomime, audiomime , imagemime] },
+       restrictions: { allowedFileTypes: uploadMime },
      }).use(Webcam, {
       onBeforeSnapshot: () => Promise.resolve(),
       countdown: false,
@@ -66,7 +67,7 @@ const UppyUpload = (props) => {
       preferredImageMimeType: null,
       showVideoSourceDropdown : true,
       locale: {}
-    }).use(ScreenCapture,{id:'MyScreenCapture'}).use(AwsS3Multipart, {
+    }).use(AwsS3Multipart, {
        limit: 1,
        companionUrl: url+"/swift/",
        Headers : { "uppy-auth-token" : "bearer "+token  },
@@ -79,6 +80,20 @@ const UppyUpload = (props) => {
        },
      });
    });
+
+    useEffect(()=>{
+      const instance = uppy.getPlugin('MyScreenCapture'); 
+      console.log(instance);
+      if(props.screenRecording !== true && instance)
+       uppy.removePlugin(instance)  
+       if(props.screenRecording === true ){
+      //uppy.use(ScreenCapture,{id:'MyScreenCapture' , target:"#screenTarget" });
+      //const scinstance = uppy.getPlugin('MyScreenCapture'); 
+      //scinstance.stopRecording();
+      }
+      
+    },[props])
+
 
    //, "Authorization" : "bearer "+token
    const completeEvent = (result) => {
@@ -226,7 +241,7 @@ const UppyUpload = (props) => {
              : null}
          </Select>{" "}
        </div>
-       <div className="uploadFileUppyBlock" >
+       <div className="uploadFileUppyBlock"  style={{width:'500px'}} >
        {/* <DragDrop   width="80%"   height="80%"
           note="Images up to 200×200px"
           // assuming `this.uppy` contains an Uppy instance:
@@ -239,17 +254,14 @@ const UppyUpload = (props) => {
             },
           }}
         />  */}
-         <Dashboard
-           uppy={uppy}
-           plugins={[]}
+         <Dashboard    uppy={uppy}   plugins={[]}
            showProgressDetails={true}
            proudlyDisplayPoweredByUppy={false}
            showRemoveButtonAfterComplete={true}
            showLinkToFileUploadResult={false}
            fileManagerSelectionType={"files"}
-           inline={true}
-            width="100%"
-         />
+           inline={true}         width="100%"
+      />
        </div>
      </div>
 

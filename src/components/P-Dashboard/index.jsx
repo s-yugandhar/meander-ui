@@ -19,7 +19,7 @@ import "./pDashboard.scss";
 import axios from 'axios';
 import {url} from '../API/index';
 import { Context } from '../../context';
-import {LineChart , Line,XAxis,YAxis , Label, Tooltip} from 'recharts';
+//import {LineChart , Line,XAxis,YAxis , Label, Tooltip} from 'recharts';
 import VideoCard from "../Shared/VideoCard";
 
 const PDashboard = () => {
@@ -151,8 +151,8 @@ const PDashboard = () => {
             title="Data Transfer, Storage, API requests"
             className="bigGraph"
         >
-          { chartData !== null ?
-          <LineChart width={500} height={200} data={chartData}>
+          {/* chartData !== null ? 
+         <LineChart width={500} height={200} data={chartData}>
           <XAxis dataKey={'date'}>        </XAxis>
           <YAxis  yAxisId="right" domain={['auto','dataMax']} orientation="right" dataKey="Hits">
           <Label value="API Requests" angle={-90}/>       </YAxis>
@@ -163,7 +163,7 @@ const PDashboard = () => {
              <Line dataKey={'Bytes_MB'} yAxisId="left" stroke="orange" ></Line>
 
             <Tooltip />
-          </LineChart>: null }
+          </LineChart>: null */}
         </Card>
         </Col>
       </Row>

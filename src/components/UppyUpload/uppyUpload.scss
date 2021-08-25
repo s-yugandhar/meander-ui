@@ -5,7 +5,7 @@
    margin: 20px auto;
    background-color: white;
    color: var(--primary);
-   height: 60px;
+   height: 50px;
    text-align: center;
    border: none;
    cursor: pointer;
@@ -61,7 +61,7 @@
          content: "";
          position: absolute;
          left: 50%;
-         top: 60px;
+         top: 40px;
          background-image: url(../../assets/images/cloud_upload.svg);
          background-repeat: no-repeat;
          background-position: top center;

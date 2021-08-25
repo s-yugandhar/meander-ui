@@ -113,19 +113,19 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
     return cnt;
   }
 
-  const innerFolder = (folderName) => {
+  const innerFolder = (folder) => {
     setLoading(true);
-    if (folderName === "All") {
+    if (folder) {
       GetFolders(state, dispatch, state.userId);
       return;
     }
-    if (folderName === "") folderName = "default";
-    GetFiles(state, dispatch, state.userId, folderName)
+    if (folder) 
+    GetFiles(state, dispatch, state.userId, folder.foldername)
       .then((res) => {
         console.log("My Videos Files res - ", res);
         setLoading(false);
         dispatch({ type: FILE_LIST, payload: { fileList: res } });
-        dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
+        dispatch({ type: FOLDER_NAME, payload: { folder : folder.foldername } });
       })
       .catch((err) => {
         setLoading(false);
@@ -216,20 +216,13 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
     }
   }, [buildRoles]);
 
-  useEffect(() => {
-    let filterType = state.filterType;
-    if (filterType === "all" || filterType === "folder")
-      GetFolders(state, dispatch, state.userId);
-    if (filterType === "audio" || filterType === "video")
-      GetFiles(state, dispatch, state.userId, state.folder.id);
-  }, [state.filterType]);
-
+  
   useEffect(() => {
     //setFilterType("all");
     dispatch({ type: "FILTER_TYPE", payload: { filterType: "video" } });
     console.log("Folder type - ", state.filterType);
     console.log("Folders list - ", state.dbfolderList);
-  }, [state.folder.id]);
+  }, [state.folder]);
 
   useEffect(() => {
     setLoading(true);
@@ -348,7 +341,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
               className="fodlerLink"
               onClick={() => setTabActive("upload")}
             >
-              Upload Video
+              Upload Audio  |  Record Now
             </Button>
           </Col>
         </Row>
@@ -456,14 +449,14 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                         optionFilterProp="children"
                         showSearch={true}
                         value={
-                          state.folder.id === "" ? "default" : state.folder.id
+                          state.folder ?  state.folder.id : ""
                         }
                         onChange={(value) => {
                           dispatch({
                             type: FOLDER_NAME,
-                            payload: { folderName: value },
+                            payload: { folder : JSON.parse(value) },
                           });
-                          if (state.folder.id !== "")
+                          if (state.folder)
                             GetFiles(
                               state,
                               dispatch,
@@ -478,7 +471,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                               return obj.foldertype === "folder" ? (
                                 <>
                                   {" "}
-                                  <Option key={obj.id} value={obj.id}>
+                                  <Option key={obj.id} value={ JSON.stringify(obj)}>
                                     {" "}
                                     {obj.foldername}
                                     {"   "}{" "}
@@ -493,7 +486,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                     <Col span="6"></Col>
                   </Row>
                   <Row gutter={15} className="py-2">
-                    {state.folder.id === "" &&
+                    {state.folder && 
                       state.videoList.map((obj, index) => {
                         return state.filterType === "all" ||
                           obj.itemtype.includes(state.filterType) ? (
@@ -513,7 +506,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                   <Row gutter={15} className="py-2">
                     {
                       // Showing Files
-                      state.folder.id !== "" && state.videoList.length > 0
+                      state.folder && state.videoList.length > 0
                         ? state.videoList.map((file, index) => {
                             return state.filterType === "all" ||
                               file.itemtype.includes(state.filterType) ? (
@@ -545,7 +538,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                   </Row>
                   <Row className="py-2 bg-white">
                     <Col span="16" push="4">
-                      <UppyUpload />
+                      <UppyUpload  mimeType="audio"/>
                     </Col>
                   </Row>
                 </Col>

@@ -30,6 +30,7 @@ import {
   GetUserdetails,
   url,
   getPublicItems,
+  createPlaylist
 } from "../API";
 
 const UppyUpload = (props) => {
@@ -46,8 +47,9 @@ const UppyUpload = (props) => {
    const token = localStorage.getItem("token");
    const uploadIdToContinueUpload = props.uploadId;
    const uploadMime = props.mimeType === "audio" ? [ audiomime] : [ videomime] ;
+   const fileObj = props.fileObj ? props.fileObj : null;
 
-   const uppy = useUppy(() => {
+const uppy = useUppy(() => {
      return new Uppy({
        allowMultipleUploads: false,
        autoProceed: false,
@@ -73,47 +75,30 @@ const UppyUpload = (props) => {
        Headers : { "uppy-auth-token" : "bearer "+token  },
        companionHeaders:{ "uppy-auth-token" : "bearer "+token  },
        getChunkSize(file) {
-         var minChunkSize  = file.size/500;
-          minChunkSize = minChunkSize < 9 * 1024 * 1024 ? 9 * 1024 * 1024 : minChunkSize ;
+         if(file.size < 5*1024*1024*1024){
+          var minChunkSize = 6*1024*1024;
          var chunks = Math.ceil(file.size / (minChunkSize));
-         return file.size < minChunkSize  ? minChunkSize  : Math.ceil(file.size / (chunks - 1));
+         return file.size < minChunkSize  ? file.size  : Math.ceil(file.size / (chunks - 1));}
+         else{
+           return 0;
+         }
        },
      });
    });
 
-    useEffect(()=>{
-      const instance = uppy.getPlugin('MyScreenCapture'); 
-      console.log(instance);
-      if(props.screenRecording !== true && instance)
-       uppy.removePlugin(instance)  
-       if(props.screenRecording === true ){
-      //uppy.use(ScreenCapture,{id:'MyScreenCapture' , target:"#screenTarget" });
-      //const scinstance = uppy.getPlugin('MyScreenCapture'); 
-      //scinstance.stopRecording();
-      }
-      
-    },[props])
-
-
    //, "Authorization" : "bearer "+token
    const completeEvent = (result) => {
      console.log(result, "inside uppy complete event");
-     let succes = result.successful;
-     let failed = result.failed;
-     let batchId = result.uploadID;
+     /*let succes = result.successful;   let failed = result.failed;     let batchId = result.uploadID;
      let insertObj = [];
      succes.map((obj, ind) => {
        if (obj.progress.uploadComplete === true) {
          let idt = obj.s3Multipart.uploadId;
          dispatch({ type: FILE_UPLOADED, payload: { fileName: obj.name } });
          //deleteAfterUpload(idt);
-         let path =
-           "bucket-" +
-           idt.split("-")[0] +
-           "/" +
-           idt.split("-")[1] +
-           "/" +
-           idt.split("-")[2];
+         let path =    "bucket-" +  idt.split("-")[0] +
+           "/" +   idt.split("-")[1] +
+           "/" +  idt.split("-")[2];
          let builtObj = {
            name: obj.name,
            title: obj.meta.title,
@@ -136,7 +121,7 @@ const UppyUpload = (props) => {
          dbAddObj(state, dispatch, insertObj);
          setStateEdit(insertObj[0].itempath);
        }
-     }
+     }*/
    };
 
    const closeUploadVideo = () => {
@@ -159,63 +144,61 @@ const UppyUpload = (props) => {
      }
    }, [state.editVideo]);
 
-   useEffect(() => {
-     if (state.folderCreated !== null && state.folderCreated !== "") {
-       setUploadVideo(true);
-     }
-   }, [state.folderCreated]);
 
     useEffect(() => {
 
       const dashboard_plugin = uppy.getPlugin('Dashboard')
-
       if(dashboard_plugin)
           dashboard_plugin.setOptions({  hideUploadButton : state.folder ? false : true });
       uppy.setOptions({
         onBeforeFileAdded: (currentFile, files) => {
           var time = Date.now();     var uuid =  String(time);
-          var chunks =   Math.ceil( currentFile.data.size / (5*1024*1024));
-          if (state.folder === null || state.folder === undefined )
-            uppy.info("Please select a folder to enable upload button");
+          if(currentFile.data.size > 5*1024*1024*1024) return false;
+          var minChunkSize = 6*1024*1024;
+         var chunks = Math.ceil(currentFile.data.size / (minChunkSize));
           const modifiedFile = {        ...currentFile,
             name: uuid + "." + currentFile.name.split(".")[1],
             size : currentFile.data.size ,  type : currentFile.type ,
             meta : { filename :uuid + "." +currentFile.name.split(".")[1],     userId : state.userId ,
-            foldername : state.folder ?  state.folder.foldername : "",
+            foldername : state.folder ?  state.folder.id :  ""  ,
             title : currentFile.name , name : currentFile.name , total_size : currentFile.data.size,
             type : currentFile.type , time : String(time) , total_chunks :  chunks-1,
-            chunk_size : currentFile.data.size < 5*1024*1024 ?   5*1024*1024 :  Math.ceil(currentFile.data.size /(chunks-1)) ,
+            chunk_size : currentFile.data.size < minChunkSize  ? currentFile.data.size  : Math.ceil(currentFile.data.size / (chunks - 1)),
             uploadIdToContinue : uploadIdToContinueUpload }
           };
+          console.log(  JSON.stringify( modifiedFile.meta ) );
           return modifiedFile;
         },
         locale: {
           strings: {
             dropPaste:
               state.folder
-                ?  `Folder : ` +
-                  state.folder.foldername + `  Drag & Drop to upload files to or %{browse}`:
-                   ` Select a folder, Drag & Drop or %{browse}`,
+                ?  `  Drag & Drop to upload files to or %{browse}`:
+                   `  Drag & Drop or %{browse}`,
           },
         },
       });
+
+      if(fileObj !== null)
+        uppy.addFile(fileObj);
+
       uppy.setMeta({
         userId: state.userId,
         foldername: state.folder ?  state.folder.id : "",
       });
-    }, [state.folder, localUserId]);
+    }, [state.folder, localUserId , uppy , fileObj]);
 
 
    return (
      <div className="meander-upload">
        <div className="uploadSelectfolderBlock">
-         <Select
+         Folder : <Select
            size="medium"
-           style={{ width: "100%", maxWidth: "360px" }}
+           style={{ width: "100%", maxWidth: "360px" , marginTop : "5px", marginBottom :"5px" }}
            placeholder="search folder"
            optionFilterProp="children"
            showSearch={true}
-           value={state.folder ?  state.folder.foldername : "default"}
+           value={state.folder ?  state.folder.foldername : ''  }
            onChange={(value) => {
              dispatch({
                type: FOLDER_NAME,
@@ -241,7 +224,7 @@ const UppyUpload = (props) => {
              : null}
          </Select>{" "}
        </div>
-       <div className="uploadFileUppyBlock"  style={{width:'500px'}} >
+       <div className="uploadFileUppyBlock" style={{marginBottom: "5px", marginTop:"5px" }}  >
        {/* <DragDrop   width="80%"   height="80%"
           note="Images up to 200×200px"
           // assuming `this.uppy` contains an Uppy instance:
@@ -260,7 +243,7 @@ const UppyUpload = (props) => {
            showRemoveButtonAfterComplete={true}
            showLinkToFileUploadResult={false}
            fileManagerSelectionType={"files"}
-           inline={true}         width="100%"
+           inline={true}         width="100%" height="400px"
       />
        </div>
      </div>

@@ -225,7 +225,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   useEffect(() => {
     setLoading(true);
     listPlaylist(state, dispatch).then((res) => {
-      if (state.dbfolderList.length === 0)
+      if (state.dbfolderList === undefined || "length" in state.dbfolderList === false || state.dbfolderList.length === 0)
         createPlaylist(state, dispatch, "default", "folder");
     });
     updateTab = addVideo;
@@ -548,8 +548,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                   </Row>
                 </>
               ) : tabActive === "upload" ? (
+                <Modal    title={null}   mask={null} maskTransitionName={null}
+                destroyOnClose={true} bodyStyle={{width:"100vw", display:"flex" , flexFlow : "column" ,height:"100%" }}
+                visible={tabActive === "upload"}  style={{  top : 64 , bottom: 0 , right : 0 , left : 0 , overflow : "hidden"}} 
+                onOk=""                onCancel={(e)=> setTabActive("videos")}
+                footer={null}                width={"100vw"}                getContainer={ ".ant-layout" } 
+              >
                 <Col span="24">
-                  <Row className="py-1">
+                  <Row className="py-0">
                     <Col span="12" className="uploadVideoTitle" style={{textAlign:"right"}} onClick={e=>{ setScreenRec(false);   }}>
                       Upload Video  
                     </Col>
@@ -557,7 +563,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                         |  Screen Recording
                     </Col>
                   </Row>
-                  <Row className="py-1 bg-white">
+                  <Row className="py-0 bg-white">
                     <Col span="16" push="4">
                     { screenRec ? 
                       <Recording />
@@ -565,7 +571,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                       <UppyUpload  mimeType="video"  />}
                     </Col>
                   </Row>
-                </Col>
+                </Col> </Modal>
               ) : (
                 null
               )}

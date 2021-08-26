@@ -2,7 +2,7 @@
    display: block;
    width: 100%;
    max-width: 320px;
-   margin: 20px auto;
+   margin: 10px auto;
    background-color: white;
    color: var(--primary);
    height: 50px;
@@ -54,14 +54,14 @@
    }
 
    .uppy-Dashboard-AddFiles-title {
-      padding-top: 200px;
+      padding-top: 140px;
       position: relative;
 
       &::before {
          content: "";
          position: absolute;
          left: 50%;
-         top: 40px;
+         top: 20px;
          background-image: url(../../assets/images/cloud_upload.svg);
          background-repeat: no-repeat;
          background-position: top center;

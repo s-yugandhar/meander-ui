@@ -3,9 +3,30 @@ import {  Button, Select, Row , Col , Card, Checkbox } from "antd";
 import { Context } from "../../context";
 import { dbAddObj,  dbGetObjByPath,  deleteAfterUpload,
   GetFiles,  GetUserdetails,  url,  getPublicItems,} from "../API";
-import RecordRTC,{CanvasRecorder , GetRecorderType , GifRecorder , MediaStreamRecorder , MRecordRTC ,MultiStreamRecorder 
- , RecordRTCConfiguration , RecordRTCPromisesHandler,StereoAudioRecorder,WebAssemblyRecorder,Whammy , WhammyRecorder ,
- invokeSaveAsDialog } from 'recordrtc';
+import RecordRTC,{CanvasRecorder ,  MediaStreamRecorder ,
+ invokeSaveAsDialog   } from 'recordrtc';
+ import UppyUpload from '../UppyUpload';
+ import localForage from "localforage";
+
+ 
+var meanderStore = localForage.createInstance({ driver : localForage.INDEXEDDB, 
+name        : 'myApp',version     : 1.0,storeName   : 'MeanderMediaStore', 
+description : 'Store to save video,audio,screen locally before uploading'});
+ 
+function _getArrayBufferToBlob(buffer, type) {
+  return new Blob([buffer], {type: type});
+}
+
+function _getBlobToArrayBuffer(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener('loadend', (e) => {
+      resolve(reader.result);
+    });
+    reader.addEventListener('error', reject);
+    reader.readAsArrayBuffer(blob);
+  });
+}
 
 
 const isClient = typeof window === 'object';
@@ -44,7 +65,7 @@ let audStream = config.audio ? await navigator.mediaDevices.getUserMedia({ audio
 var videovas = document.getElementById('canvasvideo');
 let scrStream = config.screen ? navigator.mediaDevices.getDisplayMedia ? await navigator.mediaDevices.getDisplayMedia({video : true})
             :  await   navigator.getDisplayMedia({video : true}) : null ;
-if(config.screen) videovas.srcObject = scrStream;
+//if(config.screen) videovas.srcObject = scrStream;
 let streams=[];
 if(config.audio === true && audStream){ streams.push(audStream)};
 if(config.video === true && vidStream){ streams.push(vidStream)} ;
@@ -59,6 +80,23 @@ return recorder;
 //let blob = await recorder.getBlob();//invokeSaveAsDialog(blob);
 }
 
+async function stopRecordingCallback() {
+  const video  = document.getElementById('inlinevideo');
+  //video.src = video.srcObject = null;
+   video.muted = false;    video.volume = 1;
+    recorder.stopRecording(async function(blob) {
+       video.src =  blob;
+       var blo = await recorder.getBlob();
+        //console.log(blo.size , blo.type);
+       let filename =  String(Date.now()  )+'.webm';
+       //let fil =  new File( [blo] , filename );
+       blo.name = filename;
+       let fil = { filename : filename ,name : filename , data :blo , size : blo.size ,  type : blo.type};
+       meanderStore.setItem(filename, fil );
+       console.log( meanderStore.keys());
+   });
+}
+
 const Recording = (props) => {
 
    const { Option } = Select;
@@ -71,9 +109,10 @@ const Recording = (props) => {
    const [ audioList , setAudioList] = useState([]);
    const [ videoList , setVideoList] = useState([]);
    const [ config , setConfig] = useState({});
+   const [ renderUppy , setRenderUppy] = useState(false);
    const plainOptions = ['audio', 'video', 'screen'];
    const defaultCheckedList = ['video'];
-    
+   const [ localKeys , setLocalKeys] =  useState([]);  
   const [checkedList, setCheckedList] = useState(defaultCheckedList);
   const [indeterminate, setIndeterminate] = useState(true);
   const [checkAll, setCheckAll] = useState(false);
@@ -95,8 +134,8 @@ const Recording = (props) => {
   };
 
    
-    useEffect(()=>{
-        let tempAudio = [] ;   let tempVideo = [] ;
+    useEffect(()=>{     
+      let tempAudio = [] ;   let tempVideo = [] ;
         mediaDev.map((obj,ind)=>{
             if(obj.kind === 'video' || obj.kind === 'videoinput')   tempVideo.push(obj);                
             if(obj.kind === 'audio' || obj.kind ===  'audioinput')  tempAudio.push(obj);
@@ -105,32 +144,35 @@ const Recording = (props) => {
     },[mediaDev])
 
     useEffect(()=>{
+      meanderStore.keys().then(function(keys){
+        setLocalKeys(keys);
+      });
         var conf = { audio : false , video : false , screen : false};
         checkedList.map(ob=>{   conf[ob] = true  })
         setConfig(conf);
-        console.log(checkedList );
+        console.log(checkedList , localKeys );
     },[checkedList])
-    
+        
 
-    async function stopRecordingCallback() {
-       const video  = document.getElementById('inlinevideo');
-       //video.src = video.srcObject = null;
-        video.muted = false;    video.volume = 1;
-         recorder.stopRecording(function(blob) {
-            console.log(blob.size, blob);
-            video.src =  blob;
-        });
-        //recorder.destroy();
-        //recorder = null;    
-}
+    async function SaveRecording(typ,key){
+      meanderStore.getItem(key).then(function(value) {
+      if( typ === 'local') invokeSaveAsDialog(value.data , key );
+      else {  console.log(key);
+        var fileObj = { name: key,  type: value.type, data: value.data, 
+          size : value.size ,   source: 'Local', isRemote: false   };
+        setRenderUppy(value);   }})
+  }
 
     return (
         <>
-        <Row> 
+        { renderUppy === false ?
+        <div style={{ width:"100vw",  display:"flex" , flexFlow : "column" ,height:"100%" }} >
+          <Row>
         <Col span = {12}><Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
         Check all  </Checkbox>  <CheckboxGroup options={plainOptions} value={checkedList} onChange={onChangeCheckBox} />
      </Col>
-        <Col span = {6}> { videoList.length > 1 ? <Select
+         { videoList.length > 1 ? 
+         <Col span = {4}> <Select
            size="medium"  style={{ width: "100%", maxWidth: "200px" }}
            placeholder="select video"   optionFilterProp="children"
            showSearch={false}       value={ activeVideo ? activeVideo.label : null }
@@ -140,8 +182,8 @@ const Recording = (props) => {
              return  ( <> {" "}
                      <Option key={obj.deviceId} value={JSON.stringify(obj) } >
                        {" "} {obj.label}  {"   "} </Option>{" "}  </>  )  })  }  
-          </Select> : ""         } </Col>
-        <Col span = {6}> { audioList.length > 1 ? <Select
+          </Select> </Col> : ""         } 
+        <Col span = {4}> { audioList.length > 1 ? <Select
            size="medium"   style={{ width: "100%", maxWidth: "200px" }}
            placeholder="select audio"    optionFilterProp="children"
            showSearch={false}  value={ activeAudio ? activeAudio.label : null }
@@ -153,21 +195,34 @@ const Recording = (props) => {
           </Select> : ""  } </Col>
         </Row>
         <Row >
-        
         <Card  width="400px" height="300px" >
             <video id="inlinevideo" controls autoplay playsinline style={{maxWidth:"400px",maxHeight:"300px"}}></video>
         </Card> 
             { 'screen' in config && config.screen === true?
                 <Card  width="400px" height="300px" >
-                <video id="canvasvideo" controls autoplay playsinline style={{maxWidth:"400px",maxHeight:"300px"}}></video>
+                {/*<video id="canvasvideo" controls autoplay playsinline style={{maxWidth:"400px",maxHeight:"300px"}}></video>*/}
             </Card>  : null}
         </Row>
         <Row>
+          {localKeys.length < 5 ?<>
             <Button id="btn-start-recording" onClick={(e)=>{ getStreams(config) }}>Start Recording</Button>
-            <Button id="btn-stop-recording" onClick={(e)=>{ stopRecordingCallback() } } >Stop Recording</Button>
-            {/*<Button >Pause Recording</Button>
-            <Button >Resume Recording</Button> */}
+            <Button id="btn-stop-recording" onClick={(e)=>{ stopRecordingCallback() } } >Stop Recording</Button> </>:
+            <p> {"Upload or Delete Following videos to continue using recording"} </p>}
         </Row>
+        {
+                localKeys.map((key,ind)=>{
+
+                    return <Row span={18}>
+                       <Col span={6}>{ind}. {key}</Col>
+                       <Col span={3}><Button id={key+"save-to-local"} onClick={(e)=>{  SaveRecording('local',key) } } > Save</Button></Col>
+                       <Col span={3}><Button id={key+"upload"} onClick={(e)=>{  SaveRecording('upload',key) } } > Upload </Button></Col>
+                       <Col span={3}><Button id={key+"remove"} onClick={(e)=>{ meanderStore.removeItem(key)  }}> Delete</Button></Col>
+                    </Row>
+                })
+            }
+
+        </div> : 
+        <UppyUpload fileObj={renderUppy}/>}
         </>
     )
 }

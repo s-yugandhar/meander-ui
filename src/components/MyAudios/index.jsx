@@ -37,10 +37,10 @@ import {
   SortDescendingOutlined,
   FolderAddOutlined,
   CloudUploadOutlined,
-  RightOutlined,
+  RightOutlined
 } from "@ant-design/icons";
 import VideoCard from "../Shared/VideoCard";
-import "./MyAudio.scss";
+import "../MyVideos/MyVideos.scss";
 import Loading from "../Loading";
 import { FILE_LIST, FOLDER_NAME } from "../../reducer/types";
 import {
@@ -57,6 +57,7 @@ import {
 import { Context } from "../../context";
 import FolderCard from "../Shared/FolderCard";
 import UppyUpload from "../UppyUpload";
+import { Recording } from "../MsrRecording/index.jsx";
 
 const MyAudios = ({ updateTab, openUploadVideo }) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -76,6 +77,8 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
   const { state, dispatch } = useContext(Context);
   const [sortState, setSortState] = useState(null);
   const [nfApi, setNFApi] = useState(false);
+  const [folderActive,setFolderActive] = useState(true);
+  const [screenRec,setScreenRec] = useState(false);
   const { Column } = Table;
 
   const [tabActive, setTabActive] = useState("videos");
@@ -115,17 +118,12 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
 
   const innerFolder = (folder) => {
     setLoading(true);
-    if (folder) {
-      GetFolders(state, dispatch, state.userId);
-      return;
-    }
-    if (folder) 
-    GetFiles(state, dispatch, state.userId, folder.foldername)
+    GetFiles(state, dispatch, state.userId, folder.id)
       .then((res) => {
         console.log("My Videos Files res - ", res);
         setLoading(false);
         dispatch({ type: FILE_LIST, payload: { fileList: res } });
-        dispatch({ type: FOLDER_NAME, payload: { folder : folder.foldername } });
+        dispatch({ type: FOLDER_NAME, payload: { folder: folder } });
       })
       .catch((err) => {
         setLoading(false);
@@ -216,7 +214,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
     }
   }, [buildRoles]);
 
-  
+
   useEffect(() => {
     //setFilterType("all");
     dispatch({ type: "FILTER_TYPE", payload: { filterType: "video" } });
@@ -227,7 +225,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
   useEffect(() => {
     setLoading(true);
     listPlaylist(state, dispatch).then((res) => {
-      if (state.dbfolderList.length === 0)
+      if (state.dbfolderList === undefined || "length" in state.dbfolderList === false || state.dbfolderList.length === 0)
         createPlaylist(state, dispatch, "default", "folder");
     });
     updateTab = addVideo;
@@ -291,7 +289,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
               }
               onClick={() => setTabActive("videos")}
             >
-              All Videos
+              All Audios
             </Button>
 
             <Button
@@ -341,7 +339,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
               className="fodlerLink"
               onClick={() => setTabActive("upload")}
             >
-              Upload Audio  |  Record Now
+              Upload Audio | Record Audio
             </Button>
           </Col>
         </Row>
@@ -363,22 +361,18 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                         <Button
                           type="link"
                           style={{ paddingLeft: "10px", paddingRight: "10px" }}
+                          onClick={() => { setTabActive("folders");setFolderActive(true); }}
                         >
                           Folders
                         </Button>
                       </Col>
-                      <Col style={{ fontSize: "13px", color: "#888" }}>
+                      <Col style={{ fontSize: "13px", color: '#888' }}>
                         <RightOutlined color="#888" />
                       </Col>
                       <Col
-                        style={{
-                          paddingLeft: "10px",
-                          paddingRight: "10px",
-                          fontSize: "16px",
-                          fontWeight: "600",
-                        }}
+                        style={{ paddingLeft: "10px", paddingRight: "10px", fontSize: "16px", fontWeight: "600" }}
                       >
-                        Folder Name
+                        { state.folder && folderActive === false ? state.folder.foldername : null }
                       </Col>
                     </Row>
                   </Col>
@@ -387,12 +381,12 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                       <Col span="4" className="">
                         <Select
                           defaultValue="dateModified"
-                          style={{ width: "100%" }}
+                          style={{ width: "100%", fontSize: "13px"}}
                           onChange=""
                         >
                           <Option value="dateModified">Date Modified</Option>
-                          <Option value="">Date Added</Option>
-                          <Option value="">By Title</Option>
+                          <Option value="dateAdded">Date Added</Option>
+                          <Option value="title">By Title</Option>
                         </Select>
                       </Col>
                       <Col span="16" className=""></Col>
@@ -409,9 +403,9 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                       ></Divider>
                     </Row>
                   </Col>
-                  <Col>
+                  <Col span="24">
                     <Row gutter={15}>
-                      {state.dbfolderList.map((folder, index) => {
+                      { folderActive && state.dbfolderList.map((folder, index) => {
                         return folder.foldertype === "folder" ? (
                           <Col
                             key={"folder-" + index}
@@ -421,92 +415,12 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                               folderName={folder.foldername}
                               userId={state.userId}
                               videosCount={0}
-                              folderOnClick={() => innerFolder(folder)}
+                              folderOnClick={() => { innerFolder(folder); setFolderActive(false);   }}
                             />
                           </Col>
-                        ) : (
-                          <Empty style={{ marginTop: "80px" }} />
-                        );
+                        ) : (      <Empty style={{ marginTop: "80px" }} />        );
                       })}
-                    </Row>
-                  </Col>
-                </Row>
-              ) : tabActive === "videos" ? (
-                <>
-                  <Row
-                    style={{
-                      borderBottom: "1px solid #ddd",
-                      paddingBottom: "15px",
-                      paddingTop: "15px",
-                    }}
-                  >
-                    {" "}
-                    <Col span="6">
-                      <Select
-                        size="medium"
-                        style={{ width: "100%" }}
-                        placeholder="search folder"
-                        optionFilterProp="children"
-                        showSearch={true}
-                        value={
-                          state.folder ?  state.folder.id : ""
-                        }
-                        onChange={(value) => {
-                          dispatch({
-                            type: FOLDER_NAME,
-                            payload: { folder : JSON.parse(value) },
-                          });
-                          if (state.folder)
-                            GetFiles(
-                              state,
-                              dispatch,
-                              state.userId,
-                              state.folder.id
-                            );
-                        }}
-                      >
-                        {state.dbfolderList !== undefined &&
-                        state.dbfolderList !== null
-                          ? state.dbfolderList.map((obj, ind) => {
-                              return obj.foldertype === "folder" ? (
-                                <>
-                                  {" "}
-                                  <Option key={obj.id} value={ JSON.stringify(obj)}>
-                                    {" "}
-                                    {obj.foldername}
-                                    {"   "}{" "}
-                                  </Option>{" "}
-                                </>
-                              ) : null;
-                            })
-                          : null}
-                      </Select>
-                    </Col>
-                    <Col span="12"></Col>
-                    <Col span="6"></Col>
-                  </Row>
-                  <Row gutter={15} className="py-2">
-                    {state.folder && 
-                      state.videoList.map((obj, index) => {
-                        return state.filterType === "all" ||
-                          obj.itemtype.includes(state.filterType) ? (
-                          <Col
-                            className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
-                            key={"file-" + index}
-                          >
-                            <VideoCard
-                              videoTitle={obj.title}
-                              fileObject={obj}
-                              userId={state.userId}
-                            />
-                          </Col>
-                        ) : null;
-                      })}
-                  </Row>
-                  <Row gutter={15} className="py-2">
-                    {
-                      // Showing Files
-                      state.folder && state.videoList.length > 0
+                      {folderActive === false &&  state.folder && state.videoList.length > 0
                         ? state.videoList.map((file, index) => {
                             return state.filterType === "all" ||
                               file.itemtype.includes(state.filterType) ? (
@@ -527,23 +441,139 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                           })
                         : ""
                     }
+                    </Row>
+                  </Col>
+                </Row>
+              ) : tabActive === "videos" ? (
+                <>
+                  {/*<Row
+                    style={{
+                      borderBottom: "1px solid #ddd",
+                      paddingBottom: "15px",
+                      paddingTop: "15px",
+                    }}
+                  >
+                    {" "}
+                    <Col span="6">
+                      <Select
+                        size="medium"
+                        style={{ width: "100%" }}
+                        placeholder="search folder"
+                        optionFilterProp="children"
+                        showSearch={true}
+                        value={
+                          state.folder.id === "" ? "default" : state.folder.id
+                        }
+                        onChange={(value) => {
+                          dispatch({
+                            type: FOLDER_NAME,
+                            payload: { folderName: value },
+                          });
+                          if (state.folder.id !== "")
+                            GetFiles(
+                              state,
+                              dispatch,
+                              state.userId,
+                              state.folder.id
+                            );
+                        }}
+                      >
+                        {state.dbfolderList !== undefined &&
+                        state.dbfolderList !== null
+                          ? state.dbfolderList.map((obj, ind) => {
+                              return obj.foldertype === "folder" ? (
+                                <>
+                                  {" "}
+                                  <Option key={obj.id} value={obj.id}>
+                                    {" "}
+                                    {obj.foldername}
+                                    {"   "}{" "}
+                                  </Option>{" "}
+                                </>
+                              ) : null;
+                            })
+                          : null}
+                      </Select>
+                    </Col>
+                    <Col span="12"></Col>
+                    <Col span="6"></Col>
+                          </Row>*/}
+                  <Row className="py-2" align="middle">
+                      <Col span="4" className="">
+                        <Select
+                          defaultValue="dateModified"
+                          style={{ width: "100%" }}
+                          onChange=""
+                        >
+                          <Option value="dateModified">Date Modified</Option>
+                          <Option value="dateAdded">Date Added</Option>
+                          <Option value="title">By Title</Option>
+                        </Select>
+                      </Col>
+                      <Col span="16" className=""></Col>
+                      <Col
+                        span="4"
+                        className="text-right"
+                        style={{ color: "#777" }}
+                      >
+                        Total Videos - 1000
+                      </Col>
+                      <Divider
+                        orientation="left"
+                        className="mt-2 mb-0"
+                      ></Divider>
+                    </Row>
+                  <Row gutter={15} className="py-2">
+                    {
+                      // Showing Files
+                      state.folder && state.videoList.length > 0
+                        ? state.videoList.map((file, index) => {
+                            return state.filterType === "all" ||
+                              file.itemtype.includes(state.filterType) ? (
+                              <Col
+                                className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
+                                variants={item}
+                                key={"file-" + index}
+                              >
+                                <VideoCard
+                                  videoTitle={file.title}
+                                  fileObject={file}
+                                  userId={state.userId}
+                                />
+                              </Col>
+                            ) : null
+                          })
+                        : ""
+                    }
                   </Row>
                 </>
               ) : tabActive === "upload" ? (
+                <Modal    title={null}   mask={null} maskTransitionName={null}
+                destroyOnClose={true} bodyStyle={{width:"100vw", display:"flex" , flexFlow : "column" ,height:"100%" }}
+                visible={tabActive === "upload"}  style={{  top : 64 , bottom: 0 , right : 0 , left : 0 , overflow : "hidden"}} 
+                onOk=""                onCancel={(e)=> setTabActive("videos")}
+                footer={null}                width={"100vw"}                getContainer={ ".ant-layout" } 
+              >
                 <Col span="24">
-                  <Row className="py-2">
-                    <Col span="24" className="uploadVideoTitle">
-                      Upload Video
+                  <Row className="py-0">
+                    <Col span="12" className="uploadVideoTitle" style={{textAlign:"right"}} onClick={e=>{ setScreenRec(false);   }}>
+                      Upload Audio  
+                    </Col>
+                    <Col span="10" className="uploadVideoTitle" style={{textAlign:"left"}} onClick={e=>{setScreenRec(true) }}>
+                        |  Screen Recording
                     </Col>
                   </Row>
-                  <Row className="py-2 bg-white">
+                  <Row className="py-0 bg-white">
                     <Col span="16" push="4">
-                      <UppyUpload  mimeType="audio"/>
+                    { screenRec ? 
+                      <Recording mimeType="audio" />
+                    :
+                      <UppyUpload  mimeType="audio"  />}
                     </Col>
                   </Row>
-                </Col>
+                </Col> </Modal>
               ) : (
-                <Empty style={{ marginTop: "80px" }} />
+                null
               )}
               {/*
             // build a board to provide to delete temporary files when upload fails

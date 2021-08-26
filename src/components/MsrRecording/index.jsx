@@ -116,13 +116,12 @@ const Recording = (props) => {
    const [ config , setConfig] = useState({});
    const [ renderUppy , setRenderUppy] = useState(false);
    const [ preview , setPreview] = useState(false);
-   const plainOptions = ['audio', 'video', 'screen'];
-   const defaultCheckedList = ['video'];
+   const plainOptions = props.mimeType && props.mimeType.startsWith("audio") ? ['audio']  : ['audio', 'video', 'screen'];
+   const defaultCheckedList = props.mimeType && props.mimeType.startsWith("audio") ? ['audio']  : [ 'audio','screen'];
    const [ localKeys , setLocalKeys] =  useState([]);  
   const [checkedList, setCheckedList] = useState(defaultCheckedList);
   const [indeterminate, setIndeterminate] = useState(true);
   const [checkAll, setCheckAll] = useState(false);
-
   const mediaDev = useMediaDevices();
   
 
@@ -135,38 +134,34 @@ const Recording = (props) => {
 
   const onCheckAllChange = e => {
     setCheckedList(e.target.checked ? plainOptions : []);
-    setIndeterminate(false);
-    setCheckAll(e.target.checked);
+    setIndeterminate(false);    setCheckAll(e.target.checked);
   };
 
    
     useEffect(()=>{     
-      let tempAudio = [] ;   let tempVideo = [] ;
+        let tempAudio = [] ;   let tempVideo = [] ;
         mediaDev.map((obj,ind)=>{
-            if(obj.kind === 'video' || obj.kind === 'videoinput')   tempVideo.push(obj);                
-            if(obj.kind === 'audio' || obj.kind ===  'audioinput')  tempAudio.push(obj);
+        if(obj.kind === 'video' || obj.kind === 'videoinput')   tempVideo.push(obj);                
+        if(obj.kind === 'audio' || obj.kind ===  'audioinput')  tempAudio.push(obj);
         });
         setAudioList(tempAudio);  setVideoList(tempVideo);
     },[mediaDev])
 
     useEffect(()=>{
-      meanderStore.keys().then(function(keys){
-        setLocalKeys(keys);
-      });
-        var conf = { audio : false , video : false , screen : false};
-        checkedList.map(ob=>{   conf[ob] = true  })
-        setConfig(conf);
-        console.log(checkedList , localKeys );
+      meanderStore.keys().then(function(keys){setLocalKeys(keys); });
+      var conf = { audio : false , video : false , screen : false};
+      checkedList.map(ob=>{   conf[ob] = true  });
+      setConfig(conf);     console.log(checkedList , localKeys );
     },[checkedList])
         
 
     async function SaveRecording(typ,key){
       meanderStore.getItem(key).then(function(value) {
       if( typ === 'local') invokeSaveAsDialog(value.data , key );
-      if( typ === 'upload') {console.log(key);
+      if( typ === 'upload') {
         var fileObj = { name: key,  type: value.type, data: value.data, 
-          size : value.size ,   source: 'Local', isRemote: false   };
-        setRenderUppy(value);   }
+          size : value.size ,  source: 'Local', isRemote: false };
+          console.log(key);  setRenderUppy(value);   }
       if(typ === 'play'){  const video  = document.getElementById('canvasvideo');
          video.src = URL.createObjectURL(value.data) ;    }        });
   }

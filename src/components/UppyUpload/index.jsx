@@ -46,7 +46,7 @@ const UppyUpload = (props) => {
    const localUserId = localStorage.getItem("userId");
    const token = localStorage.getItem("token");
    const uploadIdToContinueUpload = props.uploadId;
-   const uploadMime = props.mimeType === "audio" ? [ audiomime] : [ videomime] ;
+   const uploadMime = props.mimeType.startsWith("audio") ? [ audiomime] : [ videomime] ;
    const fileObj = props.fileObj ? props.fileObj : null;
 
 const uppy = useUppy(() => {

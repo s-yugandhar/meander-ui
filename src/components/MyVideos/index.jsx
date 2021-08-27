@@ -345,6 +345,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
         </Row>
 
         <Content className="">
+          { screenRec ?
+        <video id="c" controls autoPlay playsInline 
+            style={{position:"absolute", zIndex:999999 ,maxWidth:"180px",maxHeight:"150px", 
+                          top:"64px",left:"0px",border:"0.5px solid #ccc" }} ></video> : null }
           {(state.folderList !== undefined && state.folderList.length > 0) ||
           (state.fileList !== undefined && state.videoList.length > 0) ? (
             <motion.div
@@ -553,10 +557,9 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                 <Modal    title={null}   mask={null} maskTransitionName={null}
                 destroyOnClose={true} bodyStyle={{width:"100vw", display:"flex" , flexFlow : "column" ,height:"100%" }}
                 visible={tabActive === "upload"}  style={{  top : 64 , bottom: 0 , right : 0 , left : 0 , overflow : "hidden"}} 
-                onOk=""                onCancel={(e)=> setTabActive("videos")}
-                footer={null}                width={"100vw"}                getContainer={ ".ant-layout" } 
+                onOk=""                onCancel={(e)=> {setTabActive("videos"); setScreenRec(false);} }
+                footer={null}        width={"100vw"}                getContainer={ ".ant-layout" } 
               >
-                <Col span="24">
                   <Row className="py-0">
                     <Col span="12" className="uploadVideoTitle" style={{textAlign:"right"}} onClick={e=>{ setScreenRec(false);   }}>
                       Upload Video  
@@ -566,14 +569,12 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                     </Col>
                   </Row>
                   <Row className="py-0 bg-white">
-                    <Col span="16" push="4">
                     { screenRec ? 
-                      <Recording />
-                    :
-                      <UppyUpload  mimeType="video"  />}
-                    </Col>
+                    <>
+                    <Col span={16} push={4} > <Recording /> </Col></>: 
+                      <Col span={16} push={4} > <UppyUpload  mimeType="video"  /> </Col>}
                   </Row>
-                </Col> </Modal>
+                 </Modal>
               ) : (
                 null
               )}

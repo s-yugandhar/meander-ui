@@ -7,8 +7,10 @@ import RecordRTC,{CanvasRecorder ,  MediaStreamRecorder ,
  invokeSaveAsDialog , getSeekableBlob  } from 'recordrtc';
  import UppyUpload from '../UppyUpload';
  import localForage from "localforage";
+import {fabric} from 'fabric';
 
- 
+
+
 var meanderStore = localForage.createInstance({ driver : localForage.INDEXEDDB, 
 name        : 'myApp',version     : 1.0,storeName   : 'MeanderMediaStore', 
 description : 'Store to save video,audio,screen locally before uploading'});
@@ -56,28 +58,39 @@ const useMediaDevices = () => {
 };
 
 var recorder = null;
+var vidStream = null;
+var audStream = null;
+var scrStream = null;
 
 async function getStreams( config ){
-  const video  = document.getElementById('inlinevideo');
+  const video  = document.getElementById('c');
   video.muted = true;    video.volume = 0;
   var audopt =  { type: 'audio', mimeType : 'audio/mp3',  numberOfAudioChannels: isEdge ? 1 : 2,
-    checkForInactiveTracks: true,    bufferSize: 16384 , previewStream : function(stream){ video.src = stream} };
+    checkForInactiveTracks: true,    bufferSize: 16384  };
   if(isSafari) { audopt.sampleRate = 44100; audopt.bufferSize = 4096;  audopt.numberOfAudioChannels = 2;  }
-let vidStream = config.video ? await navigator.mediaDevices.getUserMedia({video: config.video}) : null;
+ vidStream = config.video ? await navigator.mediaDevices.getUserMedia(
+  { video: {    width: { min: 480, ideal: 1280, max: 1920 }, height: { min: 360, ideal: 720, max: 1080 } }  }) : null;
 
-let audStream = config.audio ? await navigator.mediaDevices.getUserMedia({ audio : config.audio}) : null;
-let scrStream = config.screen ? navigator.mediaDevices.getDisplayMedia ? await navigator.mediaDevices.getDisplayMedia({video : true})
+ audStream = config.audio ? await navigator.mediaDevices.getUserMedia({ audio : config.audio}) : null;
+ scrStream = config.screen ? navigator.mediaDevices.getDisplayMedia ? await navigator.mediaDevices.getDisplayMedia({video : true})
             :  await   navigator.getDisplayMedia({video : true}) : null ;
-let streams=[];
-if(config.audio === true && audStream){ streams.push(audStream)};
-if(config.video === true && vidStream){ streams.push(vidStream)} ;
+/*let streams=[];
 if(config.screen === true && scrStream){ streams.push(scrStream)} ;
+if(config.video === true && vidStream){ streams.push(vidStream)} ;
+if(config.audio === true && audStream){ streams.push(audStream)};*/
+let streams = null;
+if(config.screen === true && scrStream){ streams = scrStream} ;
+if(config.video === true && vidStream){  /*streams.addTrack(vidStream.getVideoTracks()[0] )*/
+  if(scrStream) {
+    video.srcObject = vidStream;  } else { streams = vidStream;} } ;
+if(config.audio === true && audStream){  if(streams === null) streams = audStream; else streams.addTrack(audStream.getAudioTracks()[0]); };
+
 var mimeType = 'video/webm';
-var options =  {  type: mimeType  , mimeType : mimeType , recordingType : MediaStreamRecorder || CanvasRecorder ,
-  previewStream : function(stream){ video.src = stream} };
+var options =  {  type: mimeType  , mimeType : mimeType , recordingType : MediaStreamRecorder || CanvasRecorder , canvas: {
+  width: 1080,  height: 720},      };
 if(config.audio === true && config.video === false && config.screen === false){
   mimeType = 'audio/webm';  options = audopt; }
-
+//previewStream : function(stream){ video.src = stream}
 recorder = RecordRTC( streams,options) ;
 console.log(recorder);
 recorder.startRecording();
@@ -96,10 +109,14 @@ async function stopRecordingCallback() {
        console.log(blo.type , blo.size)
        //let fil =  new File( [blo] , filename );
        blo.name = filename;
+       if(!isEdge){
        getSeekableBlob(recorder.getBlob(), function(seekableBlob) {
         let fil = { filename : filename ,name : filename , data :seekableBlob , size : blo.size ,  type : blo.type};
-        meanderStore.setItem(filename, fil );        console.log( meanderStore.keys());     });
-   });
+        meanderStore.setItem(filename, fil );        console.log( meanderStore.keys());     });}
+        else{  let fil = { filename : filename ,name : filename , data :blo , size : blo.size ,  type : blo.type};
+                meanderStore.setItem(filename, fil );        console.log( meanderStore.keys()); 
+        } recorder = vidStream = audStream = scrStream = null;
+   }); 
 }
 
 const Recording = (props) => {
@@ -129,7 +146,6 @@ const Recording = (props) => {
     setCheckedList(list);
     setIndeterminate(!!list.length && list.length < plainOptions.length);
     setCheckAll(list.length === plainOptions.length);
-    //console.log(checkedList);
   };
 
   const onCheckAllChange = e => {
@@ -152,6 +168,10 @@ const Recording = (props) => {
       var conf = { audio : false , video : false , screen : false};
       checkedList.map(ob=>{   conf[ob] = true  });
       setConfig(conf);     console.log(checkedList , localKeys );
+      const ele = document.getElementById('c');
+      ele.style.display = 'none';
+      if(checkedList.includes('video')) ele.style.display = 'flex' ;
+
     },[checkedList])
         
 
@@ -163,13 +183,14 @@ const Recording = (props) => {
           size : value.size ,  source: 'Local', isRemote: false };
           console.log(key);  setRenderUppy(value);   }
       if(typ === 'play'){  const video  = document.getElementById('canvasvideo');
-         video.src = URL.createObjectURL(value.data) ;    }        });
+         video.src =  URL.createObjectURL(value.data) ;    }        });
   }
 
     return (
-        <>
+        <>                
         { renderUppy === false ?
-        <div style={{ width:"100vw",  display:"flex" , flexFlow : "column" ,height:"100%" }} >
+        <>
+        <div style={{ width:"100vw",  display:"flex" , flexFlow : "column" ,height:"100%",left:"150px"  }} >
           <Row>
         <Col span = {12}><Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
         Check all  </Checkbox>  <CheckboxGroup options={plainOptions} value={checkedList} onChange={onChangeCheckBox} />
@@ -198,12 +219,11 @@ const Recording = (props) => {
           </Select> : ""  } </Col>
         </Row>
         <Row >
-        <Card  width="400px" height="300px" >
-            <video id="inlinevideo" controls autoPlay playsInline style={{maxWidth:"400px",maxHeight:"300px"}}></video>
-        </Card> 
-            <Card  width="400px" height="300px" >
-                <video id="canvasvideo" controls autoplay playsinline style={{maxWidth:"400px",maxHeight:"300px"}}></video>
-            </Card> 
+          {/*<Card >
+        <video id="inlinevideo" controls autoPlay playsInline style={{maxWidth:"200px",maxHeight:"100px"}}></video></Card>*/}
+        <Card>
+        <video id="canvasvideo" controls autoPlay playsInline style={{maxWidth:"400px",maxHeight:"300px"}}></video></Card>
+        
         </Row>
         <Row>
           {localKeys.length < 5 ?<>
@@ -213,7 +233,6 @@ const Recording = (props) => {
         </Row>
         {
                 localKeys.map((key,ind)=>{
-
                     return <Row span={18}>
                        <Col span={6}>{ind}. {key}</Col>
                        <Col span={3}><Button id={key+"play"} onClick={(e)=>{  SaveRecording('play',key) } } > Play</Button></Col>
@@ -224,7 +243,7 @@ const Recording = (props) => {
                 })
             }
 
-        </div> : 
+        </div> </>: 
         <UppyUpload fileObj={renderUppy} mimeType={renderUppy.type}/>}
         </>
     )

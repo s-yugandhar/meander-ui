@@ -42,7 +42,7 @@ import {
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import Loading from "../Loading";
-import { FILE_LIST, FOLDER_NAME } from "../../reducer/types";
+import { VIDEO_LIST, FOLDER_NAME } from "../../reducer/types";
 import {
   url,
   GetFolders,
@@ -118,11 +118,11 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   const innerFolder = (folder) => {
     setLoading(true);
-    GetFiles(state, dispatch, state.userId, folder.id)
+    GetFiles(state, dispatch, state.userId, folder.id,'video')
       .then((res) => {
         console.log("My Videos Files res - ", res);
         setLoading(false);
-        dispatch({ type: FILE_LIST, payload: { fileList: res } });
+        dispatch({ type: VIDEO_LIST, payload: { fileList: res } });
         dispatch({ type: FOLDER_NAME, payload: { folder: folder } });
       })
       .catch((err) => {
@@ -188,6 +188,19 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     createFolderModalClose();
   };
 
+  const folderDetail = (folder) => {
+    //dispatch({ type: "PAGE", payload: { page: "videos" } });
+    //dispatch({ type: FOLDER_NAME, payload: { folder : folder } });
+    var fid = folder ? folder.id : null;
+    /*dbGetObjByPath(      state,      dispatch,
+      fid ?  "bucket-" + state.userId + "/" + fid :"bucket-" + state.userId  ,
+      true    );*/
+    GetFiles(state, dispatch, state.userId, fid,'video').then((res) => {
+      console.log("My Videos Files in sidenav - ", res);
+      dispatch({ type: VIDEO_LIST, payload: { videoList: res } });
+    });
+  };
+
   useEffect(() => {
     const uobj = state.userObj;
 
@@ -217,9 +230,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   useEffect(() => {
     //setFilterType("all");
-    dispatch({ type: "FILTER_TYPE", payload: { filterType: "video" } });
-    console.log("Folder type - ", state.filterType);
-    console.log("Folders list - ", state.dbfolderList);
+    folderDetail(state.folder);
   }, [state.folder]);
 
   useEffect(() => {
@@ -228,12 +239,11 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
       if (state.dbfolderList === undefined || "length" in state.dbfolderList === false || state.dbfolderList.length === 0)
         createPlaylist(state, dispatch, "default", "folder");
     });
-    updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     GetFolders(state, dispatch, state.userId);
     GetUserdetails(state, dispatch, state.userId);
-    console.log("State - ", state);
+    
   }, []);
 
   const sortvideoList = () => {
@@ -260,20 +270,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     dispatch({ type: "VIDEO_LIST", payload: { videoList: temp } });
   };
 
-  const folderDetail = (folderName) => {
-    dispatch({ type: "PAGE", payload: { page: "videos" } });
-    dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
-    dbGetObjByPath(
-      state,
-      dispatch,
-      "bucket-" + state.userId + "/" + folderName,
-      true
-    );
-    GetFiles(state, dispatch, state.userId, folderName).then((res) => {
-      console.log("My Videos Files in sidenav - ", res);
-      dispatch({ type: FILE_LIST, payload: { fileList: res } });
-    });
-  };
+  
 
   return (
     <>
@@ -287,11 +284,10 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                   ? "fodlerLinkItem active"
                   : "fodlerLinkItem"
               }
-              onClick={() => setTabActive("videos")}
+              onClick={() => {  folderDetail(null) ;setTabActive("videos") } }
             >
               All Videos
             </Button>
-
             <Button
               type="link"
               className={
@@ -420,8 +416,9 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                           </Col>
                         ) : (      <Empty style={{ marginTop: "80px" }} />        );
                       })}
-                      {folderActive === false &&  state.folder && state.videoList.length > 0
-                        ? state.videoList.map((file, index) => {
+                      {folderActive === false &&  state.folder && state.videoList !== undefined 
+                      && state.videoList.length > 0    ? 
+                      state.videoList.map((file, index) => {
                             return state.filterType === "all" ||
                               file.itemtype.includes(state.filterType) ? (
                               <Col
@@ -526,10 +523,9 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                   <Row gutter={15} className="py-2">
                     {
                       // Showing Files
-                      state.folder && state.videoList.length > 0
+                      state.videoList !== true && 'map' in state.videoList
                         ? state.videoList.map((file, index) => {
-                            return state.filterType === "all" ||
-                              file.itemtype.includes(state.filterType) ? (
+                            return  true ? (
                               <Col
                                 className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
                                 variants={item}

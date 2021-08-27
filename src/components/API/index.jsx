@@ -79,18 +79,22 @@ export const GetFolders= async (state,dispatch,userId)=>{
    return tempFolders;
 }
 
-export async function GetFiles(state,dispatch,userId, folderName) {
+export async function GetFiles(state,dispatch,userId, folderName,typ,skip=0,limit=100) {
    let tempFiles = [];
-   if (folderName === '') return [];
-   const getFiles = await axios.post(url + '/list_objects?id=' + userId + '&recursive=false&foldername=' + folderName, null, {
+   let qstr = typ === 'audio' ? `&foldername=${folderName}&typ=${'audio'}&skip=${skip}&limit=${limit}`
+          :`&foldername=${folderName}&typ=${'video'}&skip=${skip}&limit=${limit}`;
+   if (folderName === '' || folderName === null || folderName === undefined) 
+      qstr = typ === 'audio' ? `&typ=${'audio'}&skip=${skip}&limit=${limit}` : `&typ=${'video'}&skip=${skip}&limit=${limit}`
+
+   const getFiles = await axios.post(url + '/list_objects?id=' + userId + qstr, null, {
       headers: {
          accept: 'application/json', Authorization : "bearer "+state.token,
       }
    }).then(res => {
       dispatch({type:VIDEO_LIST , payload : { videoList : res.data.dblist }});
-      return true;
+      return res.data.dblist;
    })
-   return getFiles ? true : false;
+   return getFiles ;
 }
 
 

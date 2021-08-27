@@ -42,7 +42,7 @@ import {
 import VideoCard from "../Shared/VideoCard";
 import "../MyVideos/MyVideos.scss";
 import Loading from "../Loading";
-import { FILE_LIST, FOLDER_NAME } from "../../reducer/types";
+import { FILE_LIST, FOLDER_NAME , VIDEO_LIST } from "../../reducer/types";
 import {
   url,
   GetFolders,
@@ -118,11 +118,11 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
 
   const innerFolder = (folder) => {
     setLoading(true);
-    GetFiles(state, dispatch, state.userId, folder.id)
+    GetFiles(state, dispatch, state.userId, folder.id,'audio')
       .then((res) => {
         console.log("My Videos Files res - ", res);
         setLoading(false);
-        dispatch({ type: FILE_LIST, payload: { fileList: res } });
+        dispatch({ type: VIDEO_LIST, payload: { videoList: res } });
         dispatch({ type: FOLDER_NAME, payload: { folder: folder } });
       })
       .catch((err) => {
@@ -217,9 +217,8 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
 
   useEffect(() => {
     //setFilterType("all");
-    dispatch({ type: "FILTER_TYPE", payload: { filterType: "video" } });
-    console.log("Folder type - ", state.filterType);
-    console.log("Folders list - ", state.dbfolderList);
+      folderDetail(state.folder);
+
   }, [state.folder]);
 
   useEffect(() => {
@@ -230,10 +229,9 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
     });
     updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
-    dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
+    //dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     GetFolders(state, dispatch, state.userId);
-    GetUserdetails(state, dispatch, state.userId);
-    console.log("State - ", state);
+    //GetUserdetails(state, dispatch, state.userId);
   }, []);
 
   const sortvideoList = () => {
@@ -260,16 +258,17 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
     dispatch({ type: "VIDEO_LIST", payload: { videoList: temp } });
   };
 
-  const folderDetail = (folderName) => {
-    dispatch({ type: "PAGE", payload: { page: "videos" } });
+  const folderDetail = (folder) => {
+    /*dispatch({ type: "PAGE", payload: { page: "videos" } });
     dispatch({ type: FOLDER_NAME, payload: { folderName: folderName } });
     dbGetObjByPath(
       state,
       dispatch,
       "bucket-" + state.userId + "/" + folderName,
       true
-    );
-    GetFiles(state, dispatch, state.userId, folderName).then((res) => {
+    );*/
+    var fid = folder ? folder.id : null;
+    GetFiles(state, dispatch, state.userId, fid,'audio').then((res) => {
       console.log("My Videos Files in sidenav - ", res);
       dispatch({ type: FILE_LIST, payload: { fileList: res } });
     });
@@ -287,7 +286,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                   ? "fodlerLinkItem active"
                   : "fodlerLinkItem"
               }
-              onClick={() => setTabActive("videos")}
+              onClick={() => { folderDetail(null); setTabActive("videos") }}
             >
               All Audios
             </Button>
@@ -420,7 +419,8 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                           </Col>
                         ) : (      <Empty style={{ marginTop: "80px" }} />        );
                       })}
-                      {folderActive === false &&  state.folder && state.videoList.length > 0
+                      {folderActive === false &&  state.folder && state.videoList !== undefined
+                      && state.videoList.length > 0
                         ? state.videoList.map((file, index) => {
                             return state.filterType === "all" ||
                               file.itemtype.includes(state.filterType) ? (
@@ -516,7 +516,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                         className="text-right"
                         style={{ color: "#777" }}
                       >
-                        Total Videos - 1000
+                        Total Audios - 1000
                       </Col>
                       <Divider
                         orientation="left"
@@ -526,10 +526,9 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                   <Row gutter={15} className="py-2">
                     {
                       // Showing Files
-                      state.folder && state.videoList.length > 0
+                       state.videoList.length > 0
                         ? state.videoList.map((file, index) => {
-                            return state.filterType === "all" ||
-                              file.itemtype.includes(state.filterType) ? (
+                            return true ? (
                               <Col
                                 className="ant-col-xs-24 ant-col-sm-12 ant-col-md-8 ant-col-lg-6 mb-15"
                                 variants={item}

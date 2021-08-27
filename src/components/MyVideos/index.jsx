@@ -246,17 +246,21 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     
   }, []);
 
-  const sortvideoList = () => {
+  const sortvideoList = (value) => {
     console.log(sortState);
-    if (sortState === null) return;
+    if (value === undefined || value === null || value === "") return;
     let temp = [];
-    if (sortState === "asc")
-      temp = state.videoList.sort(
-        (a, b) => Number(a.updatetime) - Number(b.updatetime)
-      );
-    if (sortState === "desc")
+    if (value === "dateModified")
       temp = state.videoList.sort(
         (a, b) => Number(b.updatetime) - Number(a.updatetime)
+      );
+    if (value === "dateAdded")
+      temp = state.videoList.sort(
+        (a, b) => Number(a.createtime) - Number(b.createtime)
+      );
+      if (value === "title")
+      temp = state.videoList.sort(
+        (a, b) => (a.title > b.title) ? 1 : ((b.title > a.title)? -1 : 0)
       );
     dispatch({ type: "VIDEO_LIST", payload: { videoList: temp } });
   };
@@ -376,12 +380,13 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                     <Row className="py-2" align="middle">
                       <Col span="4" className="">
                         <Select
-                          defaultValue="dateModified"
+                          defaultValue=""
                           style={{ width: "100%", fontSize: "13px"}}
-                          onChange=""
-                        >
+                          value = {sortState}
+                          onChange={(value)=>{ setSortState(value);  sortvideoList(value);   }}
+                        >  <Option value=""></Option>
                           <Option value="dateModified">Date Modified</Option>
-                          <Option value="dateAdded">Date Added</Option>
+                          {/*<Option value="dateAdded">Date Added</Option>*/}
                           <Option value="title">By Title</Option>
                         </Select>
                       </Col>
@@ -497,13 +502,14 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                           </Row>*/}
                   <Row className="py-2" align="middle">
                       <Col span="4" className="">
-                        <Select
-                          defaultValue="dateModified"
-                          style={{ width: "100%" }}
-                          onChange=""
-                        >
+                      <Select
+                          defaultValue=""
+                          style={{ width: "100%", fontSize: "13px"}}
+                          value = {sortState}
+                          onChange={(value)=>{ setSortState(value);  sortvideoList(value);   }}
+                        >  <Option value=""></Option>
                           <Option value="dateModified">Date Modified</Option>
-                          <Option value="dateAdded">Date Added</Option>
+                          {/*<Option value="dateAdded">Date Added</Option>*/}
                           <Option value="title">By Title</Option>
                         </Select>
                       </Col>

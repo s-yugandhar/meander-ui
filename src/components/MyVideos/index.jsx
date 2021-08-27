@@ -221,7 +221,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
           console.log(ob.userRole);
           VL.push(ob);
         });
-        dispatch({ type: "VIDEO_LIST", payload: { videoList: VL } });
+        //dispatch({ type: "VIDEO_LIST", payload: { videoList: VL } });
         setBuildRoles(false);
       }
     }
@@ -242,7 +242,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
     GetFolders(state, dispatch, state.userId);
-    GetUserdetails(state, dispatch, state.userId);
+    //GetUserdetails(state, dispatch, state.userId);
     
   }, []);
 

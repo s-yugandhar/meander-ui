@@ -48,7 +48,6 @@ import {
   GetFolders,
   dbGetObjByPath,
   GetFiles,
-  GetUserdetails,
   CreateNewFolder,
   listPlaylist,
   createPlaylist,
@@ -208,7 +207,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
           console.log(ob.userRole);
           VL.push(ob);
         });
-        dispatch({ type: "VIDEO_LIST", payload: { videoList: VL } });
+        //dispatch({ type: "VIDEO_LIST", payload: { videoList: VL } });
         setBuildRoles(false);
       }
     }

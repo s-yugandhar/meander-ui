@@ -47,7 +47,9 @@ const UppyUpload = (props) => {
    const token = localStorage.getItem("token");
    const uploadIdToContinueUpload = props.uploadId;
    const uploadMime = props.mimeType.startsWith("audio") ? [ audiomime] : [ videomime] ;
+   const compUrl = props.mimeType.startsWith("audio") ? '/audioupload/swift/' : '/videoupload/swift/' ;
    const fileObj = props.fileObj ? props.fileObj : null;
+
 
 const uppy = useUppy(() => {
      return new Uppy({
@@ -71,7 +73,7 @@ const uppy = useUppy(() => {
       locale: {}
     }).use(AwsS3Multipart, {
        limit: 1,
-       companionUrl: url+"/swift/",
+       companionUrl: url+ compUrl,
        Headers : { "uppy-auth-token" : "bearer "+token  },
        companionHeaders:{ "uppy-auth-token" : "bearer "+token  },
        getChunkSize(file) {
@@ -191,6 +193,8 @@ const uppy = useUppy(() => {
 
    return (
      <div className="meander-upload">
+       { props.mimeType.startsWith('audio') ||   props.mimeType.startsWith('video') ? "" :
+       <p>Possible error in upload , mimeType doesn't start with audio or video</p> }
        <div className="uploadSelectfolderBlock">
          Folder : <Select
            size="medium"

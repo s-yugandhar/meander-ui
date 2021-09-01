@@ -7,7 +7,6 @@ import RecordRTC,{CanvasRecorder ,  MediaStreamRecorder ,
  invokeSaveAsDialog , getSeekableBlob  } from 'recordrtc';
  import UppyUpload from '../UppyUpload';
  import localForage from "localforage";
-import {fabric} from 'fabric';
 
 
 

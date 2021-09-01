@@ -22,8 +22,10 @@ import {
 
 import {
   PlayCircleOutlined,
+  EyeOutlined,
   ReloadOutlined,
   DeleteOutlined,
+  EditOutlined,
   LoadingOutlined,
   PlusSquareOutlined,
   PlusOutlined,
@@ -37,11 +39,12 @@ import {
   listPlaylist,
   createPlaylist,
   getServedLinks,
+  putItem,
 } from "../API";
 import { Context } from "../../context";
-import PlayVideo from "../PlayVideo";
 import Logo from "../../assets/images/Meander_Logo.svg";
 import Loading from "../Loading";
+import {fabric} from 'fabric';
 
 const tabs = [
   { key: "pvideo", tab: "Play Video" },
@@ -49,6 +52,44 @@ const tabs = [
   { key: "thumbnail", tab: "Attach/View THumbnail" },
   { key: "getlinks", tab: "Get Links" },
 ];
+
+
+function captureFrame (video, format,text) {
+  if (typeof video === 'string') {
+    video = document.querySelector(video)
+  }
+
+  if (video == null || video.nodeName !== 'VIDEO') {
+    throw new TypeError('First argument must be a <video> element or selector')
+  }
+
+  if (format == null) {
+    format = 'png'
+  }
+
+  if (format !== 'png' && format !== 'jpeg' && format !== 'webp') {
+    throw new TypeError('Second argument must be one of "png", "jpeg", or "webp"')
+  }
+
+  const canvas = document.createElement('canvas')
+  const width = canvas.width = video.videoWidth
+  const height = canvas.height = video.videoHeight
+
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0)
+  ctx.font = "30px";
+  ctx.strokeStyle = 'red';
+  ctx.strokeText(text,250,250)
+
+  const dataUri = canvas.toDataURL('image/' + format)
+  const data = dataUri.split(',')[1]
+
+  return {
+    image: Buffer.from(data, 'base64'),
+    width,
+    height
+  }
+}
 
 const EditVideo = (props) => {
   const { Header, Footer, Sider, Content } = Layout;
@@ -58,6 +99,7 @@ const EditVideo = (props) => {
   const { state, dispatch } = useContext(Context);
   const [quality, setQuality] = useState("480p");
   const [fileList, setFileList] = useState([]);
+  const [thumbnail, setThumbnail] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
   const [seePreview, setSeePreview] = useState(false);
   const [trans, setTrans] = useState(true);
@@ -65,19 +107,33 @@ const EditVideo = (props) => {
   const [copywhat, setCopyWhat] = useState("play");
   const [showcode, setShowCode] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [plist, setPlist] = useState([]);
+  const [showSelectFrame, setShowSelectFrame] = useState([]);
   const [flag, setFlag] = useState(false);
   const [links, setLinks] = useState(null);
   let editV = { ...state.editVideo };
 
   const { TabPane } = Tabs;
-
+  
   let mp4 = {
-    "1080p": "/mp41080k.mp4",
-    "720p": "/mp4720k.mp4",
-    "480p": "/mp4480k.mp4",
-    "240p": "/mp4240k.mp4",
+    "1080p": "/mp41080k.mp4",    "720p": "/mp4720k.mp4",
+    "480p": "/mp4480k.mp4",    "240p": "/mp4240k.mp4",
   };
+
+  function grabScreenshot(editvideo){
+    const text = editvideo ? editvideo.title : "" ;
+    const frame = captureFrame('#editvideotag','png', text) // Buffer that contains .png file data
+    // show the captured video frame in the DOM
+    var image = new Image();
+    image.width = frame.width;
+    image.height = frame.height
+
+    image.src = window.URL.createObjectURL(new window.Blob([frame.image]))
+
+    setThumbnail([new window.Blob([frame.image]) ,  ...thumbnail]);
+    //document.body.appendChild(image)
+}
+    
+  
 
   const isTranscodeDone = (imgurl) => {
     if (trans === false) {
@@ -217,7 +273,8 @@ const EditVideo = (props) => {
     });
     //obj['owner_id'] = state.userId;
     console.log(obj);
-    dbUpdateObj(state, dispatch, obj);
+    var flag = obj.itempath.startsWith('video') ? 'video' : obj.itempath.startsWith('audio') ? 'audio' : null;
+    if(flag) putItem(flag,state,dispatch,obj.id,obj);
   };
 
   const uploadButton = (
@@ -250,16 +307,16 @@ const EditVideo = (props) => {
     setFileList(fileList.fileList);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = (img) => {
     setLoading(true);
     if (state.editVideo === null || state.editVideo === undefined) return "";
     let formData = new FormData();
     let foldername = state.editVideo.itempath.split("/")[1];
     let filename = state.editVideo.itempath.split("/")[2];
-    let file = fileList[0].originFileObj;
+    console.log(formData , img);
+    let file = new File( [img ],filename.split(".")[0]+"-thumb.png" );           
     formData.append("file", file);
-    console.log(formData);
+    
     axios
       .post(
         url + `/uploadthumb/${state.userId}/${foldername}/${filename}`,
@@ -288,6 +345,7 @@ const EditVideo = (props) => {
   const callback = (key) => {
     console.log("Tab change key - ", key);
   };
+
 
   useEffect(() => {
     if (links === null) {
@@ -392,57 +450,39 @@ const EditVideo = (props) => {
 
                             {/* Thumbnail Block Starts */}
                             <Col span="24" style={{ marginBottom: "24px" }}>
-                              <Row>
-                                <Col span="8" style={{ padding: "10px" }}>
-                                  <img
-                                    style={{
-                                      height: "240px",
-                                      width: "360px",
-                                    }}
-                                    src={state.editVideo.thumbnail}
-                                    alt="Attached Thumbnail"
-                                  />
-                                </Col>
-                                <Col span="8" style={{ padding: "10px" }}>
-                                  <img
-                                    style={{
-                                      height: "240px",
-                                      width: "360px",
-                                    }}
-                                    src={state.editVideo.thumbnail}
-                                    alt="Attached Thumbnail"
-                                  />
-                                </Col>
-                                <Col span="8" style={{ padding: "10px" }}>
-                                  <img
-                                    style={{
-                                      maxWidth: "100%",
-                                      maxHeight: "200px",
-                                    }}
-                                    src={state.editVideo.thumbnail}
-                                    alt="Attached Thumbnail"
-                                  />
-                                </Col>
-                                <Col span="24px">
-                                  <Button
+                              <Row>{ thumbnail.length < 3 ?<Button
                                     type="default"
                                     style={{ marginRight: "10px" }}
+                                    onClick={e=>{ grabScreenshot(editV)}}
                                   >
-                                    Select from Video
-                                  </Button>
-                                  <Button
-                                    type="default"
+                                    Select thumbnail from Video
+                                  </Button> : null }</Row>
+                              <Row>
+                              {   thumbnail.map((obj,ind)=>{                                
+                                return <Col span="8" style={{ padding: "10px" }}>
+                                  <Row> <Button   type="default" key={"up-"+ind}
                                     style={{ marginRight: "10px" }}
+                                    onClick={(e)=> handleSubmit(obj)}
                                   >
                                     Upload
-                                  </Button>
-                                  <Button
+                                  </Button> &nbsp;&nbsp;
+                                    <EyeOutlined id={ind} onClick={(e)=> setPreviewImage(obj)}></EyeOutlined> &nbsp;&nbsp;
+                                        <DeleteOutlined id={ind+"del"} onClick={e=> setThumbnail(thumbnail.filter((ob,id)=>id!== ind   ))}></DeleteOutlined>
+                                  </Row>
+                                  <img style={{ maxHeight :"100px" ,  maxWidth : "150px",
+                                      height: "100px",    width: "150px",
+                                    }}  crossOrigin="anonymous"   src={ URL.createObjectURL(obj)}
+                                    alt="Attached Thumbnail" />   </Col>
+                                }) }
+                            
+                                <Row>
+                                  {/*<Button
                                     type="default"
                                     style={{ marginRight: "10px" }}
                                   >
                                     Random
-                                  </Button>
-                                </Col>
+                                  </Button>*/}
+                                </Row>
                               </Row>
                             </Col>
                             {/* Thumbnail Block Ends */}
@@ -478,13 +518,6 @@ const EditVideo = (props) => {
                             </Col>
 
                             <Col span={24}>
-                              <Form.Item
-                                label="Title"
-                                name={"title"}
-                                className="editFormItem "
-                              >
-                                <Input value="" />
-                              </Form.Item>
                               <Form.Item
                                 label="Embed links works?"
                                 name={"scope"}
@@ -597,31 +630,7 @@ const EditVideo = (props) => {
                             </Col>
                           </Row>
                         </TabPane>
-                        {/*   <TabPane
-                          tab="Attach/View Thumbnail"
-                          key="2"
-                          style={{ padding: "25px" }}
-                        >
-                          <Row>
-                            <Col span={11}>
-                              <Form.Item
-                                label=" Attach Thumbnail"
-                                name={"thumbnail"}
-                                className="editFormItem"
-                                placeholder={
-                                  "Upload a thumbnail to attach link here"
-                                }
-                              >
-                                <Input
-                                  type={"hidden"}
-                                  value={
-                                    state.editVideo === null ||
-                                    state.editVideo === undefined
-                                      ? null
-                                      : state.editVideo.thumbnail
-                                  }
-                                />
-                              </Form.Item>
+                        {/* 
                               <Upload
                                 listType="picture-card"
                                 fileList={fileList}
@@ -638,109 +647,7 @@ const EditVideo = (props) => {
                                 {" "}
                                 Upload{" "}
                               </Button>
-                            </Col>
-                            <Col span={1}></Col>
-                            {trans ? (
-                              <Col span={11}>
-                                <div>
-                                  <Radio.Group
-                                    onChange={(e) => setSeeWhat(e.target.value)}
-                                    value={seewhat}
-                                  >
-                                    <Radio defaultChecked value={1}>
-                                      {"Thumbnail"}
-                                    </Radio>
-                                    <Radio value={2}>{"Play "}</Radio>
-                                    {state.editVideo !== null &&
-                                    state.editVideo !== undefined &&
-                                    state.editVideo.thumbnail ? (
-                                      <Radio value={3}>{"Custom Thumb"}</Radio>
-                                    ) : null}
-                                  </Radio.Group>
-                                  {seewhat === 1 ? (
-                                    <img
-                                      style={{
-                                        height: "240px",
-                                        width: "360px",
-                                      }}
-                                      src={getMp4Url(state, "img")}
-                                      alt="Auto Generated Thumbnail"
-                                    />
-                                  ) : null}
-                                  {seewhat === 3 ? (
-                                    <img
-                                      style={{
-                                        height: "240px",
-                                        width: "360px",
-                                      }}
-                                      src={state.editVideo.thumbnail}
-                                      alt="Attached Thumbnail"
-                                    />
-                                  ) : null}
-                                  {seewhat === 2 ? (
-                                    <>
-                                      {editV !== null &&
-                                      editV.itempath !== undefined ? (
-                                        <div className="video-container">
-                                          {editV.itemtype.includes("video") ? (
-                                            <video
-                                              className="video"
-                                              controls
-                                              key={quality}
-                                              poster={
-                                                getMp4Url(state, "img")
-                                                  ? getMp4Url(state, "img")
-                                                  : Logo
-                                              }
-                                              style={{
-                                                height: "240px",
-                                                width: "360px",
-                                              }}
-                                            >
-                                              <source
-                                                label={quality}
-                                                id={quality}
-                                                src={
-                                                  cdn_url +
-                                                  editV.itempath.split(".")[0] +
-                                                  mp4[quality]
-                                                }
-                                                type="video/mp4"
-                                              />{" "}
-                                            </video>
-                                          ) : (
-                                            <audio
-                                              className="video"
-                                              controls
-                                              key={"keyaudio"}
-                                              poster={Logo}
-                                            >
-                                              <source
-                                                label={"a4"}
-                                                id={"a4"}
-                                                src={
-                                                  cdn_url +
-                                                  editV.itempath.split(".")[0] +
-                                                  "/audio4.mp3"
-                                                }
-                                              />
-                                            </audio>
-                                          )}
-                                        </div>
-                                      ) : null}
-                                    </>
-                                  ) : null}
-                                </div>
-                              </Col>
-                            ) : (
-                              <Col span={11}>
-                                {" "}
-                                {`A autogenerated thumbnail will load
-                here as soon as video processing is completed`}{" "}
-                              </Col>
-                            )}
-                          </Row>
-                        </TabPane>
+                            
                        */}{" "}
                         <TabPane
                           tab="Get Links"
@@ -775,20 +682,27 @@ const EditVideo = (props) => {
                     {editV !== null && editV.itempath !== undefined ? (
                       <div
                         className="video-container"
-                        style={{ position: "relative", height: "100%" }}
+                        style={{ position: "relative", height: "100%" , top : 0 }}
                       >
-                        {editV.itemtype.includes("video") ? (
-                          <video
+                        {editV.itemtype.includes("video") ? (<>
+                        { previewImage ?
+                          <img style={{ height: "auto",    width: "100%",
+                                    }}  crossOrigin="anonymous"   src={ URL.createObjectURL(previewImage)}
+                                    alt="Attached Thumbnail" />   : 
+                                    null }
+                      <video
+                          crossOrigin="anonymous"
+                          id="editvideotag"
                             className="video"
-                            controls
+                            controls autoPlay
                             key={quality}
                             poster={
-                              getMp4Url(state, "img")
-                                ? getMp4Url(state, "img")
+                              editV.thumbnail
+                                ? editV.thumbnail
                                 : Logo
                             }
                             style={{
-                              height: "100%",
+                              height: "50%",
                               width: "100%",
                             }}
                           >
@@ -798,11 +712,11 @@ const EditVideo = (props) => {
                               src={
                                 cdn_url +
                                 editV.itempath.split(".")[0] +
-                                mp4[quality]
+                                "/mp41080k.mp4"
                               }
                               type="video/mp4"
                             />{" "}
-                          </video>
+                          </video></>
                         ) : (
                           <audio
                             className="video"
@@ -811,12 +725,9 @@ const EditVideo = (props) => {
                             poster={Logo}
                           >
                             <source
-                              label={"a4"}
-                              id={"a4"}
+                              label={"a4"}    id={"a4"}
                               src={
-                                cdn_url +
-                                editV.itempath.split(".")[0] +
-                                "/audio4.mp3"
+                                cdn_url +  editV.itempath.split(".")[0] +  "/audio4.mp3"
                               }
                             />
                           </audio>

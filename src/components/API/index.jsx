@@ -81,12 +81,10 @@ export const GetFolders= async (state,dispatch,userId)=>{
 
 export async function GetFiles(state,dispatch,userId, folderName,typ,skip=0,limit=100) {
    let tempFiles = [];
-   let qstr = typ === 'audio' ? `&foldername=${folderName}&typ=${'audio'}&skip=${skip}&limit=${limit}`
-          :`&foldername=${folderName}&typ=${'video'}&skip=${skip}&limit=${limit}`;
+   let qstr =  `&foldername=${folderName}&skip=${skip}&limit=${limit}`;
    if (folderName === '' || folderName === null || folderName === undefined) 
-      qstr = typ === 'audio' ? `&typ=${'audio'}&skip=${skip}&limit=${limit}` : `&typ=${'video'}&skip=${skip}&limit=${limit}`
-
-   const getFiles = await axios.post(url + '/list_objects?id=' + userId + qstr, null, {
+      qstr =  `&skip=${skip}&limit=${limit}` ;
+   const getFiles = await axios.post(url + `/${typ}s/list_objects?id=` + userId + qstr, null, {
       headers: {
          accept: 'application/json', Authorization : "bearer "+state.token,
       }
@@ -366,3 +364,73 @@ export const convertDate = (date) => {
   const dt = new Date(date).toLocaleDateString();
   return dt;
 };
+
+// items api with typ flag accepting audio,video,image etc
+export const getItem=async(typ , state,dispatch,key)=>{
+   const userId = localStorage.getItem('userId');
+   const token = localStorage.getItem('token');
+   let path = `/${typ}s/${key}`;
+    const tempFolders = await axios.get(url + path , {
+        headers: {
+           accept: 'application/json', Authorization : "bearer "+state.token,
+              }
+     }).then(res => {
+        dispatch({type:"EDIT_VIDEO",payload:{ editVideo : res.data}});
+        return res.data;   }).catch(err=> {
+          return null; });
+       return tempFolders;
+ };
+
+ export const putItem=async(typ , state,dispatch,key,obj)=>{
+   const userId = localStorage.getItem('userId');
+   const token = localStorage.getItem('token');
+   let path = `/${typ}s/${key}`;
+    const tempFolders = await axios.put(url + path , JSON.stringify(obj)  , {
+        headers: {
+           accept: 'application/json', Authorization : "bearer "+state.token,
+              }
+     }).then(res => {
+        //dispatch({type:"PUBLIC_VIDEOS",payload:{publicVideos : res.data}});
+ 
+        if(userId !== null){
+          //dispatch({type:"VIDEO_LIST",payload:{ videoList : res.data}});
+        }
+        return res.data;   }).catch(err=> {
+          return [] });
+       return tempFolders;
+ };
+
+ export const getItemList=async(typ , state,dispatch)=>{
+   const userId = localStorage.getItem('userId');
+   const token = localStorage.getItem('token');
+   let path = `/${typ}s`;
+    const tempFolders = await axios.get(url + path , {
+        headers: {
+           accept: 'application/json', Authorization : "bearer "+state.token,
+              }
+     }).then(res => {
+        dispatch({type:"VIDEO_LIST",payload:{ videoList : res.data}});
+ 
+        if(userId !== null){
+          dispatch({type:"VIDEO_LIST",payload:{ videoList : res.data}});
+        }
+        return res.data;   }).catch(err=> {
+          return [] });
+       return tempFolders;
+ };
+
+
+ export const deleteItem=async(typ , state,dispatch,key)=>{
+   const userId = localStorage.getItem('userId');
+   const token = localStorage.getItem('token');
+   let path = `/${typ}s/${key}`;
+    const tempFolders = await axios.get(url + path , {
+        headers: {
+           accept: 'application/json', Authorization : "bearer "+state.token,
+              }
+     }).then(res => {
+        console.log(res);
+        return res.data;   }).catch(err=> {
+          return null });
+       return tempFolders;
+ };

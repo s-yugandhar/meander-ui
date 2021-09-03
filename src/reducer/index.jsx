@@ -33,7 +33,7 @@ export const initialState = {
    token: localToken ? localToken : null,
    userId: localUserId ? localUserId : null,
    userName: localUserName ? localUserName : null,
-   page: localToken ? 'videos' : 'login',
+   page: localToken ? 'p-dashboard' : 'login',
    folderCreated: null,
    fileUploaded: null,
    folderName: '' ,

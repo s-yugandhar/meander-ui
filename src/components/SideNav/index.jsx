@@ -33,7 +33,7 @@ import { Context } from "../../context";
 const location = window.location;
 
 const SideNav = ({ updateTab, openUploadVideo }) => {
-  const [selectedKeys, setSelectedKeys] = useState(["videos"]);
+  const [selectedKeys, setSelectedKeys] = useState(["p-dashboard"]);
   const [errMsg, setErrMsg] = useState(null);
   /* const [api, contextHolder] = notification.useNotification(); */
   const [fsrch, setFsrch] = useState("");

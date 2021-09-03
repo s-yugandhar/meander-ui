@@ -314,7 +314,7 @@ const EditVideo = (props) => {
     let foldername = state.editVideo.itempath.split("/")[1];
     let filename = state.editVideo.itempath.split("/")[2];
     console.log(formData , img);
-    let file = new File( [img ],filename.split(".")[0]+"-thumb.png" );           
+    let file = new File( [img ],filename.split(".")[0]+"thumb.png" );           
     formData.append("file", file);
     
     axios

@@ -307,6 +307,14 @@ const EditVideo = (props) => {
     setFileList(fileList.fileList);
   };
 
+  const uploadprops = {
+    beforeUpload: file => {
+      setThumbnail([file ,  ...thumbnail]);
+      return false;
+    },
+    fileList,
+  };
+
   const handleSubmit = (img) => {
     setLoading(true);
     if (state.editVideo === null || state.editVideo === undefined) return "";
@@ -314,7 +322,7 @@ const EditVideo = (props) => {
     let foldername = state.editVideo.itempath.split("/")[1];
     let filename = state.editVideo.itempath.split("/")[2];
     console.log(formData , img);
-    let file = new File( [img ],filename.split(".")[0]+"thumb.png" );           
+    let file = img instanceof File? img : new File( [img ],filename.split(".")[0]+"thumb.png" );           
     formData.append("file", file);
     
     axios
@@ -450,29 +458,41 @@ const EditVideo = (props) => {
 
                             {/* Thumbnail Block Starts */}
                             <Col span="24" style={{ marginBottom: "24px" }}>
-                              <Row>{ thumbnail.length < 3 ?<Button
+                              <Row>{ thumbnail.length < 3 && state.editVideo.itemtype.startsWith("video") ?<Button
                                     type="default"
                                     style={{ marginRight: "10px" }}
                                     onClick={e=>{ grabScreenshot(editV)}}
                                   >
                                     Select thumbnail from Video
-                                  </Button> : null }</Row>
+                                  </Button>                                   
+                                  : null }
+                                  {thumbnail.length < 3 ?
+                                  <Upload {...uploadprops}>
+                                  <Button >Select File</Button>
+                                </Upload>
+                                  
+                                  :null}
+                                  </Row>
                               <Row>
                               {   thumbnail.map((obj,ind)=>{                                
-                                return <Col span="8" style={{ padding: "10px" }}>
-                                  <Row> <Button   type="default" key={"up-"+ind}
-                                    style={{ marginRight: "10px" }}
-                                    onClick={(e)=> handleSubmit(obj)}
-                                  >
-                                    Upload
-                                  </Button> &nbsp;&nbsp;
-                                    <EyeOutlined id={ind} onClick={(e)=> setPreviewImage(obj)}></EyeOutlined> &nbsp;&nbsp;
-                                        <DeleteOutlined id={ind+"del"} onClick={e=> setThumbnail(thumbnail.filter((ob,id)=>id!== ind   ))}></DeleteOutlined>
-                                  </Row>
+                                return <Col span="8" style={{ padding: "10px" }}>                            
                                   <img style={{ maxHeight :"100px" ,  maxWidth : "150px",
                                       height: "100px",    width: "150px",
                                     }}  crossOrigin="anonymous"   src={ URL.createObjectURL(obj)}
-                                    alt="Attached Thumbnail" />   </Col>
+                                    alt="Attached Thumbnail"  onMouseOver={(e)=>{ setPreviewImage(obj) }}  onMouseOut={(e)=>{setPreviewImage(null)}} />
+                                    
+                                  <Row style={{ marginTop : 5}}> <Button size="small"  type="default" key={"up-"+ind}
+                                    
+                                    onClick={(e)=> handleSubmit(obj)}
+                                  >    Upload
+                                  </Button> &nbsp;&nbsp;&nbsp;&nbsp;
+                                    {/*<EyeOutlined id={ind} onClick={(e)=> setPreviewImage(obj)}></EyeOutlined> */} 
+                                    <Button size="small"  type="default" key={"del-"+ind}
+                                    
+                                    onClick={e=> setThumbnail(thumbnail.filter((ob,id)=>id!== ind   ))}
+                                  >    Remove
+                                  </Button>                                        
+                                  </Row>   </Col>
                                 }) }
                             
                                 <Row>
@@ -684,22 +704,20 @@ const EditVideo = (props) => {
                         className="video-container"
                         style={{ position: "relative", height: "100%" , top : 0 }}
                       >
-                        {editV.itemtype.includes("video") ? (<>
-                        { previewImage ?
+                        
+                        { previewImage ? 
                           <img style={{ height: "auto",    width: "100%",
                                     }}  crossOrigin="anonymous"   src={ URL.createObjectURL(previewImage)}
-                                    alt="Attached Thumbnail" />   : 
-                                    null }
-                      <video
+                                  alt="Attached Thumbnail" />   : 
+                        editV.itemtype.includes("video") ?
+                          <video
                           crossOrigin="anonymous"
                           id="editvideotag"
                             className="video"
-                            controls autoPlay
+                            controls 
                             key={quality}
-                            poster={
-                              editV.thumbnail
-                                ? editV.thumbnail
-                                : Logo
+                            poster={ previewImage ? previewImage:
+                              editV.thumbnail ? editV.thumbnail : Logo
                             }
                             style={{
                               height: "50%",
@@ -716,13 +734,14 @@ const EditVideo = (props) => {
                               }
                               type="video/mp4"
                             />{" "}
-                          </video></>
-                        ) : (
+                          </video>
+                         : 
                           <audio
                             className="video"
                             controls
                             key={"keyaudio"}
-                            poster={Logo}
+                            poster={ previewImage ? previewImage:
+                              editV.thumbnail ? editV.thumbnail : Logo }
                           >
                             <source
                               label={"a4"}    id={"a4"}
@@ -731,7 +750,7 @@ const EditVideo = (props) => {
                               }
                             />
                           </audio>
-                        )}
+                        }
                       </div>
                     ) : null}
                   </>

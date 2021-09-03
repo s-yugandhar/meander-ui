@@ -229,7 +229,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
 
   useEffect(() => {
     //setFilterType("all");
-    folderDetail(state.folder);
+    //folderDetail(state.folder);
   }, [state.folder]);
 
   useEffect(() => {

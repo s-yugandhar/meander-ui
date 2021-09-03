@@ -91,39 +91,23 @@ const uppy = useUppy(() => {
    //, "Authorization" : "bearer "+token
    const completeEvent = (result) => {
      console.log(result, "inside uppy complete event");
-     /*let succes = result.successful;   let failed = result.failed;     let batchId = result.uploadID;
+     let succes = result.successful;   let failed = result.failed;     let batchId = result.uploadID;
      let insertObj = [];
      succes.map((obj, ind) => {
        if (obj.progress.uploadComplete === true) {
          let idt = obj.s3Multipart.uploadId;
-         dispatch({ type: FILE_UPLOADED, payload: { fileName: obj.name } });
          //deleteAfterUpload(idt);
-         let path =    "bucket-" +  idt.split("-")[0] +
-           "/" +   idt.split("-")[1] +
-           "/" +  idt.split("-")[2];
-         let builtObj = {
-           name: obj.name,
-           title: obj.meta.title,
-           description: obj.meta.description,
-           itempath: path,
-           itemtype: obj.type,
-           itemsize: obj.size,
-           upload_state: "complete",
-           scope: "private",
-           updatetime: obj.meta.time,
-         };
-         insertObj.push(builtObj);
+         let body = obj.response.body;
+         console.log(body.obj);
+         insertObj.push(body.obj);   
        }
      });
      dispatch({ type: UPPY_SUCCESS, payload: { uppySuccess: succes } });
      dispatch({ type: UPPY_FAILED, payload: { uppyFailed: failed } });
      dispatch({ type: UPPY_BATCHID, payload: { uppyBatchId: batchId } });
-     if (insertObj.length > 0) {
-       if (stateEdit === false) {
-         dbAddObj(state, dispatch, insertObj);
-         setStateEdit(insertObj[0].itempath);
-       }
-     }*/
+     dispatch({ type: "EDIT_VIDEO", payload : { editVideo : insertObj[0] }});
+     dispatch({ type: "PAGE", payload: { page: "edit-video" } });
+     
    };
 
    const closeUploadVideo = () => {
@@ -133,25 +117,14 @@ const uppy = useUppy(() => {
 
    useEffect(() => {
      uppy.on("complete", (result) => {
-       //completeEvent(result);
+       completeEvent(result);
      });
      return () => uppy.off("complete");
    }, [uppy]);
 
-   useEffect(() => {
-     if (stateEdit !== false) {
-       setStateEdit(false);
-       closeUploadVideo();
-       //dispatch({ type: "PAGE", payload: { page: "edit-video" } });
-     }
-   }, [state.editVideo]);
-
 
     useEffect(() => {
 
-      const dashboard_plugin = uppy.getPlugin('Dashboard')
-      if(dashboard_plugin)
-          dashboard_plugin.setOptions({  hideUploadButton : state.folder ? false : true });
       uppy.setOptions({
         onBeforeFileAdded: (currentFile, files) => {
           var time = Date.now();     var uuid =  String(time);

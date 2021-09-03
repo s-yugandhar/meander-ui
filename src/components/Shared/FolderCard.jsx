@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Button, Card, Dropdown, Menu, Tooltip } from "antd";
 import {   EditOutlined, DeleteOutlined,   LinkOutlined,
    FolderFilled,   EllipsisOutlined,   DeleteFilled} from "@ant-design/icons";
-import {deleteFile_Folder , GetFolders} from '../API';
+import {deleteFile_Folder , listPlaylist} from '../API';
 import { Context} from '../../context'
 import {FOLDER_NAME , FOLDER_LIST} from '../../reducer/types';
 
@@ -11,7 +11,7 @@ const FolderCard = (props) => {
    const {state,dispatch}= useContext(Context);
 
    const showAllvideos = () => {
-      GetFolders(state,dispatch,state.userId);
+      listPlaylist(state,dispatch);
     }
 
 

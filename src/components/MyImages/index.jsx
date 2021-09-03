@@ -45,7 +45,6 @@ import Loading from "../Loading";
 import { FILE_LIST, FOLDER_NAME } from "../../reducer/types";
 import {
   url,
-  GetFolders,
   dbGetObjByPath,
   GetFiles,
   GetUserdetails,
@@ -116,7 +115,7 @@ const MyImages = ({ updateTab, openUploadVideo }) => {
   const innerFolder = (folderName) => {
     setLoading(true);
     if (folderName === "All") {
-      GetFolders(state, dispatch, state.userId);
+      listPlaylist(state, dispatch);
       return;
     }
     if (folderName === "") folderName = "default";
@@ -219,7 +218,7 @@ const MyImages = ({ updateTab, openUploadVideo }) => {
   useEffect(() => {
     let filterType = state.filterType;
     if (filterType === "all" || filterType === "folder")
-      GetFolders(state, dispatch, state.userId);
+      listPlaylist(state, dispatch );
     if (filterType === "audio" || filterType === "video")
       GetFiles(state, dispatch, state.userId, state.folder.id);
   }, [state.filterType]);
@@ -240,7 +239,7 @@ const MyImages = ({ updateTab, openUploadVideo }) => {
     updateTab = addVideo;
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
-    GetFolders(state, dispatch, state.userId);
+    listPlaylist(state, dispatch );
     GetUserdetails(state, dispatch, state.userId);
     console.log("State - ", state);
   }, []);

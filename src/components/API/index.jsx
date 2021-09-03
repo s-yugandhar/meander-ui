@@ -56,28 +56,6 @@ export const GetUserdetails= async (state,dispatch ,userId)=>{
    return tempFolders;
 }
 
-export const GetFolders= async (state,dispatch,userId)=>{
-   if (userId === undefined )   return [];
-   let setfolders = new Set();
-   //dispatch({  type : FOLDER_LIST ,  payload : { folderList : []  }});
-   const tempFolders = await axios.post(url + '/list_objects?id=' + userId + '&recursive=true', null, {
-      headers: {
-         accept: 'application/json', Authorization : "bearer "+state.token,
-            }
-   }).then(res => {
-      console.log(res);
-      return res.data;   })
-      tempFolders.dblist.map(obj=>{
-         setfolders.add( obj.itempath.split("/")[1]  );
-      });
-      setfolders.add("default");
-   dispatch({  type : FOLDER_NAME , payload : {folderName : ''}});
-   dispatch( { type : FOLDER_LIST , payload :{ folderList : [...setfolders] }  });
-   //dispatch({ type : VIDEO_LIST , payload : {videoList :tempFolders.dblist } });
-   //dispatch({   type: PAGE,   payload: {    page: 'videos'    } });
-   console.log(" data in get folders", state.folderList);
-   return tempFolders;
-}
 
 export async function GetFiles(state,dispatch,userId, folderName,typ,skip=0,limit=100) {
    let tempFiles = [];
@@ -385,18 +363,14 @@ export const getItem=async(typ , state,dispatch,key)=>{
    const userId = localStorage.getItem('userId');
    const token = localStorage.getItem('token');
    let path = `/${typ}s/${key}`;
-    const tempFolders = await axios.put(url + path , JSON.stringify(obj)  , {
+    const tempFolders = await axios.put(url + path , obj  , {
         headers: {
            accept: 'application/json', Authorization : "bearer "+state.token,
               }
      }).then(res => {
-        //dispatch({type:"PUBLIC_VIDEOS",payload:{publicVideos : res.data}});
- 
-        if(userId !== null){
-          //dispatch({type:"VIDEO_LIST",payload:{ videoList : res.data}});
-        }
-        return res.data;   }).catch(err=> {
-          return [] });
+      notification.open({message : " Update succesful"});
+   }).catch(err=> {
+      notification.open({message : " Update failed"}); });
        return tempFolders;
  };
 

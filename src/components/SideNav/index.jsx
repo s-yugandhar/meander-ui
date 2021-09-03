@@ -21,11 +21,11 @@ import {
 import { PAGE} from "../../reducer/types";
 import {
   dbGetObjByPath,
-  GetFolders,
   url,
   GetFiles,
   CreateNewFolder,
   GetUserdetails,
+  listPlaylist,
 } from "../API/index";
 
 import { Context } from "../../context";
@@ -138,7 +138,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             <Menu.Item
               key="videos"
               onClick={() => {
-                GetFolders(state, dispatch, state.userId);
+                listPlaylist(state, dispatch);
+                GetFiles(state,dispatch,state.userId,null,'video');
                 loadPage("videos");
               }}
             >
@@ -147,6 +148,8 @@ const SideNav = ({ updateTab, openUploadVideo }) => {
             <Menu.Item
               key="p-audio"
               onClick={() => {
+                GetFiles(state,dispatch,state.userId,null,'audio');
+                listPlaylist(state, dispatch);
                 loadPage("audios");
               }}
             >

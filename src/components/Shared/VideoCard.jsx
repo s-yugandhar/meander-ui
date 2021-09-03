@@ -40,7 +40,6 @@ import {
 } from "../../reducer/types";
 import {
   dbGetObjByPath,
-  GetFolders,
   url,
   cdn_url,
   GetFiles,
@@ -99,10 +98,7 @@ const VideoCard = (props) => {
     });
   };
 
-  const showAllvideos = () => {
-    GetFolders(state, dispatch, state.userId);
-  };
-
+  
   async function deleteFile(state, dispatch, id, file) {
     let flag = window.confirm("Do you really want to delete file ?");
     if (flag === false) return;
@@ -114,9 +110,7 @@ const VideoCard = (props) => {
         file.itempath.split("/")[1] + "/" + file.itempath.split("/")[2],
         false
       ).then((res) => {
-        state.folder.id === ""
-          ? showAllvideos()
-          : onSideNavFolderClick(state.folder.id);
+        console.log(res);
       });
     else alert("this is not a file to delete");
   }

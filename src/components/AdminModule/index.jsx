@@ -221,7 +221,7 @@ const AdminModule = (props) => {
       />
     ),
     audios: <MyAudios />,
-    images: <MyImages />,
+      /*images: <MyImages />*/
     "add-video": <AddVideo />,
     billing: <MyBilling />,
     profile: <MyProfile />,

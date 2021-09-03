@@ -45,7 +45,6 @@ import Loading from "../Loading";
 import { VIDEO_LIST, FOLDER_NAME } from "../../reducer/types";
 import {
   url,
-  GetFolders,
   dbGetObjByPath,
   GetFiles,
   GetUserdetails,
@@ -236,12 +235,11 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
   useEffect(() => {
     setLoading(true);
     listPlaylist(state, dispatch).then((res) => {
-      if (state.dbfolderList === undefined || "length" in state.dbfolderList === false || state.dbfolderList.length === 0)
-        createPlaylist(state, dispatch, "default", "folder");
+      console.log(res);
     });
     console.log("All Videos updateTab - ", updateTab);
     dispatch({ type: "VIDEO_LIST", payload: { videoList: [] } });
-    GetFolders(state, dispatch, state.userId);
+    //listPlaylist(state, dispatch);
     //GetUserdetails(state, dispatch, state.userId);
     
   }, []);
@@ -347,7 +345,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
         <Content className="">
           { screenRec ?
         <video id="c" controls autoPlay playsInline 
-            style={{position:"absolute", zIndex:999999 ,maxWidth:"180px",maxHeight:"150px", 
+            style={{position:"absolute", zIndex:999999 ,maxWidth:"200px",maxHeight:"150px", 
                           top:"64px",left:"0px",border:"0.5px solid #ccc" }} ></video> : null }
           {(state.folderList !== undefined && state.folderList.length > 0) ||
           (state.fileList !== undefined && state.videoList.length > 0) ? (

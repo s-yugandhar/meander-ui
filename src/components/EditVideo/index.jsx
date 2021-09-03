@@ -273,8 +273,8 @@ const EditVideo = (props) => {
     });
     //obj['owner_id'] = state.userId;
     console.log(obj);
-    var flag = obj.itempath.startsWith('video') ? 'video' : obj.itempath.startsWith('audio') ? 'audio' : null;
-    if(flag) putItem(flag,state,dispatch,obj.id,obj);
+    var flag = obj.itemtype.startsWith('video') ? 'video' : obj.itemtype.startsWith('audio') ? 'audio' : null;
+     putItem(flag,state,dispatch,obj.id,obj);
   };
 
   const uploadButton = (
@@ -422,7 +422,7 @@ const EditVideo = (props) => {
             <Form
               name="basic"
               form={form}
-              onFinish={(values) => updateState(values)}
+              onFinish={ updateState}
               layout="vertical"
             >
               <Row align="stretch">
@@ -773,7 +773,6 @@ const EditVideo = (props) => {
                           type="primary"
                           htmlType="submit"
                           size="large"
-                          disabled=""
                           style={{ marginLeft: "10px", width: "150px" }}
                         >
                           Save

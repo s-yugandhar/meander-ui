@@ -239,13 +239,10 @@ const TopHeader = (props) => {
 
   const userMenu = (
     <Menu>
-      {
-        state.archiveAccount !== null ? (
-          <Menu.Item onClick={() => switchToSelf(state, dispatch, archive)}>
+      { /* <Menu.Item onClick={() => switchToSelf(state, dispatch, archive)}>
             Switch To Own Account
-          </Menu.Item>
-        ) : null
-        /*<Menu.Item onClick={() => { setSelectedTab('profile') ;
+          </Menu.Item>        
+        <Menu.Item onClick={() => { setSelectedTab('profile') ;
       dispatch({ type: PAGE, payload: { page: 'profile' } }); }}>
         My Profile
       </Menu.Item>*/
@@ -326,9 +323,8 @@ const TopHeader = (props) => {
           <Row justify="end" align="middle" style={{ height: "64px" }}>
             {/* Switch User drodpwon */}
             <Col className="top-header-col">
-              {(state.userObj &&
-                (state.userObj.roles === "reseller" ||
-                  state.userObj.roles === "super_admin")) ||
+              {( localUserId && state.userObj && (!['upload-videos','upload-audios'].includes(state.page)) &&
+                (state.userObj.roles === "reseller" || state.userObj.roles === "super_admin")) ||
               archive !== null ? (
                 <Select
                   size="middle"
@@ -448,25 +444,25 @@ const TopHeader = (props) => {
             </Col> */}
 
             {/* Docs */}
-            <Col className="top-header-col">
+            { localUserId && (!['upload-videos','upload-audios'].includes(state.page))?
+            <><Col className="top-header-col">
               <Button type="link" className="topHeaderIconBtn text">
                 Docs
               </Button>
             </Col>
 
             {/* Group List */}
-            <Col className="top-header-col">
+              <Col className="top-header-col">
               <Button type="link" className="topHeaderIconBtn">
                 <IoGrid className="topHeaderIcon" />
               </Button>
-            </Col>
-
+            </Col> 
             {/* Group List */}
             <Col className="top-header-col">
               <Button type="link" className="topHeaderIconBtn">
                 <IoNotificationsSharp className="topHeaderIcon" />
               </Button>
-            </Col>
+            </Col> </> : null }
 
             {/* User Account Dropdown */}
             <Col className="top-header-col">

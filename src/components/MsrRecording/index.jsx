@@ -1,5 +1,5 @@
 import React, { useContext,useState, useEffect ,useRef } from 'react';
-import {  Button, Select, Row , Col , Card, Checkbox } from "antd";
+import {  Button, Select, Row , Col , Card, Checkbox , Layout } from "antd";
 import { Context } from "../../context";
 import { dbAddObj,  dbGetObjByPath,  deleteAfterUpload,
   GetFiles,  GetUserdetails,  url,  getPublicItems,} from "../API";
@@ -135,7 +135,8 @@ var options =  {  type: mimeType  , mimeType : mimeType , recordingType : MediaS
   width: 1080,  height: 720},      };
 if(config.audio === true && config.video === false && config.screen === false){
   mimeType = 'audio/webm';  options = audopt; }
-  videoprev.srcObject = streams;
+  if(videoprev){ videoprev.muted = true; videoprev.volume = 0;
+  videoprev.srcObject = streams; }
 recorder = RecordRTC( streams,options) ;
 console.log(recorder);
 recorder.startRecording();
@@ -173,6 +174,7 @@ const Recording = (props) => {
    const { Option } = Select;
    const CheckboxGroup = Checkbox.Group;
    //const { state, dispatch } = useContext(Context);
+   const { Header, Footer, Content } = Layout;
    const localUserId = localStorage.getItem("userId");
    const token = localStorage.getItem("token");
    const [ recState , setRecState] = useState(false);
@@ -241,23 +243,21 @@ const Recording = (props) => {
   }
 
     return (
-        <>                
-        { renderUppy === false ?
         <>
-        <div style={{ width:"100vw",  display:"flex" , flexFlow : "column" ,height:"100%",left:"150px"  }} onMouseMove={(e)=> { updateLocalStore()}}>
-          
+        { renderUppy === false ?
+        <Content   style={{  minHeight: "100vh",backgroundColor:"white"}} 
+       onMouseMove={(e)=> { updateLocalStore()}}>
         { localKeys.length < 5 ?<Row>
-          { recState ?  <Col span={24}>
+          { recState ?  <Col span={18} push={4}>
           <Button id="btn-stop-recording" onClick={(e)=>{ stopRecordingCallback();setRecState(false); } } >Stop Recording</Button>
           </Col>:
-          <Col span = {24}>
+          <Col span = {18} push={4}>&nbsp;&nbsp;
             <Button id="btn-start-recording" onClick={(e)=>{ getStreams(config); setRecState(true);  }}>Start Recording</Button>
-            &nbsp;&nbsp;&nbsp;&nbsp;
             <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
               Check all  </Checkbox>  <CheckboxGroup options={plainOptions} value={checkedList} onChange={onChangeCheckBox} /> 
         </Col> }
         </Row>:
-            <Row> <p> {"Upload or Delete Following videos to continue using recording"} </p></Row> }
+            <Row> <Col span={18} push={4}><p> {"Upload or Delete Following videos to continue using recording"} </p></Col></Row> }
          {/*{ videoList.length > 15 ? 
          <Col span = {4}> <Select
            size="medium"  style={{ width: "100%", maxWidth: "200px" }}
@@ -280,31 +280,33 @@ const Recording = (props) => {
              return ( <> <Option key={obj.deviceId} value={ JSON.stringify(obj) } >
                      {" "} {obj.label}  {"   "}   </Option>   </>  )  })  }  
           </Select>  </Col>: ""  }  */}
-        <Row >
+        <Row align="stretch">
           {/*<Card >
         <video id="inlinevideo" controls autoPlay playsInline style={{maxWidth:"200px",maxHeight:"100px"}}></video></Card>*/}
-        <Col span={14}>
-        <Card >
-        <video id="canvasvideo" controls autoPlay playsInline style={{ width:"80vw",height:"60vh" ,maxWidth:"720px",maxHeight:"540px"}}></video></Card>
+        <Col span={4}> {<div style={{ top:"-100px",width: "240px", height: "240px",  borderRadius: "120px",
+                           WebkitMaskImage : "-webkit-radial-gradient(circle, white 100%, white 100%)" }} >
+        <video id="c"  autoPlay playsInline  style={{position:"absolute", width:"480px",height:"480px", 
+            top:"-120px",left:"-130px",border:"0.5px solid #ccc" }} ></video>  </div> }
         </Col>
-        <Col span={10}>
-        {
-                localKeys.map((key,ind)=>{
-                    return <><Row>
-                       {ind}.&nbsp;&nbsp;&nbsp; 
+        <Col span={14}  >
+        <video id="canvasvideo" controls={!recState} autoPlay playsInline style={{  height:"60vh",width:"80vw",maxWidth:"720px",maxHeight:"540px"}}></video>
+        </Col>
+        <Col >
+          {     localKeys.map((key,ind)=>{
+                    return (
+                    <> <br></br><Row> {ind}.&nbsp;
                        <Button size={"small"} id={key+"play"} onClick={(e)=>{  SaveRecording('play',key) } } > Play</Button>
                        <Button size={"small"} id={key+"save-to-local"} onClick={(e)=>{  SaveRecording('local',key) } } > Save</Button>
                        <Button size={"small"} id={key+"upload"} onClick={(e)=>{  SaveRecording('upload',key) } } > Upload </Button>
                        <Button size={"small"} id={key+"remove"} onClick={(e)=>{ meanderStore.removeItem(key); updateLocalStore();  }}> Delete</Button>
-                    </Row>
-                    <br></br></>
+                    </Row> </> )
                 })
-            }
+          }
         </Col>
         </Row>      
-        </div> </>: 
-        <UppyUpload fileObj={renderUppy} mimeType={renderUppy.type}/>}
-        </>
+        </Content>:
+        <Content>   <UppyUpload fileObj={renderUppy} mimeType={renderUppy.type}/> </Content>       }
+              </>
     )
 }
 

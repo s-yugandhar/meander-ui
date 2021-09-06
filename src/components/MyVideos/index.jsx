@@ -335,7 +335,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
             <Button
               type="link"
               className="fodlerLink"
-              onClick={() => setTabActive("upload")}
+              onClick={() => dispatch({type : "PAGE" , payload : { page : "upload-videos"}  })}
             >
               Upload Video
             </Button>
@@ -343,10 +343,6 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
         </Row>
 
         <Content className="">
-          { screenRec ?
-        <video id="c" controls autoPlay playsInline 
-            style={{position:"absolute", zIndex:999999 ,maxWidth:"200px",maxHeight:"150px", 
-                          top:"64px",left:"0px",border:"0.5px solid #ccc" }} ></video> : null }
           {(state.folderList !== undefined && state.folderList.length > 0) ||
           (state.fileList !== undefined && state.videoList.length > 0) ? (
             <motion.div
@@ -552,7 +548,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                   </Row>
                 </>
               ) : tabActive === "upload" ? (
-                <Modal    title={null}   mask={null} maskTransitionName={null}
+                {/*<Modal    title={null}   mask={null} maskTransitionName={null}
                 destroyOnClose={true} bodyStyle={{width:"100vw", display:"flex" , flexFlow : "column" ,height:"100%" }}
                 visible={tabActive === "upload"}  style={{  top : 64 , bottom: 0 , right : 0 , left : 0 , overflow : "hidden"}} 
                 onOk=""                onCancel={(e)=> {setTabActive("videos"); setScreenRec(false);} }
@@ -572,7 +568,7 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
                     <Col span={16} push={4} > <Recording /> </Col></>: 
                       <Col span={16} push={4} > <UppyUpload  mimeType="video"  /> </Col>}
                   </Row>
-                 </Modal>
+                    </Modal>*/}
               ) : (
                 null
               )}

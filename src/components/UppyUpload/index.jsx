@@ -168,7 +168,7 @@ const uppy = useUppy(() => {
      <div className="meander-upload">
        { props.mimeType.startsWith('audio') ||   props.mimeType.startsWith('video') ? "" :
        <p>Possible error in upload , mimeType doesn't start with audio or video</p> }
-       <div className="uploadSelectfolderBlock">
+       {/*<div className="uploadSelectfolderBlock">
          Folder : <Select
            size="medium"
            style={{ width: "100%", maxWidth: "360px" , marginTop : "5px", marginBottom :"5px" }}
@@ -200,7 +200,7 @@ const uppy = useUppy(() => {
                })
              : null}
          </Select>{" "}
-       </div>
+       </div>*/}
        <div className="uploadFileUppyBlock" style={{marginBottom: "5px", marginTop:"5px" }}  >
        {/* <DragDrop   width="80%"   height="80%"
           note="Images up to 200×200px"

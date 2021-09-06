@@ -333,7 +333,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
             <Button
               type="link"
               className="fodlerLink"
-              onClick={() => setTabActive("upload")}
+              onClick={() => dispatch({type : "PAGE" , payload : { page : "upload-audios"}  })}
             >
               Upload Audio | Record Audio
             </Button>
@@ -544,7 +544,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                   </Row>
                 </>
               ) : tabActive === "upload" ? (
-                <Modal    title={null}   mask={null} maskTransitionName={null}
+                {/*<Modal    title={null}   mask={null} maskTransitionName={null}
                 destroyOnClose={true} bodyStyle={{width:"100vw", display:"flex" , flexFlow : "column" ,height:"100%" }}
                 visible={tabActive === "upload"}  style={{  top : 64 , bottom: 0 , right : 0 , left : 0 , overflow : "hidden"}} 
                 onOk=""                onCancel={(e)=> setTabActive("videos")}
@@ -567,7 +567,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                       <UppyUpload  mimeType="audio"  />}
                     </Col>
                   </Row>
-                </Col> </Modal>
+                    </Col> </Modal>*/}
               ) : (
                 null
               )}

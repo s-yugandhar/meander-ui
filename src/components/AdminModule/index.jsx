@@ -27,6 +27,9 @@ import { Context } from "../../context";
 import "./adminModule.scss";
 import SideNav from "../SideNav";
 import MyVideos from "../MyVideos";
+import MyAudios from "../MyAudios";
+import {MyVideosUpload} from "../MyVideosUpload";
+import {MyAudiosUpload} from "../MyAudiosUpload";
 import AddVideo from "../AddVideo";
 import MyProfile from "../MyProfile";
 import Login from "../../Login";
@@ -64,7 +67,6 @@ import TopHeader from "../TopHeader";
 import PDashboard from "../P-Dashboard";
 import UppyUpload from "../UppyUpload";
 import MyBilling from "../MyBilling";
-import MyAudios from "../MyAudios";
 import MyImages from "../MyImages";
 
 const AdminModule = (props) => {
@@ -221,6 +223,8 @@ const AdminModule = (props) => {
       />
     ),
     audios: <MyAudios />,
+    "upload-videos" : <MyVideosUpload/>  ,
+    "upload-audios" :  <MyAudiosUpload/>,
       /*images: <MyImages />*/
     "add-video": <AddVideo />,
     billing: <MyBilling />,
@@ -312,7 +316,7 @@ const AdminModule = (props) => {
       <Layout>
         <TopHeader  dyHeaderBG={props.dyHeaderBG} dyLogo={props.dyLogo}/>
        <Layout>
-          {localUserId ? (
+          {localUserId && state.page !== "upload-videos" && state.page !== "upload-audios"? (
             <Sider
               collapsedWidth={0}
               breakpoint="md"

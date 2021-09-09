@@ -59,6 +59,7 @@ export async function GetFiles(state, dispatch, userId, folderName, typ, skip = 
   let tempFiles = [];
   let qstr = `&foldername=${folderName}&skip=${skip}&limit=${limit}`;
   if (folderName === "" || folderName === null || folderName === undefined) qstr = `&skip=${skip}&limit=${limit}`;
+  dispatch({ type: VIDEO_LIST, payload: { videoList: [] } });
   const getFiles = await axios
     .post(url + `/${typ}s/list_objects?id=` + userId + qstr, null, {
       headers: {

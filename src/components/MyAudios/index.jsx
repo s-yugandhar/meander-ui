@@ -209,7 +209,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
             </Button>
 
             <Button type="link" className={tabActive === "folders" ? "fodlerLinkItem active" : "fodlerLinkItem"} 
-            onClick={() => setTabActive("folders")}>
+            onClick={() => { setTabActive("folders");setFolderActive(false) }}>
               Folders
             </Button>
 
@@ -246,7 +246,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
                           style={{ paddingLeft: "10px", paddingRight: "10px" }}
                           onClick={() => {
                             setTabActive("folders");
-                            setFolderActive(true);
+                            setFolderActive(false);
                           }}>
                           Folders
                         </Button>

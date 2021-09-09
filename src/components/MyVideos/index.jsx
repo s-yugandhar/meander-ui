@@ -207,7 +207,9 @@ const MyVideos = ({ updateTab, openUploadVideo }) => {
               All Videos
             </Button>
             <Button type="link" className={tabActive === "folders" ? "fodlerLinkItem active" : "fodlerLinkItem"} 
-            onClick={() => {     setTabActive("folders");  setFolderActive(false);  }}>
+            onClick={() => {     setTabActive("folders");
+              setFolderActive(false);
+            }}>
               Folders
             </Button>
             <Button type="link" className={tabActive === "channels" ? "fodlerLinkItem active" : "fodlerLinkItem"} onClick={() => setTabActive("channels")}>

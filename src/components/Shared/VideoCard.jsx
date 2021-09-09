@@ -166,20 +166,15 @@ const VideoCard = (props) => {
   );
 
   const actionssuccess = [
-    props.fileObject.userRole !== "viewer" && props.fileObject.userRole !== "user" ? (
       <Tooltip title="Click to delete video">
         <DeleteOutlined key="delete" title={"click to delete object"} onClick={(e) => deleteFile(state, dispatch, props.userId, props.fileObject)} />
       </Tooltip>
-    ) : null,
-    props.fileObject.userRole !== "viewer" ? (
+    ,
       <Tooltip title="Click to edit Metadata">
         <EditOutlined key="edit" onClick={(e) => editVideoFunc(state, dispatch, props, url, false)} />
-      </Tooltip>
-    ) : null,
-    <Tooltip title="copy player link">
-      <LinkOutlined key="playnotinmenu" onClick={(e) => handleMenuClick({ key: "playnotinmenu" })} />
-    </Tooltip>,
-    <Popover content={props.fileObject.itemtype.includes("audio") ? null : null} title={null}>
+      </Tooltip>,
+      <Popover content={props.fileObject.itemtype.includes("audio") ? menuaudio : menuvideo} title={null}>
+        <Tooltip title="copy player link">
       <Button
         htmlType="a"
         key="link"
@@ -189,11 +184,13 @@ const VideoCard = (props) => {
         }}
         aria-hidden={true}
         style={{ borderColor: "white", padding: 0 }}>
+      <LinkOutlined style={{ fontSize: "24px" }} key="playnotinmenu" onClick={(e) => handleMenuClick({ key: "playnotinmenu" })} />
+      </Button>
+    </Tooltip>
+    </Popover>,
         <Tooltip title="Copy links to video">
           <EllipsisOutlined style={{ fontSize: "24px" }} />
-        </Tooltip>
-      </Button>
-    </Popover>,
+        </Tooltip>,
   ];
 
   const triggerUppyUpload = (state, dispatch, id) => {};

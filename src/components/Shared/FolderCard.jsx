@@ -81,7 +81,7 @@ const FolderCard = (props) => {
             </Button>
          </Dropdown> */}
        {/* <Button type="link" className="floatingFolderOptions"><EllipsisOutlined className="folderDropDownIcon" /></Button> */}
-     <Modal title="Create New Folder" destroyOnClose={true} visible={editPop} onOk="" onCancel={()=>setEditPop(false)} footer={null}>
+     <Modal title="Edit Folder" destroyOnClose={true} visible={editPop} onOk="" onCancel={()=>setEditPop(false)} footer={null}>
         <Form name="basic" initialValues={{ folderName : props.folderName }} onFinish={editFolder} layout="vertical">
           {/*errMsg ? (
             <Alert   message={errMsg}
@@ -118,7 +118,7 @@ const FolderCard = (props) => {
           </Form.Item>*/}
           <Form.Item>
             <Button type="primary" htmlType="submit" size="large" >
-              Create Folder
+              save
             </Button>
           </Form.Item>
         </Form>

@@ -32,7 +32,7 @@ const MyAudios = ({ updateTab, openUploadVideo }) => {
   const { state, dispatch } = useContext(Context);
   const [sortState, setSortState] = useState(null);
   const [nfApi, setNFApi] = useState(false);
-  const [folderActive, setFolderActive] = useState(true);
+  const [folderActive, setFolderActive] = useState(false);
   const [screenRec, setScreenRec] = useState(false);
   const { Column } = Table;
 

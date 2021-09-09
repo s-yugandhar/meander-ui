@@ -184,7 +184,7 @@ const VideoCard = (props) => {
         }}
         aria-hidden={true}
         style={{ borderColor: "white", padding: 0 }}>
-      <LinkOutlined style={{ fontSize: "24px" }} key="playnotinmenu" onClick={(e) => handleMenuClick({ key: "playnotinmenu" })} />
+      <LinkOutlined  key="playnotinmenu" onClick={(e) => handleMenuClick({ key: "playnotinmenu" })} />
       </Button>
     </Tooltip>
     </Popover>,

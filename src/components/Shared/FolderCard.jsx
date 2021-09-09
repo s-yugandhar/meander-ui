@@ -1,28 +1,32 @@
-import React, { useContext } from "react";
-import { Button, Card, Dropdown, Menu, Tooltip } from "antd";
+import React, { useContext , useState } from "react";
+import { Button, Card, Dropdown, Menu, Tooltip , Modal,Form , Input} from "antd";
 import {   EditOutlined, DeleteOutlined,   LinkOutlined,
    FolderFilled,   EllipsisOutlined,   DeleteFilled} from "@ant-design/icons";
-import {deleteFile_Folder , listPlaylist} from '../API';
+import {deletePlaylist , listPlaylist , editPlaylistName} from '../API';
 import { Context} from '../../context'
 import {FOLDER_NAME , FOLDER_LIST} from '../../reducer/types';
+import axios from "axios";
 
 const FolderCard = (props) => {
 
-   const {state,dispatch}= useContext(Context);
-
+   const {state,dispatch}    = useContext(Context);
+   const [editPop,setEditPop] = useState(false);  
    const showAllvideos = () => {
       listPlaylist(state,dispatch);
     }
 
+   const deleteFolder = (id ) => {
+      let flag = window.confirm('Do you really want to delete folder ?');
+    if (flag === false) return;
+      deletePlaylist(state , dispatch ,id  ).then((res)=>{ showAllvideos()});
+   }
 
-   const deleteFolder = (id , folder) => {
-      let flag = window.confirm('Do you really want to delete folder and its content ?');
-    if (flag == false) return;
-      if( folder in state.folderList   )
-      deleteFile_Folder(state , dispatch ,id , folder , true  ).then((res)=>{ showAllvideos()});
-      else
-      alert("this is not a folder to delete");
-      showAllvideos();
+   const editFolder = (values) => {
+     console.log(values);
+    let obj = props.folderObj ;
+    obj.foldername = values.folderName;obj.cleanname= values.folderName;
+    if(obj.acl === null || obj.acl === undefined) obj.acl = {}
+      editPlaylistName(state,dispatch,props.folderObj.id,obj);
    }
 
    const menu = (
@@ -34,6 +38,7 @@ const FolderCard = (props) => {
    );
 
    return (
+     <>
      <Card
        bordered={true}
        className="cardVideo cardFolder full-width"
@@ -42,11 +47,13 @@ const FolderCard = (props) => {
              <DeleteOutlined
                key="delete"
                title={"click to delete object"}
+               onClick={()=> deleteFolder(props.folderObj.id)}
              />
            </Tooltip>,
            <Tooltip title="Click to edit Metadata">
              <EditOutlined
                key="edit"
+               onClick={()=> setEditPop(true)}
              />
            </Tooltip>
           ]}
@@ -63,7 +70,7 @@ const FolderCard = (props) => {
            <div className="videoCardInfoBlock">
              <div className="videoTitle folderTitle">{props.folderName}</div>
              <div className="publishedDate folderInfo">
-               {props.videosCount} {props.folderName}
+               {props.videosCount} {" videos"}
              </div>
            </div>
          </Button>
@@ -74,7 +81,50 @@ const FolderCard = (props) => {
             </Button>
          </Dropdown> */}
        {/* <Button type="link" className="floatingFolderOptions"><EllipsisOutlined className="folderDropDownIcon" /></Button> */}
-     </Card>
+     <Modal title="Create New Folder" destroyOnClose={true} visible={editPop} onOk="" onCancel={()=>setEditPop(false)} footer={null}>
+        <Form name="basic" initialValues={{ folderName : props.folderName }} onFinish={editFolder} layout="vertical">
+          {/*errMsg ? (
+            <Alert   message={errMsg}
+              closable type="error"
+              onClose={() => setErrMsg(null)}
+              style={{ marginBottom: "20px" }}
+            />
+          ) : null */}
+          <Form.Item
+            label="Folder Name"
+            name="folderName"
+            rules={[
+              {
+                required: true,
+                message: "Please enter any name!",
+              },
+              { max: 35, message: "Maximum 35 characters" },
+            ]}>
+            <Input />
+          </Form.Item>
+          {/*<Form.Item
+            label="Access to"
+            name="accessTo"
+            rules={[
+              {
+                require: true,
+              },
+            ]}>
+            <Select mode="multiple" size="middle" placeholder="Please select" onChange="" style={{ width: "100%" }}>
+              <Option>Access 1</Option>
+              <Option>Access 2</Option>
+              <Option>Access 3</Option>
+          </Select>
+          </Form.Item>*/}
+          <Form.Item>
+            <Button type="primary" htmlType="submit" size="large" >
+              Create Folder
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+      </Card>
+     </>
    );
 };
 

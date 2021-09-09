@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ImageLoad = React.memo(({ src, placeholder, alt = "" }) => {
+const ImageLoad = React.memo(({ id ,src, placeholder, alt = "" }) => {
   const [loading, setLoading] = useState(true);
   const [currentSrc, updateSrc] = useState(placeholder);
 
@@ -16,7 +16,8 @@ const ImageLoad = React.memo(({ src, placeholder, alt = "" }) => {
   }, [src])
 
   return (
-    <img
+    <img loading={'lazy'} decoding={'async'}
+    id={id}
       src={currentSrc}
       style={{
         opacity: loading ? 0.5 : 1,

@@ -25,14 +25,14 @@ return (
 >*/
     <Layout style={{ minHeight: "100vh",backgroundColor:"white" }}>
         <Row className="py-1 bg-white">
-            <Col span="12" className="uploadVideoTitle" style={{textAlign:"right"}} onClick={e=>{ setScreenRec(false);   }}>
+            <Col span="10" className="uploadVideoTitle" style={{textAlign:"right",color : screenRec ? "black" : "blue"}} onClick={e=>{ setScreenRec(false);   }}>
             Upload Video  
-            </Col>
-            <Col span="10" className="uploadVideoTitle" style={{textAlign:"left"}} onClick={e=>{setScreenRec(true) }}>
-                |  Screen Recording
+            </Col> 
+            <Col span="10" className="uploadVideoTitle" style={{textAlign:"left",color : screenRec ? "blue" : "black"}} onClick={e=>{setScreenRec(true) }}>
+            | Screen Recording
             </Col>
         </Row>
-        { screenRec ? <Recording />  :  
+        { screenRec ? <Recording mimeType="video" />  :  
         <Row>
             <Col span={4}></Col>
         <Col span={16} > <UppyUpload  mimeType="video"  /> </Col>

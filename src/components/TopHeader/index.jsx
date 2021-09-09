@@ -30,6 +30,7 @@ import { Link } from "react-router-dom";
 import { IoGridSharp } from "react-icons/io5";
 import {ImUser } from "react-icons/im";
 import {
+  IoChevronBack,
   IoGrid,
   IoNotificationsSharp,
   IoChevronDownSharp,
@@ -50,7 +51,7 @@ const TopHeader = (props) => {
 
   useEffect(() => {
     console.log(props);
-  });
+  },[]);
 
   const toggleToUser = async (state, dispatch, record) => {
     let flag = window.confirm("Do you really want to switch profile");
@@ -266,6 +267,7 @@ const TopHeader = (props) => {
   };
 
   useEffect(() => {
+    if(state.userObj === null || state.userObj === undefined)
     GetUserdetails(state, dispatch, state.userId);
     console.log("headerroles", archive);
     if (state.userObj) {
@@ -288,9 +290,8 @@ const TopHeader = (props) => {
         token = archive.token;
       }
       GetAllUserdetails({ token: token }, dispatch, userId);
-    } else {
-    }
-  }, [state.videoList]);
+    } 
+  }, []);
 
   return (
     <Header
@@ -298,6 +299,18 @@ const TopHeader = (props) => {
       style={{ backgroundColor: dyHeaderBG, borderBottom: "1px solid #ddd" }}
     >
       <Row>
+          { 
+           (!['upload-videos','upload-audios'].includes(state.page)) ?null:
+           <Col span={1} className="top-header-col">
+             <Row justify="end" align="middle" style={{ height: "64px" }}>
+          <Button type="link" className="topHeaderIconBtn">
+             <IoChevronBack className="topHeaderIcon"  onClick={(e)=>{
+                dispatch({ type : 'PAGE', payload : {page : state.page === "upload-videos" ? "videos" : "audios"}})
+             }}/>
+           </Button></Row>
+
+        </Col>
+          }
         <Col span={4}>
           {window.location.hostname === "portal.meander.video" ? (
             <div style={{ color: "white" }} className="brandingLogoBlock">
@@ -309,7 +322,8 @@ const TopHeader = (props) => {
             </div>
           )}
         </Col>
-        <Col span={2}>
+
+        <Col span={(!['upload-videos','upload-audios'].includes(state.page)) ? 2:1}>
           {/*<Input.Search
              onChange={(e) => getPublicItems(state, dispatch, e.target.value)}
              placeholder={

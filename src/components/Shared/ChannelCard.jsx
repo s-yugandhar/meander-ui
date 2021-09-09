@@ -25,7 +25,7 @@ import logo from "../../assets/images/meander-1920x1080.png";
 import { icons } from "antd/lib/image/PreviewGroup";
 import UppyUpload from "../UppyUpload/index.jsx";
 
-const VideoCard = (props) => {
+const ChannelCard = (props) => {
   const { state, dispatch } = useContext(Context);
   const { Meta } = Card;
   const [visible, setVisible] = useState(false);
@@ -38,7 +38,7 @@ const VideoCard = (props) => {
   const callServedLinks = (play) => {
     setLinks(null);
     if (links === null || play === true) {
-      getServedLinks(state, dispatch, props.fileObject.id, play)
+      getServedLinks(state, dispatch, props.folderObj.id, play)
         .then((res) => {
           setLinks(res);
         })
@@ -51,7 +51,7 @@ const VideoCard = (props) => {
   }, []);
 
   function getMp4Url(props, type) {
-    if (type === "mp3" && props.fileObject.itemtype.includes("audio")) return links["mp3_url"];
+    if (type === "mp3" && props.folderObj.itemtype.includes("audio")) return links["mp3_url"];
     if (type === "mp4") return links["mp4_url"];
     if (type === "img") return links["img_url"];
     if (type === "dash") return links["dash_url"];
@@ -78,7 +78,7 @@ const VideoCard = (props) => {
   }
 
   const getPlayUrl = (state, dispatch, url, props) => {
-    let obj = props.fileObject;
+    let obj = props.folderObj;
     let temppath = obj.itempath;
     let dbobj = state.videoList.find((ob) => ob.itempath === temppath);
     if (dbobj !== undefined) {
@@ -99,9 +99,9 @@ const VideoCard = (props) => {
 
   const editVideoFunc = (state, dispatch, props, url, play) => {
     let playUrl = play ? getPlayUrl(state, dispatch, url, props) : null;
-    let embedUrl = embedCodeFunc(state, dispatch, props.fileObject);
+    let embedUrl = embedCodeFunc(state, dispatch, props.folderObj);
     let userId = props.userId;
-    let obj = props.fileObject;
+    let obj = props.folderObj;
     obj.playUrl = playUrl;
     obj.embedCode = embedUrl;
     dispatch({ type: PAGE, payload: { page: "edit-video" } });
@@ -113,7 +113,7 @@ const VideoCard = (props) => {
   const handleMenuClick = (e) => {
     console.log(e);
     let code = null;
-    if (e.key === "iframe") code = embedCodeFunc(state, dispatch, props.fileObject);
+    if (e.key === "iframe") code = embedCodeFunc(state, dispatch, props.folderObj);
     if (e.key === "mp3") code = getMp4Url(props, "mp3");
     if (e.key === "hls") code = getMp4Url(props, "hls");
     if (e.key === "dash") code = getMp4Url(props, "dash");
@@ -166,20 +166,20 @@ const VideoCard = (props) => {
   );
 
   const actionssuccess = [
-    props.fileObject.userRole !== "viewer" && props.fileObject.userRole !== "user" ? (
+    props.folderObj.userRole !== "viewer" && props.folderObj.userRole !== "user" ? (
       <Tooltip title="Click to delete video">
-        <DeleteOutlined key="delete" title={"click to delete object"} onClick={(e) => deleteFile(state, dispatch, props.userId, props.fileObject)} />
+        <DeleteOutlined key="delete" title={"click to delete object"} onClick={(e) => {;}} />
       </Tooltip>
     ) : null,
-    props.fileObject.userRole !== "viewer" ? (
+    props.folderObj.userRole !== "viewer" ? (
       <Tooltip title="Click to edit Metadata">
-        <EditOutlined key="edit" onClick={(e) => editVideoFunc(state, dispatch, props, url, false)} />
+        <EditOutlined key="edit" onClick={(e) => { ;}} />
       </Tooltip>
     ) : null,
     <Tooltip title="copy player link">
       <LinkOutlined key="playnotinmenu" onClick={(e) => handleMenuClick({ key: "playnotinmenu" })} />
     </Tooltip>,
-    <Popover content={props.fileObject.itemtype.includes("audio") ? null : null} title={null}>
+    <Popover content={props.folderObj.itemtype.includes("audio") ? null : null} title={null}>
       <Button
         htmlType="a"
         key="link"
@@ -211,21 +211,21 @@ const VideoCard = (props) => {
             content={
               <>
                 <Badge
-                  count={props.fileObject.dislikes}
+                  count={props.folderObj.dislikes}
                   title="dislikes"
                   showZero
                   style={{ backgroundColor: "red" }}
                   overflowCount={999999999}
                 ></Badge>
                 <Badge
-                  count={props.fileObject.likes}
+                  count={props.folderObj.likes}
                   title="likes"
                   overflowCount={999999999}
                   showZero
                   style={{ backgroundColor: "yellowgreen" }}
                 ></Badge>
                 <Badge
-                  count={props.fileObject.hits}
+                  count={props.folderObj.hits}
                   title="views"
                   overflowCount={999999999}
                   showZero
@@ -240,9 +240,9 @@ const VideoCard = (props) => {
       }
       headStyle={{ height: "25%" }}
       bodyStyle={{ height: "55%" }} */
-      actions={props.fileObject.upload_state === "complete" ? actionssuccess : actionPending}
+      actions={ actionssuccess }
       className="cardVideo full-width">
-      <div className="videoCardBlock full-width" id={props.fileObject.id}>
+      <div className="videoCardBlock full-width" id={props.folderObject.id}>
         {/*<div className="videoDuration">10:00</div>
         //style={{ backgroundImage: `url( ${getMp4Url(props,`img`)}) repeat 0 0`  }}
         href={getPlayUrl(state, dispatch, url, props)}
@@ -251,22 +251,22 @@ const VideoCard = (props) => {
           {/*<VideoCameraOutlined className="videoIconLoading" />*/}
           {
             <ImageLoad
-              id={props.fileObject.id}
-              src={props.fileObject.thumbnail === null ? null : props.fileObject.thumbnail}
+              id={props.folderObj.id}
+              src={props.folderObj.thumbnail === null ? null : props.folderObj.thumbnail}
               placeholder={logo}
-              alt={props.fileObject.title + " " + props.fileObject.description}
+              alt={props.folderObj.foldername + " " + props.folderObj.cleanname}
             />
           }
-          <Button className="playBtn" type="button" onClick={(e) => editVideoFunc(state, dispatch, props, url, true)}>
+          <Button className="playBtn" type="button" onClick={(e) => {;}}>
             <PlayCircleOutlined />
           </Button>
         </div>
         <div className="video-content full-width">
-          <Text ellipsis={true} className="video-title full-width" title={props.videoTitle}>
-            {props.videoTitle}
+          <Text ellipsis={true} className="video-title full-width" title={props.folderName}>
+            {props.folderName}
           </Text>
           <Text className="video-date full-width">
-            {new Date(props.fileObject.updatetime === "-1" || props.fileObject.updatetime === -1 ? null : props.fileObject.updatetime * 1).toLocaleString()}
+            {new Date(true || props.folderObj.updatetime === "-1" || props.folderObj.updatetime === -1 ? null : props.folderObj.updatetime * 1).toLocaleString()}
           </Text>
         </div>
         {/*<div className="videoCardInfoBlock" style={{  }}>ss
@@ -284,11 +284,7 @@ const VideoCard = (props) => {
         }}
         closable={true}
         footer={null}>
-        {props.fileObject.upload_state !== "complete" ? (
-          <>
-            <UppyUpload uploadId={props.fileObject.id}></UppyUpload>
-          </>
-        ) : (
+        (
           <>
             {" "}
             <Row>
@@ -305,7 +301,7 @@ const VideoCard = (props) => {
                 {" "}
                 <ArrowDownOutlined width={"8px"} height={"8px"} color={"#ccc"} /> Click on any button to copy the code
               </Col>
-              <Col span={6}>{props.fileObject.itemtype.includes("audio") ? menuaudio : menuvideo}</Col>
+              <Col span={6}>{ null}</Col>
               <Col span={1}></Col>
               <Col
                 span={15}
@@ -331,4 +327,4 @@ const VideoCard = (props) => {
   );
 };
 
-export default VideoCard;
+export default ChannelCard;

@@ -209,7 +209,6 @@
   color: #e64a19;
 }
 
-
 .text-align-center {
   text-align: center;
 }
@@ -243,4 +242,29 @@
 
 .text-center {
   text-align: center;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #eee;
+}
+
+.loginSignupTitle {
+  padding-right: 25px;
+  padding-top: 15px;
+  .ant-typography {
+    font-style: italic;
+    text-align: right;
+    color: #ccc !important;
+    font-size: 25px;
+    font-weight: normal;
+  }
+}
+
+
+
+.meander-logo {
+  padding:12px 20px;
+  img {
+    max-height: 40px;
+  }
 }
